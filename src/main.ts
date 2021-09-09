@@ -1,26 +1,44 @@
-import { dom } from 'mve-dom'
-import './style.css'
-import { todoView } from './todo'
+import { EOParseResult } from "mve-core/util"
+import { dom } from "mve-dom/index"
+import { acts, listActs } from "."
+let cache:EOParseResult<Node>
+function defaultAct(act:string){
+	return dom.root(function(me){
+		return {
+			type:"div",
+			children:[
+				dom(`未找到路由定义:${act}`),
+				dom("可用定义有"),
+				listActs()
+			]
+		}
+	})
+}
 
-const app = document.querySelector<HTMLDivElement>('#app')!
-
-// app.innerHTML = `
-//   <h1>Hello Vite with mve!</h1>
-//   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
-// `
-
-const root=dom.root(function(me) {
-  return {
-    type:"div",
-    children:[
-      todoView
-    ]
+function init(){
+	const hash=location.hash
+	//如果没有hash，默认指定为index
+	const actPath=hash?hash.split("?")[0].slice(1):"index"
+	const act=acts.find(v=>v.url==actPath)
+	if(cache && cache.destroy){
+		cache.destroy()
+		document.body.removeChild(cache.element)
+	}
+	if(act){
+		cache=act.render()
+	}else{
+		cache=defaultAct(actPath)
+	}
+	document.body.appendChild(cache.element)
+	if(cache.init){
+		cache.init()
+	}
+}
+window.addEventListener("hashchange",init)
+init()
+window.addEventListener("close",function(){
+  
+  if(cache && cache.destroy){
+    cache.destroy()
   }
 })
-app.append(root.element)
-if(root.init){
-  root.init()
-}
-if(root.destroy){
-  window.addEventListener("close",root.destroy)
-}
