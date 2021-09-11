@@ -37,7 +37,6 @@ function init(){
 window.addEventListener("hashchange",init)
 init()
 window.addEventListener("close",function(){
-  
   if(cache && cache.destroy){
     cache.destroy()
   }

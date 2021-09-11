@@ -1,5 +1,6 @@
 import { EOParseResult } from "mve-core/util"
 import { dom } from "mve-dom"
+import { 桌面 } from "./desktop"
 import { simpleAdd } from "./simpleAdd"
 import { simpleTodo } from "./simpleTodo"
 import { todo } from "./todo"
@@ -48,6 +49,11 @@ export const acts:Act[]=[
 				}
 			})
 		}
+	},
+	{
+		title:"桌面",
+		url:"desktop",
+		render:桌面
 	},
 	{
 		title:"简单的加法",
