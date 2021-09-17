@@ -1,78 +1,71 @@
-import { EOParseResult } from "mve-core/util"
-import { dom } from "mve-dom"
-import { 桌面 } from "./desktop"
-import { simpleAdd } from "./simpleAdd"
-import { simpleTodo } from "./simpleTodo"
-import { todo } from "./todo"
-import { tree } from "./tree"
+import { dom } from "mve-dom";
+import { 桌面 } from "./desktop";
+import { router } from "./router";
+import { add } from "./simpleAdd";
+import { simpleTodo } from "./simpleTodo";
+import { todo } from "./todo";
+import { tree } from "./tree";
 
-export type Act={
-	title:string
-	url:string
-	render():EOParseResult<Node>
-}
 
-export function listActs(){
+
+const index=router(function(me,route){
 	return dom({
 		type:"ul",
-		children:acts.map(v=>dom({
-			type:"li",
-			children:[
-				dom({
-					type:"a",
-					attr:{
-						href:"javascript:void(0)"
-					},
-					text:v.title,
-					event:{
-						click(){
-							location.hash="#"+v.url
+		children:Object.keys(rootRouter).map(function(url){
+			const o=rootRouter[url]
+			return dom({
+				type:"li",
+				children:[
+					dom({
+						type:"a",
+						attr:{
+							href:"javascript:void(0)"
+						},
+						text:o.title,
+						event:{
+							click(){
+								location.hash="#"+url
+							}
 						}
-					}
-				})
-			]
-		}))
-	})
-}
-
-export const acts:Act[]=[
-	{
-		title:"首页",
-		url:"index",
-		render(){
-			return dom.root(function(me){
-				return {
-					type:"div",
-					children:[
-						listActs()
-					]
-				}
+					})
+				]
 			})
-		}
+		})
+	})
+})
+
+
+export const rootRouter={
+	index:{
+		title:"首页",
+		route:index,
 	},
-	{
+	desktop:{
 		title:"桌面",
-		url:"desktop",
-		render:桌面
+		route:桌面
 	},
-	{
+	simpleAdd:{
 		title:"简单的加法",
-		url:"simpleAdd",
-		render:simpleAdd
+		route:router(function(me,route){
+			return add(me)
+		})
 	},
-	{
+	simpleTodo:{
 		title:"简单的Todo",
-		url:"simpleTodo",
-		render:simpleTodo
+		route:router(function(me,route){
+			return simpleTodo(me)
+		})
 	},
-  {
+  todo:{
     title:"todo",
-    url:"todo",
-    render:todo
+    route:router(function(me,route){
+			return todo(me)
+		})
   },
-  {
+  tree:{
     title:"tree",
-    url:"tree",
-    render:tree
+    route:router(function(me,route){
+			return tree(me)
+		})
   }
-]
+}

@@ -1,17 +1,19 @@
 import { dom } from "mve-dom/index";
 import {mve} from "mve-core/util"
-
-
-export function simpleAdd(){
-	return dom.root(function(me){
-		const count=mve.valueOf(0)
-		return {
-			type:"button",
-			text(){return count()+""},
-			event:{
-				click(){
-					count(count()+1)
-				}
+export function add(me:mve.LifeModel){
+	const count=mve.valueOf(0)
+	return dom({
+		type:"button",
+		init(){
+			console.log("初始化")
+		},
+		destroy(){
+			console.log("销毁")
+		},
+		text(){return count()+""},
+		event:{
+			click(){
+				count(count()+1)
 			}
 		}
 	})
