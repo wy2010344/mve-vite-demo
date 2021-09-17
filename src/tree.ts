@@ -52,26 +52,21 @@ function treeBranch(me:mve.LifeModel,row:TreeRow,i:mve.GValue<number>) {
     ]
   })
 }
-export function tree(){
+export function tree(me:mve.LifeModel){
   const rootList=mve.arrayModelOf<TreeRow>([])
-  return dom.root(function(me){
-    return {
-      type:"div",
-      children:[
-        dom("tree"),
-        dom({
-          type:"button",text:"追加根节点",
-          event:{
-            click(){
-              rootList.push({})
-            }
-          }
-        }),
-        dom({
-          type:"ul",
-          children:modelChildren(rootList,treeBranch)
-        })
-      ]
-    }
-  })
+	return [
+		dom("tree"),
+		dom({
+			type:"button",text:"追加根节点",
+			event:{
+				click(){
+					rootList.push({})
+				}
+			}
+		}),
+		dom({
+			type:"ul",
+			children:modelChildren(rootList,treeBranch)
+		})
+	]
 }

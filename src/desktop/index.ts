@@ -2,6 +2,7 @@ import {dom} from 'mve-dom/index'
 import { desktopOf } from './form'
 import { 首页 } from './index/首页'
 import { mve } from 'mve-core/util'
+import { router } from '../router'
 
 const width=mve.valueOf(0)
 const height=mve.valueOf(0)
@@ -16,25 +17,22 @@ function resize(){
 window.addEventListener("resize",resize)
 resize()
 
-export function 桌面(){
+export const 桌面=router(function(me,route){
 	const desktop=desktopOf({
 		width,height
 	})
 	desktop.add(首页)
-	
-	return dom.root(function(me){
-		return {
-			type:"div",
-			init(){
-			},
-			style:{
-				width:"100%",
-				height:"100%",
-				position:"fixed",
-				top:"0",
-				left:"0"
-			},
-			children:desktop.render
-		}
+	return dom({
+		type:"div",
+		init(){
+		},
+		style:{
+			width:"100%",
+			height:"100%",
+			position:"fixed",
+			top:"0",
+			left:"0"
+		},
+		children:desktop.render
 	})
-}
+})
