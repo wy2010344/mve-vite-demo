@@ -2,7 +2,7 @@ import {dom} from 'mve-dom/index'
 import { desktopOf } from './form'
 import { 首页 } from './index/首页'
 import { mve } from 'mve-core/util'
-import { router } from '../router'
+import { createRouter } from '../router'
 
 const width=mve.valueOf(0)
 const height=mve.valueOf(0)
@@ -17,7 +17,7 @@ function resize(){
 window.addEventListener("resize",resize)
 resize()
 
-export const 桌面=router(function(me,route){
+export const 桌面=createRouter(function(me,route){
 	const desktop=desktopOf({
 		width,height
 	})

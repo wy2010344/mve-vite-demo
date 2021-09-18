@@ -1,14 +1,17 @@
 import { clsOf, dom } from "mve-dom/index"
-import { routerView, RouterParam } from "./router"
-import {mve} from 'mve-core/util'
+import { routerView, createRouter } from "./router"
 import { rootRouter } from "."
 const topAreaCls=clsOf("topArea")
-const routerParam=mve.valueOf<RouterParam>({path:[],query:{}})
-const root=dom.root(function(me){
+
+
+const rootRoute=createRouter(function(me,router){
 	const map={}
 	Object.entries(rootRouter).map(([key,v])=>{
 		map[key]=v.route 
 	})
+	return routerView(me,router,map)
+})([])
+const root=dom.root(function(me){
 	return {
 		type:"div",
 		children:[
@@ -24,7 +27,7 @@ const root=dom.root(function(me){
 				}
 				`
 			}),
-			routerView(me,routerParam,map)
+			rootRoute.render(me)
 		]
 	}
 })
@@ -55,7 +58,7 @@ function hashChange(){
 	if(path.length==0){
 		path.push("index")
 	}
-	routerParam({path,query})
+	rootRoute.param({path,query})
 }
 window.addEventListener("hashchange",hashChange)
 hashChange()
