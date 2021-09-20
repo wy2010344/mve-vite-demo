@@ -1,103 +1,94 @@
 import { dom, DOMNodeAll } from "mve-dom";
+import { createRouter, QueryWrapper, routerView } from "./router";
+import { todoMVC, TodoRouter } from "./todo/index";
 import { 桌面 } from "./desktop";
-import { CreateSubRouter, createRouter } from "./router";
 import { add } from "./simpleAdd";
 import { simpleTodo } from "./simpleTodo";
-import { todoMVC } from "./todo/index";
 import { todo } from "./todo";
 import { tree } from "./tree";
+import { ticTacToe } from "./tic-tac-toe";
 
 
 
 const index=createRouter(function(me,route){
 	return dom({
 		type:"ul",
-		children:Object.keys(rootRouter).map(function(url){
-			const o=rootRouter[url]
-			return dom({
-				type:"li",
-				children:[
-					dom({
-						type:"a",
-						attr:{
-							href:"javascript:void(0)"
-						},
-						text:o.title,
-						event:{
-							click(){
-								location.hash="#"+url
-							}
-						}
-					})
-				]
-			})
-		})
+		children:[
+			goLi("首页",function(){
+				rootRoute.go("index",{})
+			}),
+			goLi("桌面系统",function(){
+				rootRoute.go("desktop",{})
+			}),
+			goLi("todoMVC",function(){
+				rootRoute.go("todoMVC/all",{})
+			}),
+			goLi("active",function(){
+				rootRoute.go("todoMVC/active",{b:"2"})
+			},`
+			tastejs的todomvc
+			https://todomvc.com/
+			`),
+			goLi("tic-tac-toe",function(){
+				rootRoute.go("tic_tac_toe",{})
+			},`
+			仿react的tic-tac-toe
+			`)
+		]
 	})
 })
 
-interface RouterWithDes{
-	title:string
-	route:CreateSubRouter
-	description:DOMNodeAll
+function goLi(title:string,click:()=>void,des?:DOMNodeAll){
+	return dom({
+		type:"li",
+		children:[
+			dom({
+				type:"a",
+				attr:{
+					href:"javascript:void(0)"
+				},
+				text:title,
+				event:{
+					click
+				}
+			}),
+			dom(des||"")
+		]
+	})
 }
 
-export const rootRouter:{[key:string]:RouterWithDes}={
-	index:{
-		title:"首页",
-		route:index,
-		description:`
-		顶层所有索引
-		`
-	},
-	desktop:{
-		title:"桌面",
-		route:桌面,
-		description:`
-		一个桌面系统
-		`
-	},
-	simpleAdd:{
-		title:"简单的加法",
-		route:createRouter(function(me,route){
+export type MRootRouter={
+	index:QueryWrapper
+	desktop:QueryWrapper
+	simpleAdd:QueryWrapper
+	simpleTodo:QueryWrapper
+	todo:QueryWrapper
+	tree:QueryWrapper
+	todoMVC:TodoRouter
+	ask:TodoRouter
+	tic_tac_toe:QueryWrapper
+}
+
+export const rootRoute=createRouter<MRootRouter>(function(me,router){
+	return routerView(me,router,{
+		index,
+		desktop:桌面,
+		simpleAdd:createRouter(function(me,r){
 			return add(me)
 		}),
-		description:`
-		简单的加法
-		`
-	},
-	simpleTodo:{
-		title:"简单的Todo",
-		route:createRouter(function(me,route){
+		simpleTodo:createRouter(function(me,r){
 			return simpleTodo(me)
 		}),
-		description:`
-		一个简单的todo
-		`
-	},
-  todo:{
-    title:"todo",
-    route:createRouter(function(me,route){
+		todo:createRouter(function(me,r){
 			return todo(me)
 		}),
-		description:`
-		另一个简单的todo
-		`
-  },
-  tree:{
-    title:"tree",
-    route:createRouter(function(me,route){
+		tree:createRouter(function(me,r){
 			return tree(me)
 		}),
-		description:`
-		树状层级结构
-		`
-  },
-	todoMve:{
-		title:"todoMVC",
-		route:todoMVC,
-		description:`
-		tastejs的todomvc
-		https://todomvc.com/
-		`
-	}
-}
+		todoMVC,
+		ask:todoMVC,
+		tic_tac_toe:createRouter(function(me){
+			return ticTacToe(me)
+		})
+	})
+})([])

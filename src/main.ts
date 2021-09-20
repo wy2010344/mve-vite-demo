@@ -1,16 +1,7 @@
 import { clsOf, dom } from "mve-dom/index"
-import { routerView, createRouter } from "./router"
-import { rootRouter } from "."
+import { rootRoute } from "./index"
 const topAreaCls=clsOf("topArea")
 
-
-const rootRoute=createRouter(function(me,router){
-	const map={}
-	Object.entries(rootRouter).map(([key,v])=>{
-		map[key]=v.route 
-	})
-	return routerView(me,router,map)
-})([])
 const root=dom.root(function(me){
 	return {
 		type:"div",
@@ -69,3 +60,4 @@ if(root.init){
 if(root.destroy){
 	window.addEventListener("unload",root.destroy)
 }
+console.log("jjjj")

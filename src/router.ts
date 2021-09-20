@@ -2,14 +2,16 @@ import {EOChildren} from 'mve-core/childrenBuilder'
 import {modelChildren} from 'mve-core/modelChildren'
 import {mve} from 'mve-core/util'
 import { dom } from 'mve-dom'
-export function routerView(me:mve.LifeModel,router:Router,createRoutes:{[key:string]:CreateSubRouter}){
-	const routes:{[key:string]:Router}={}
+export function routerView<T>(
+	me:mve.LifeModel,router:Router<T>,createRoutes:{[key in keyof T]:CreateSubRouter<T[key]>}
+){
+	const routes:{[key:string]:Router<T>}={}
 	Object.entries(createRoutes).forEach(function([k,v]){
-		routes[k]=v(router.parentPath.concat(k))
+		const fun=v as CreateSubRouter<any>
+		routes[k]=fun(router.parentPath.concat(k))
 	})
 	const default404Router=default404FactoryRouter(router.parentPath.concat("404"))
-
-	const currentRoute=mve.arrayModelOf<Router>([])
+	const currentRoute=mve.arrayModelOf<Router<T>>([])
 	function clear(){
 		if(currentRoute.size()>0){
 			currentRoute.remove(0)
@@ -35,7 +37,7 @@ export function routerView(me:mve.LifeModel,router:Router,createRoutes:{[key:str
 					}else{
 						//发生了改变，替换当前route
 						currentRoute.remove(0)
-						currentRoute.push(changeR)
+						currentRoute.push(changeR as any)
 						changeR.param({
 							path:rest,query
 						})
@@ -48,7 +50,7 @@ export function routerView(me:mve.LifeModel,router:Router,createRoutes:{[key:str
 			}
 		}
 	)
-	return modelChildren(currentRoute,function(me,row,i){ 
+	return modelChildren(currentRoute,function(me,row,i){
 		return row.render(me) 
 	})
 }
@@ -60,36 +62,52 @@ export interface RouterParam{
 	path:string[]
 	query:QueryParam
 }
-export type CreateSubRouter=(parentPath:string[])=>Router
-export class Router{
+export type CreateSubRouter<T>=(parentPath:string[])=>Router<T>
+export class Router<T>{
 	readonly param=mve.valueOf<RouterParam>({path:[],query:{}})
 	constructor(
 		public readonly parentPath:string[],
-		private fun:(me:mve.LifeModel,router:Router)=>EOChildren<Node>
+		private fun:(me:mve.LifeModel,router:Router<T>)=>EOChildren<Node>
 	){}
+
+	current():keyof T{
+		return this.param().path[0] as keyof T
+	}
 	render(me:mve.LifeModel){
 		return this.fun(me,this)
 	}
-	go(path:string,query?:QueryParam){
-		if(path.startsWith('.')){
-			//相对路径
-			const vs=path.split('/')
-			for(const v of vs){
-				if(v && v!='.'){
-					if(v=='..'){
-
-					}else{
-
-					}
-				}
-			}
-		}else{
-
-		}
+	/**
+	 * 中能在自己的下游路径漫游
+	 * @param path 
+	 * @param query 
+	 */
+	go<K extends keyof MCircle<T>>(path:K,query:(MCircle<T>[K] extends QueryWrapper? MCircle<T>[K]['value']:never)){
+		location.hash=this.parentPath.concat(path as string).join('/')+queryToString(query as any)
 	}
 }
 
-export function createRouter(fun:(me:mve.LifeModel,router:Router)=>EOChildren<Node>):CreateSubRouter{
+function queryToString(q?:QueryParam){
+	if(q){
+		const vs:string[]=[]
+		Object.entries(q).forEach(function([k,v]){
+			if(v instanceof Array){
+				for(const i of v){
+					vs.push(`${k}=${i}`)
+				}
+			}else{
+				vs.push(`${k}=${v}`)
+			}
+		})
+		if(vs.length>0){
+			return '?'+vs.join('&')
+		}
+	}
+	return ''
+}
+
+export function createRouter<T>(
+	fun:(me:mve.LifeModel,router:Router<T>
+)=>EOChildren<Node>):CreateSubRouter<T>{
 	return function(parentPath){
 		return new Router(parentPath,fun)
 	}
@@ -120,3 +138,42 @@ const default404FactoryRouter=createRouter(function(me,router){
 		]
 	})
 })
+
+export class QueryWrapper<T extends QueryParam={}>{
+	constructor(public value:T){}
+}
+/**加前缀，变联合*/
+type ToUnion<K extends string,V>=V extends {
+	[key in infer KV]:any
+} ? KV extends string ? {
+	[key2 in `${K}/${KV}`]:V[KV]
+} : never : never
+/**加前缀 */
+export type CombineRouter<K extends string,V>=UnionToIntersection<ToUnion<K,V>>
+/**子级加前缀 */
+export type CombineRouterSub<K extends (keyof V & string),V>=UnionToIntersection<ToUnion<K,V[K]>>
+/**
+ * 联合转交叉
+ */
+export type UnionToIntersection<U> =
+  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
+
+/**
+ * T里选择value的类型是F的key
+ */
+export type IncludeKey<T,F> = {
+	[key in keyof T]:T[key] extends F ? key : never
+}[keyof T]
+/**
+ * T里选择value的类型不是F的key
+ */
+export type ExcludeKey<T,F> = {
+	[key in keyof T]:T[key] extends F ? never : key
+}[keyof T]
+
+/**
+ * 打平
+ */
+export type MCircle<T>={
+	[k1 in IncludeKey<T,QueryWrapper>]:T[k1]
+} & CombineRouterSub<ExcludeKey<T,QueryWrapper> & string,T>
