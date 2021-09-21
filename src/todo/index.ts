@@ -19,6 +19,7 @@ interface TodoItem{
 	completed:mve.Value<boolean>
 	title:mve.Value<string>
 	show:mve.Value<boolean>
+	state:mve.Value<"init"|"destroy">
 }
 
 const filterValue:{
@@ -59,6 +60,8 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 			}
 		}
 	)
+	/**动画时长 */
+	const animateS=0.5
 	return dom({
 		type:"div",cls:"todo-app-main",
 		children:[
@@ -83,10 +86,15 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 												if(DOM.keyCode.ENTER(e)){
 													const v=addInput.value.trim()
 													if(v){
-														todos.push({
+														const todo:TodoItem={
 															show:mve.valueOf(true),
 															title:mve.valueOf(v),
-															completed:mve.valueOf(false)
+															completed:mve.valueOf(false),
+															state:mve.valueOf("init")
+														}
+														todos.push(todo)
+														setTimeout(function(){
+															todo.state(null)
 														})
 														addInput.value=''
 													}
@@ -135,7 +143,14 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 												style:{
 													display(){
 														return todo.show()?'':'none'
-													}
+													},
+													left(){
+														return todo.state()=='destroy'
+														?'100%'
+														:todo.state()=='init'
+														? '-100%'
+														:'0'
+													},transition:`left ${animateS}s`
 												},
 												children:[
 													dom({type:"div",cls:"view",children:[
@@ -157,7 +172,10 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 														}}),
 														dom({type:"button",cls:"destroy",event:{
 															click(){
-																todos.remove(i())
+																todo.state("destroy")
+																setTimeout(function(){
+																	todos.remove(i())
+																},animateS*1000)
 															}
 														}})
 													]}),

@@ -35,14 +35,33 @@ export function desktopOf(k:DeskTopParam){
 	const panels=mve.arrayModelOf<PanelWithIndex>([])
 	const vs:PanelWithIndex[]=[]
 
-	function add(v:FormPanel){
-		const index=mve.valueOf(vs.length)
-		const pw={
-			panel:v,
-			index
+
+	function bringToFront(row:PanelWithIndex){
+		const idx=vs.indexOf(row)
+		if(idx<vs.length-1){
+			vs.push(row)
+			vs.splice(idx,1)
+			for(let i=idx;i<vs.length;i++){
+				vs[i].index(i)
+			}
 		}
-		panels.push(pw)
-		vs.push(pw)
+	}
+
+	function add(v:FormPanel){
+		const old=panels.findRow(x=>x.panel==v)
+		if(old){
+			//已经存在，放到最后
+			bringToFront(old)
+		}else{
+			//不存在
+			const index=mve.valueOf(vs.length)
+			const pw={
+				panel:v,
+				index
+			}
+			panels.push(pw)
+			vs.push(pw)
+		}
 	}
 	return {
 		add,	
@@ -56,14 +75,7 @@ export function desktopOf(k:DeskTopParam){
 				desktop:k,
 				index:row.index,
 				bringToFront(){
-					const idx=vs.indexOf(row)
-					if(idx<vs.length-1){
-						vs.push(row)
-						vs.splice(idx,1)
-						for(let i=idx;i<vs.length;i++){
-							vs[i].index(i)
-						}
-					}
+					bringToFront(row)
 				}
 			})
 		})
