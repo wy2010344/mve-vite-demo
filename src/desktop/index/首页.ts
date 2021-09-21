@@ -1,4 +1,5 @@
 import { dom } from "mve-dom"
+import { ticTacToeUndoRedo } from "../../tic-tac-toe/undoRedo"
 import { dragResizePanel } from "../form"
 import { 关于我 } from "./关于我"
 
@@ -15,6 +16,20 @@ export const 首页=dragResizePanel(function(x){
 				event:{
 					click(){
 						x.panel.add(关于我)
+					}
+				}
+			}),
+			dom({
+				type:"button",
+				text:"tictactoe",
+				event:{
+					click(){
+						x.panel.add(dragResizePanel(function(x){
+							return {
+								title:"tictactoe",
+								children:ticTacToeUndoRedo(x.panel.me)
+							}
+						}))
 					}
 				}
 			})

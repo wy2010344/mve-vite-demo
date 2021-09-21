@@ -1,6 +1,6 @@
 import { clsOf, dom } from "mve-dom/index";
 import {mve} from "mve-core/util"
-import {modelChildren} from "mve-core/modelChildren"
+import {modelChildren,modelChildrenReverse} from "mve-core/modelChildren"
 
 interface List{
 	content:mve.Value<string>
@@ -48,50 +48,142 @@ justify-content:space-between;
 		}),
 		dom({
 			type:"ul",
-			children:modelChildren(list,function(me,p,i){
-				let checkbox:HTMLInputElement
-				return dom({
+			children:[
+				dom({
 					type:"li",
-					cls:liClass,
-					children:[
-						dom({
-							type:"input",init(v){checkbox=v},
-							attr:{
-								type:"checkbox",
-							},
-							prop:{
-								checked:p.complete
-							},
-							event:{
-								change(e){
-									p.complete(checkbox.checked)
-								}
-							}
-						}),
-						dom({
-							type:"span",
-							style:{
-								"text-decoration"(){
-									return p.complete()?"line-through":""
-								}
-							},
-							text:p.content
-						}),
-						dom({
-							type:"a",
-							text:"x",
-							attr:{
-								href:"javascript:void(0)"
-							},
-							event:{
-								click(){
-									list.remove(i())
-								}
-							}
-						})
-					]
+					text:"前面一条",
+				}),
+				listItemOf(list),
+				dom({
+					type:"li",
+					text:"后面一条",
+				}),
+			]
+		}),
+		dom({
+			type:"hr"
+		}),
+		dom({
+			type:"h2",
+			text:"测试局部反转"
+		}),
+		dom({
+			type:"ul",
+			children:[
+				dom({
+					type:"li",
+					text:"前面一条",
+				}),
+				listItemReverseOf(list),
+				dom({
+					type:"li",
+					text:"后面一条",
+				}),
+			]
+		}),
+		dom({
+			type:"hr"
+		}),
+		dom({
+			type:"h2",
+			text:"测试全局反转"
+		}),
+		dom({
+			type:"ul",
+			childrenReverse:true,
+			children:[
+				dom({
+					type:"li",
+					text:"前面一条",
+				}),
+				listItemOf(list),
+				dom({
+					type:"li",
+					text:"后面一条",
 				})
-			})
+			]
+		}),
+		dom({
+			type:"hr"
+		}),
+		dom({
+			type:"h2",
+			text:"测试交替"
+		}),
+		dom({
+			type:"ul",
+			childrenReverse:true,
+			children:[
+				dom({
+					type:"li",
+					text:"前面一条",
+				}),
+				listItemOf(list),
+				dom({
+					type:"li",
+					text:"中间一条",
+				}),
+				listItemReverseOf(list),
+				dom({
+					type:"li",
+					text:"后面一条",
+				}),
+			]
 		})
 	]
+}
+
+function modelChildrenRender(list:mve.ArrayModel<List>,me:mve.LifeModel,p:List,i:mve.GValue<number>){
+	let checkbox:HTMLInputElement
+	return dom({
+		type:"li",
+		cls:liClass,
+		children:[
+			dom({
+				type:"input",init(v){checkbox=v},
+				attr:{
+					type:"checkbox",
+				},
+				prop:{
+					checked:p.complete
+				},
+				event:{
+					change(e){
+						p.complete(checkbox.checked)
+					}
+				}
+			}),
+			dom({
+				type:"span",
+				style:{
+					"text-decoration"(){
+						return p.complete()?"line-through":""
+					}
+				},
+				text:p.content
+			}),
+			dom({
+				type:"a",
+				text:"x",
+				attr:{
+					href:"javascript:void(0)"
+				},
+				event:{
+					click(){
+						list.remove(i())
+					}
+				}
+			})
+		]
+	})
+}
+function listItemReverseOf(list:mve.ArrayModel<List>){
+	return modelChildrenReverse(list,function(me,row,i){
+		return modelChildrenRender(list,me,row,i)
+	})
+}
+function listItemOf(list:mve.ArrayModel<List>){
+	return modelChildren(list,function(me,p,i){
+		return modelChildrenRender(list,me,p,i)
+	})
 }

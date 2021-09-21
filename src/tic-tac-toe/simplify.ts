@@ -4,7 +4,6 @@ import { dom } from "mve-dom";
 import { modelChildren } from 'mve-core/modelChildren'
 import  "./index.less"
 
-
 type N9Value="X"|"O"|null
 type N9Square=[
   N9Value,N9Value,N9Value,
@@ -12,14 +11,21 @@ type N9Square=[
   N9Value,N9Value,N9Value,
 ]
 type N9Step=0|1|2|3|4|5|6|7|8
-
 interface History{
   squares:N9Square
   xIsNext:boolean
+	/**当前胜了吗？谁胜了 */
+	winner?:"X"|"O"|"FAIR"
+	/**下落点0~8,初始-1*/
+	point: N9Step | -1
 }
 
-
-function calculateWinner(squares:N9Square) {
+/**
+ * 可以进一步优化，因为某个棋落下时触发，要么这个棋胜利，即找这个棋的横、竖、双斜是否完全相同
+ * @param squares 
+ * @returns 
+ */
+function calculateWinner(squares:N9Square):"X"|"O" {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -33,7 +39,7 @@ function calculateWinner(squares:N9Square) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return squares[a] as any
     }
   }
   return null;
@@ -42,9 +48,13 @@ function calculateWinner(squares:N9Square) {
 function board(p:{
   value():string
   click():void
+	background():string
 }){
   return dom({
     type:"button",cls:"square",
+		style:{
+			background:p.background
+		},
     event:{
       click:p.click
     },
@@ -53,7 +63,8 @@ function board(p:{
 }
 function renderBoard(p:{
   square():N9Square
-  click(i:keyof N9Square & number):void
+	point():number
+  click(i:N9Step):void
 }){
   function renderCell(i:number){
     return board({
@@ -61,8 +72,11 @@ function renderBoard(p:{
         return p.square()[i]
       },
       click(){
-        p.click(i)
-      }
+        p.click(i as N9Step)
+      },
+			background(){
+				return p.point()==i?'gray':''
+			}
     })
   }
   return dom({
@@ -95,19 +109,17 @@ function renderBoard(p:{
     ]
   })
 }
-
 /**
- * 可以优化的点：
- * 1.每局棋可以缓存是否已经成功
- * 2.不全局记录（比如数据库你每次都全局记录？)只记录操作的状态
+ * 可以进一步优化，历史记录变成历史操作记录撤销与重做
  * @param me 
  * @returns 
  */
-export function ticTacToe(me:mve.LifeModel){
+export function ticTacToeSimplify(me:mve.LifeModel){
   const historys=mve.arrayModelOf<History>([
     {
       squares:Array(9).fill(null) as N9Square,
-      xIsNext:true
+      xIsNext:true,
+			point:-1
     }
   ])
   const stepNumber=mve.valueOf(0)
@@ -118,6 +130,9 @@ export function ticTacToe(me:mve.LifeModel){
         type:"div",cls:"game-board",
         children:[
           renderBoard({
+						point(){
+							return historys.get(stepNumber()).point
+						},
             square(){
               return historys.get(stepNumber()).squares
             },
@@ -128,13 +143,17 @@ export function ticTacToe(me:mve.LifeModel){
               }
               const current=historys.get(stepNumber())
               const squares=current.squares.slice() as N9Square
-              if(calculateWinner(squares) || squares[i]){
+              if(current.winner || squares[i]){
                 return
               }
               squares[i] = current.xIsNext ? 'X' : 'O'
+
+							const winner=calculateWinner(squares) || (historys.size()==9?'FAIR':null)
               historys.push({
                 squares,
-                xIsNext:!current.xIsNext
+                xIsNext:!current.xIsNext,
+								point:i,
+								winner
               })
               stepNumber(stepNumber()+1)
             }
@@ -148,10 +167,11 @@ export function ticTacToe(me:mve.LifeModel){
             type:"div",
             text(){
               const current=historys.get(stepNumber())
-              const winner=calculateWinner(current.squares)
+              const winner=current.winner
               return winner ? `Winner: ${winner}` : `Next player: ${current.xIsNext ? 'X' : 'O'}`
             }
           }),
+					//历史记录
           dom({
             type:"ol",
             children:modelChildren(historys,function(me,history,i){
@@ -160,6 +180,11 @@ export function ticTacToe(me:mve.LifeModel){
                 children:[
                   dom({
                     type:"button",
+										style:{
+											color(){
+												return i()==stepNumber()?"blue":''
+											}
+										},
                     text(){
                       return i()?`Go to move #${i()}`:`Go to game start`
                     },
