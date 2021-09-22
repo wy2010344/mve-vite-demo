@@ -81,7 +81,7 @@ export class Router<T>{
 	 * @param path 
 	 * @param query 
 	 */
-	go<K extends keyof MCircle<T>>(path:K,query:(MCircle<T>[K] extends QueryWrapper? MCircle<T>[K]['value']:never)){
+	go<K extends keyof MSCircle<T>>(path:K,query:(MSCircle<T>[K] extends QueryWrapper? MSCircle<T>[K]['value']:never)){
 		location.hash=this.parentPath.concat(path as string).join('/')+queryToString(query as any)
 	}
 }
@@ -142,38 +142,41 @@ const default404FactoryRouter=createRouter(function(me,router){
 export class QueryWrapper<T extends QueryParam={}>{
 	constructor(public value:T){}
 }
-/**加前缀，变联合*/
-type ToUnion<K extends string,V>=V extends {
-	[key in infer KV]:any
-} ? KV extends string ? {
-	[key2 in `${K}/${KV}`]:V[KV]
-} : never : never
-/**加前缀 */
-export type CombineRouter<K extends string,V>=UnionToIntersection<ToUnion<K,V>>
-/**子级加前缀 */
-export type CombineRouterSub<K extends (keyof V & string),V>=UnionToIntersection<ToUnion<K,V[K]>>
-/**
- * 联合转交叉
- */
-export type UnionToIntersection<U> =
-  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
 
-/**
- * T里选择value的类型是F的key
- */
-export type IncludeKey<T,F> = {
-	[key in keyof T]:T[key] extends F ? key : never
-}[keyof T]
-/**
- * T里选择value的类型不是F的key
- */
-export type ExcludeKey<T,F> = {
-	[key in keyof T]:T[key] extends F ? never : key
-}[keyof T]
+type MSCircle<T>=MCircle<T,QueryWrapper,'/'>
+///////////////////////////////////////////////////////////////////////////////////
 
 /**
  * 打平
  */
-export type MCircle<T>={
-	[k1 in IncludeKey<T,QueryWrapper>]:T[k1]
-} & CombineRouterSub<ExcludeKey<T,QueryWrapper> & string,T>
+ export type MCircle<T,V,S extends string>={
+	[k1 in IncludeKey<T,V>]:T[k1]
+} & CombineRouterSub<ExcludeKey<T,V> & string,T,S>
+
+/**子级加前缀 */
+export type CombineRouterSub<K extends (keyof V & string),V,S extends string>=UnionToIntersection<ToUnion<K,V[K],S>>
+/**加前缀，变联合*/
+type ToUnion<K extends string,V,S extends string>=V extends {
+	[key in infer KV]:any
+} ? KV extends string ? {
+	[key2 in `${K}${S}${KV}`]:V[KV]
+} : never : never
+
+/**
+ * 联合转交叉
+ */
+ export type UnionToIntersection<U> =
+ (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
+
+/**
+* T里选择value的类型是F的key
+*/
+export type IncludeKey<T,F> = {
+ [key in keyof T]:T[key] extends F ? key : never
+}[keyof T]
+/**
+* T里选择value的类型不是F的key
+*/
+export type ExcludeKey<T,F> = {
+ [key in keyof T]:T[key] extends F ? never : key
+}[keyof T]

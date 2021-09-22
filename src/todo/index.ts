@@ -150,7 +150,8 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 														:todo.state()=='init'
 														? '-100%'
 														:'0'
-													},transition:`left ${animateS}s`
+													},
+													transition:`left ${animateS}s`
 												},
 												children:[
 													dom({type:"div",cls:"view",children:[
