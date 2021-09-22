@@ -18,8 +18,9 @@ export function support(me:mve.LifeModel){
       dom({
         type:"ul",
         children:[
-          linkA("当前项目源码地址","https://gitee.com/wy2010344/mve-vite-demo"),
-          linkA("文章包地址","https://gitee.com/wy2010344/article"),
+          linkA("当前项目源码地址","https://gitee.com/wy2010344/mve-vite-demo.git"),
+          linkA("当前项目源码演示地址","https://wy2010344.gitee.io/mve-vite-demo/"),
+          linkA("文章包地址","https://gitee.com/wy2010344/article.git"),
           linkSub("mve-core",[
             linkA("gitee","https://gitee.com/wy2010344/npm_mve.git"),
             linkA("github","https://github.com/wy2010344/npm_mve.git")
@@ -51,32 +52,40 @@ export function support(me:mve.LifeModel){
           })
         })
       }),
-      dom("创作不易，如果给你带来帮助，欢迎给作者打赏。"),
-      dom({
-        type:"h4",
-        text:"微信"
-      }),
-      dom({
-        type:"img",
-        attr:{
-          src:"https://wy2010344.gitee.io/article/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81-small.png"
-        }
-      }),
-      dom({
-        type:"h4",
-        text:"支付宝"
-      }),
-      dom({
-        type:"img",
-        attr:{
-          src:"https://wy2010344.gitee.io/article/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81-small.png"
-        }
-      })
+			dom({
+				type:"div",
+				style:{
+					"text-align":"center"
+				},
+				children:[
+					dom("创作不易，如果给你带来帮助，欢迎给作者打赏。"),
+					dom({
+						type:"h4",
+						text:"微信"
+					}),
+					dom({
+						type:"img",
+						attr:{
+							src:"https://wy2010344.gitee.io/article/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81-small.png"
+						}
+					}),
+					dom({
+						type:"h4",
+						text:"支付宝"
+					}),
+					dom({
+						type:"img",
+						attr:{
+							src:"https://wy2010344.gitee.io/article/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81-small.png"
+						}
+					})
+				]
+			})
     ]
   })
 }
 
-function linkSub(title:string,children:EOChildren<Node>){
+export function linkSub(title:string,children:EOChildren<Node>){
   return dom({
     type:"li",
     children:[
