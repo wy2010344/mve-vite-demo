@@ -16,13 +16,17 @@ type Operate={
   who:"X"|"O"
   /**下的点 */
   point:N9Step
+	/**谁胜利了*/
+  winner?:"X"|"O"|"FAIR"
 }
 /**当前状态 */
 interface CurrentState{
   stepNumber:N9Step | -1
   square:N9Square
-  xIsNext:boolean
-  winner?:"X"|"O"|"FAIR"
+}
+
+function getWhoNext(op?:Operate){
+	return op?op.who=='X'?'O':'X':'X'
 }
 
 function board(p:{
@@ -85,25 +89,20 @@ export function ticTacToeUndoRedo(me:mve.LifeModel){
   const historys=mve.arrayModelOf<Operate>([])
   const current=mve.valueOf<CurrentState>({
     square:Array(9).fill(null) as N9Square,
-    xIsNext:true,
     stepNumber:-1
   })
   /**重做 */
   function redo(c:CurrentState){
     const op=historys.get(c.stepNumber+1)
     c.square[op.point]=op.who
-    c.xIsNext=!c.xIsNext
     c.stepNumber++
-    c.winner=calculateWinner(c.square) || (c.stepNumber == 8 ? 'FAIR' : undefined)
     return c
   }
   /**撤销 */
   function undo(c:CurrentState){
     const op=historys.get(c.stepNumber)
     c.square[op.point]=null
-    c.xIsNext=!c.xIsNext
     c.stepNumber--
-    c.winner=null
     return c
   }
   return dom({
@@ -130,13 +129,17 @@ export function ticTacToeUndoRedo(me:mve.LifeModel){
                 //清空原来的历史
                 historys.pop()
               }
-              if(c.winner || c.square[i]){
+							const last=historys.getLast()
+              if((last && last.winner) || c.square[i]){
                 //当前已经是胜利或者有棋子
                 return
               }
+							//最先是X
+							const who=getWhoNext(last)
               historys.push({
-                who:c.xIsNext?"X":"O",
-                point:i
+                who,
+                point:i,
+								winner:calculateWinner(c.square,who,i) || (c.stepNumber == 7 ? 'FAIR' : undefined)
               })
               current(redo(c))
             }
@@ -149,8 +152,8 @@ export function ticTacToeUndoRedo(me:mve.LifeModel){
           dom({
             type:"div",
             text(){
-              const c=current()
-              return c.winner ? `Winner: ${c.winner}` : `Next player: ${c.xIsNext ? 'X' : 'O'}`
+              const last=historys.get(current().stepNumber)
+              return last && last.winner ? `Winner: ${last.winner}` : `Next player: ${getWhoNext(last)}`
             }
           }),
           //历史记录
@@ -173,8 +176,6 @@ export function ticTacToeUndoRedo(me:mve.LifeModel){
                         const c=current()
                         c.square.fill(null)
                         c.stepNumber=-1
-                        c.winner=null
-                        c.xIsNext=true
                         current(c)
                       }
                     }
@@ -228,9 +229,12 @@ export function ticTacToeUndoRedo(me:mve.LifeModel){
 /**
  * 可以进一步优化，落子时自动判断谁赢
  * @param squares 
+ * @param who 谁下子
+ * @param point 下在什么点
  * @returns 
  */
-function calculateWinner(squares:N9Square):"X"|"O" {
+function calculateWinner(squares:N9Square,who:"X"|"O",point:number):"X"|"O" {
+	squares[point]=who
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -244,8 +248,10 @@ function calculateWinner(squares:N9Square):"X"|"O" {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a] as any
+			squares[point]=null
+			return who
     }
   }
+	squares[point]=null
   return null;
 }

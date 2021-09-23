@@ -6,12 +6,14 @@ export function buildTitle(p:{
   move(e:Event):void,
   hideClose:mve.TValue<boolean>,
   closeClick?(e:Event):void;
-  max:mve.Value<Boolean>;
+  max:mve.TValue<Boolean>;
+	maxClick():void
   hideMax:mve.TValue<boolean>;
   title?:ItemValue;
 }){
 	const hideClose=mve.valueOrCall(p.hideClose)
 	const hideMax=mve.valueOrCall(p.hideMax)
+	const isMax=mve.valueOrCall(p.max)
   return dom({
     type:"div",
     style:{
@@ -73,14 +75,14 @@ export function buildTitle(p:{
           }
         },
 				text(){
-					return p.max()?"o":"O"
+					return isMax()?"o":"O"
 				},
         event:{
           mousedown(e){
             e.stopPropagation(e)
           },
           click(){
-            p.max(!p.max());
+						p.maxClick()
           }
         }
       }),
