@@ -172,9 +172,12 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 		const height=p.height||mve.valueOf(600)
 		//是否在max动画期间
 		const sizeLocationAnimate={
-			on:mve.valueOf(false),
-			left:mve.valueOf(0),
-			top:mve.valueOf(0),
+			//初始化进来是true
+			on:mve.valueOf(true),
+			//初始位置是默认位置
+			left:mve.valueOf(left()),
+			top:mve.valueOf(top()),
+			//初始长宽都是0
 			width:mve.valueOf(0),
 			height:mve.valueOf(0)
 		}
@@ -185,29 +188,14 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 				targetAnimationOf({
 					data:[
 						{
-							from:0,
 							to:width(),
 							value:sizeLocationAnimate.width
 						},
 						{
-							from:0,
 							to:height(),
 							value:sizeLocationAnimate.height
-						},
-						{
-							from:width()/2,
-							to:left(),
-							value:sizeLocationAnimate.left
-						},
-						{
-							from:height()/2,
-							to:top(),
-							value:sizeLocationAnimate.top
 						}
 					],
-					begin(){
-						sizeLocationAnimate.on(true)
-					},
 					change:Tween.Cubic.easeIn,
 					duration:300,
 					end(){
@@ -332,6 +320,9 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 					},
 					hideMax: p.hideMax,
 					closeClick(){
+						//右上角关闭
+						sizeLocationAnimate.left(sizeLocationCurrent.left())
+						sizeLocationAnimate.top(sizeLocationCurrent.top())
 						targetAnimationOf({
 							data:[
 								{
@@ -343,18 +334,6 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 									from:sizeLocationCurrent.height(),
 									to:0,
 									value:sizeLocationAnimate.height
-								},
-								{
-									from:sizeLocationCurrent.left(),
-									//to:0,
-									to:sizeLocationCurrent.left() + (sizeLocationCurrent.width()/2),
-									value:sizeLocationAnimate.left
-								},
-								{
-									from:sizeLocationCurrent.top(),
-									//to:0,
-									to:sizeLocationCurrent.top() + (sizeLocationCurrent.height()/2),
-									value:sizeLocationAnimate.top
 								}
 							],
 							change:Tween.Cubic.easeOut,

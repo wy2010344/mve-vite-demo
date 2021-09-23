@@ -20,6 +20,8 @@ export function targetAnimationOf(p:{
 	for(const v of vs){
 		if('from' in v){
 			v.value(v.from)
+		}else{
+			v.from=v.value()
 		}
 		v.update=v.update||function(from,to,percent){
 			return (to - from) * percent + from
