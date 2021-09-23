@@ -1,8 +1,9 @@
 import { dom } from "mve-dom"
+import { moveFilter } from "../../sortAndFilter/move"
 import { ticTacToeUndoRedo } from "../../tic-tac-toe/undoRedo"
 import { dragResizePanel } from "../form"
 import { 关于我 } from "./关于我"
-
+import { mve } from 'mve-core/util'
 
 
 export const 首页=dragResizePanel(function(x){
@@ -23,10 +24,13 @@ export const 首页=dragResizePanel(function(x){
 				type:"button",
 				text:"tictactoe",
 				event:{
-					click(){
+					click(e:MouseEvent){
+						console.log(e)
 						x.panel.add(dragResizePanel(function(x){
 							return {
 								title:"tictactoe",
+								left:mve.valueOf(e.clientX),
+								top:mve.valueOf(e.clientY),
 								children:ticTacToeUndoRedo(x.panel.me)
 							}
 						}))
