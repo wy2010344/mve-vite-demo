@@ -14,6 +14,7 @@ import { ticTacToeUndoRedo } from "./tic-tac-toe/undoRedo";
 import { flexSortAndFilter } from "./sortAndFilter/flexOrder";
 import { filterOnly } from "./sortAndFilter/filterOnly";
 import { filterCacheOnly } from "./sortAndFilter/filterCacheOnly";
+import { sameRootTree } from "./sameRootTree";
 
 
 const index=createRouter(function(me,route){
@@ -90,6 +91,11 @@ const index=createRouter(function(me,route){
 						},[
 							dom("就地复用方案的sort-filter")
 						]),
+					]),
+					goLi("同级树",function(){
+						rootRoute.go("sameRootTree",{})
+					},[
+						dom("使用Table来完成的树结构，数据结构是树，在DOM上是表格")
 					])
 				]
 			}),
@@ -137,6 +143,7 @@ export type MRootRouter={
 	sortAndFilterFlexOrder:QueryWrapper
 	sortAndFilterFilterChildren:QueryWrapper
 	sortAndFilterFilterCacheChildren:QueryWrapper
+	sameRootTree:QueryWrapper
 }
 
 export const rootRoute=createRouter<MRootRouter>(function(me,router){
@@ -174,6 +181,7 @@ export const rootRoute=createRouter<MRootRouter>(function(me,router){
 		}),
 		sortAndFilterFilterCacheChildren:createRouter(function(me){
 			return filterCacheOnly(me)
-		})
+		}),
+		sameRootTree:createRouter(sameRootTree)
 	})
 })([])

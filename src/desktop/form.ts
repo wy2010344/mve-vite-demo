@@ -5,6 +5,7 @@ import { resizeZoom } from './resize'
 import { dragMoveHelper, dragResizeHelper } from './drag'
 import { buildTitle } from './title'
 import { modelChildren} from 'mve-core/modelChildren'
+import { targetAnimationOf, Tween, tweenAnimationOf } from '../animate'
 
 
 export interface FormPanelParam{
@@ -88,6 +89,15 @@ export interface DragResizePanelParam{
 	contentHeight():number
 	panel:FormPanelParam
 }
+/**
+ * 用三组size的含义
+ * 最大化时的size是桌面的size，只受桌面影响
+ * 自己的常用size，外部可操纵
+ * 动画期间的size
+ * 如果只用一个size，被外部程序操纵，就会混乱
+ * @param render 
+ * @returns 
+ */
 export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 	width?:mve.Value<number>
 	height?:mve.Value<number>
@@ -101,34 +111,110 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 }):FormPanel{
 	return function(x){
 		const titleHeight=30
-		function renderWidth(){
-			if(max()){
-				return x.desktop.width()
-			}else{
-				return width()
-			}
-		}
-		function renderHeight(){
-			if(max()){
-				return x.desktop.height()
-			}else{
-				return height()
+		/**当前尺寸位置 */
+		const sizeLocationCurrent={
+			width(){
+				if(sizeLocationAnimate.on()){
+					return sizeLocationAnimate.width()
+				}else{
+					if(max()){
+						return x.desktop.width()
+					}else{
+						return width()
+					}
+				}
+			},
+			height(){
+				if(sizeLocationAnimate.on()){
+					return sizeLocationAnimate.height()
+				}else{
+					if(max()){
+						return x.desktop.height()
+					}else{
+						return height()
+					}
+				}
+			},
+			top(){
+				if(sizeLocationAnimate.on()){
+					return sizeLocationAnimate.top()
+				}else{
+					if(max()){
+						return 0
+					}else{
+						return top()
+					}
+				}
+			},
+			left(){
+				if(sizeLocationAnimate.on()){
+					return sizeLocationAnimate.left()
+				}else{
+					if(max()){
+						return 0
+					}else{
+						return left()
+					}
+				}
 			}
 		}
 		const p=render({
 			panel:x,
 			contentHeight(){
-				return renderHeight()-titleHeight
+				return sizeLocationCurrent.height()-titleHeight
 			},
-			contentWidth:renderWidth
+			contentWidth:sizeLocationCurrent.width
 		})
 		const max=p.max||mve.valueOf(false)
 		const top=p.top||mve.valueOf(0)
 		const left=p.left||mve.valueOf(0)
 		const width=p.width||mve.valueOf(400)
 		const height=p.height||mve.valueOf(600)
+		//是否在max动画期间
+		const sizeLocationAnimate={
+			on:mve.valueOf(false),
+			left:mve.valueOf(0),
+			top:mve.valueOf(0),
+			width:mve.valueOf(0),
+			height:mve.valueOf(0)
+		}
 		return dom({
 			type:"div",
+			init(){
+				//初始化
+				targetAnimationOf({
+					data:[
+						{
+							from:0,
+							to:width(),
+							value:sizeLocationAnimate.width
+						},
+						{
+							from:0,
+							to:height(),
+							value:sizeLocationAnimate.height
+						},
+						{
+							from:width()/2,
+							to:left(),
+							value:sizeLocationAnimate.left
+						},
+						{
+							from:height()/2,
+							to:top(),
+							value:sizeLocationAnimate.top
+						}
+					],
+					begin(){
+						sizeLocationAnimate.on(true)
+					},
+					change:Tween.Cubic.easeIn,
+					duration:300,
+					end(){
+						sizeLocationAnimate.on(false)
+					}
+				})
+			},
 			event:{
 				mousedown:{
 					capture:true,
@@ -136,6 +222,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 				}
 			},
 			style:{
+				overflow:"hidden",
 				background:"white",
 				"border-radius":"5px",
 				position:"absolute",
@@ -144,24 +231,16 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 				},
 				"box-shadow":"rgb(102, 102, 102) 0px 0px 20px 5px",
 				top(){
-					if(max()){
-						return "0px"
-					}else{
-						return top()+'px'
-					}
+					return sizeLocationCurrent.top()+'px'
 				},
 				left(){
-					if(max()){
-						return "0px"
-					}else{
-						return left()+"px"
-					}
+					return sizeLocationCurrent.left()+'px'
 				},
 				width(){
-					return renderWidth()+'px'
+					return sizeLocationCurrent.width()+'px'
 				},
 				height(){
-					return renderHeight()+'px'
+					return sizeLocationCurrent.height()+'px'
 				}
 			},
 			children:[
@@ -178,8 +257,117 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 					}),
 					hideClose:p.hideClose,
 					max,
+					maxClick(){
+						if(max()){
+							//缩小
+							targetAnimationOf({
+								data:[
+									{
+										from:sizeLocationCurrent.width(),
+										to:width(),
+										value:sizeLocationAnimate.width
+									},
+									{
+										from:sizeLocationCurrent.height(),
+										to:height(),
+										value:sizeLocationAnimate.height
+									},
+									{
+										from:sizeLocationCurrent.left(),
+										to:left(),
+										value:sizeLocationAnimate.left
+									},
+									{
+										from:sizeLocationCurrent.top(),
+										to:top(),
+										value:sizeLocationAnimate.top
+									}
+								],
+								begin(){
+									sizeLocationAnimate.on(true)
+								},
+								change:Tween.Cubic.easeIn,
+								duration:300,
+								end(){
+									sizeLocationAnimate.on(false)
+									max(false)
+								}
+							})
+						}else{
+							//放大
+							targetAnimationOf({
+								data:[
+									{
+										from:sizeLocationCurrent.width(),
+										to:x.desktop.width(),
+										value:sizeLocationAnimate.width
+									},
+									{
+										from:sizeLocationCurrent.height(),
+										to:x.desktop.height(),
+										value:sizeLocationAnimate.height
+									},
+									{
+										from:sizeLocationCurrent.left(),
+										to:0,
+										value:sizeLocationAnimate.left
+									},
+									{
+										from:sizeLocationCurrent.top(),
+										to:0,
+										value:sizeLocationAnimate.top
+									}
+								],
+								begin(){
+									sizeLocationAnimate.on(true)
+								},
+								change:Tween.Cubic.easeIn,
+								duration:300,
+								end(){
+									sizeLocationAnimate.on(false)
+									max(true)		
+								}
+							})
+						}
+					},
 					hideMax: p.hideMax,
-					closeClick:x.remove,
+					closeClick(){
+						targetAnimationOf({
+							data:[
+								{
+									from:sizeLocationCurrent.width(),
+									to:0,
+									value:sizeLocationAnimate.width
+								},
+								{
+									from:sizeLocationCurrent.height(),
+									to:0,
+									value:sizeLocationAnimate.height
+								},
+								{
+									from:sizeLocationCurrent.left(),
+									//to:0,
+									to:sizeLocationCurrent.left() + (sizeLocationCurrent.width()/2),
+									value:sizeLocationAnimate.left
+								},
+								{
+									from:sizeLocationCurrent.top(),
+									//to:0,
+									to:sizeLocationCurrent.top() + (sizeLocationCurrent.height()/2),
+									value:sizeLocationAnimate.top
+								}
+							],
+							change:Tween.Cubic.easeOut,
+							begin(){
+								sizeLocationAnimate.on(true)
+							},
+							duration:300,
+							end(){
+								sizeLocationAnimate.on(false)
+								x.remove()
+							}
+						})
+					}
 				}),
 				p.children,
 				resizeZoom({
