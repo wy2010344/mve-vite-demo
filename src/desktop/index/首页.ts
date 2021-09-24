@@ -4,6 +4,7 @@ import { ticTacToeUndoRedo } from "../../tic-tac-toe/undoRedo"
 import { dragResizePanel } from "../form"
 import { 关于我 } from "./关于我"
 import { mve } from 'mve-core/util'
+import { 动画展示 } from "./动画"
 
 
 export const 首页=dragResizePanel(function(x){
@@ -25,7 +26,6 @@ export const 首页=dragResizePanel(function(x){
 				text:"tictactoe",
 				event:{
 					click(e:MouseEvent){
-						console.log(e)
 						x.panel.add(dragResizePanel(function(x){
 							return {
 								title:"tictactoe",
@@ -34,6 +34,15 @@ export const 首页=dragResizePanel(function(x){
 								children:ticTacToeUndoRedo(x.panel.me)
 							}
 						}))
+					}
+				}
+			}),
+			dom({
+				type:"button",
+				text:"tictactoe",
+				event:{
+					click(e:MouseEvent){
+						x.panel.add(动画展示)
 					}
 				}
 			})
