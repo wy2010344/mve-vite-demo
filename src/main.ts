@@ -60,4 +60,3 @@ if(root.init){
 if(root.destroy){
 	window.addEventListener("unload",root.destroy)
 }
-console.log("jjjj")

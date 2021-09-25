@@ -21,8 +21,6 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 		currentEase(ease)
 		call(ease)
 	}
-	selectV(allTweens[0])
-
 
 	const idAnimation=idOf("select-animation")
 	const idAnimationType=idOf("select-animation-type")
@@ -33,6 +31,9 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 	})
 	return dom({
 		type:"div",
+		init(){
+			selectV(allTweens[0])
+		},
 		children:[
 			dom({
 				type:"div",
