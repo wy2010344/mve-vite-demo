@@ -39,7 +39,7 @@ export const 首页=dragResizePanel(function(x){
 			}),
 			dom({
 				type:"button",
-				text:"tictactoe",
+				text:"动画效果",
 				event:{
 					click(e:MouseEvent){
 						x.panel.add(动画展示)

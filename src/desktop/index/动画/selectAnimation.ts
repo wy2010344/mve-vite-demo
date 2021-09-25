@@ -4,7 +4,7 @@ import { Tween, DrawOfBezier3, drawOfBezier3, tweenAnimationOf } from '../../../
 import { mve } from 'mve-core/util'
 import { dom, idOf } from 'mve-dom/index'
 import { ifChildren } from 'mve-core/ifChildren'
-import { filterChildren } from 'mve-core/fiilterChildren'
+import { filterChildren } from 'mve-core/filterChildren'
 
 const allTweens=Object.keys(Tween)
 const allEasys=["easeIn","easeOut","easeInOut"]
@@ -43,7 +43,7 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 					}),
 					allTweens.map(function(tween){
 						return dom({
-							type:"div",
+							type:"span",
 							children:[
 								dom({
 									type:"input",
@@ -79,7 +79,7 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 					}),
 					filterChildren(easyList,function(me,kv){
 						return dom({
-							type:"div",
+							type:"span",
 							children:[
 								dom({
 									type:"input",

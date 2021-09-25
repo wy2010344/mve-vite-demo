@@ -37,6 +37,11 @@ export function filterCacheOnly(me:mve.LifeModel){
 			}),
 			dom({
 				type:"div",
+				style:{
+					'font-family':'Monaco',
+					'letter-spacing':'2px',
+					'text-align':'right'
+				},
 				children:filterCacheChildren(
 					function(){
 						const x=filterSort()

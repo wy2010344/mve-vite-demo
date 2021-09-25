@@ -1,4 +1,3 @@
-//@ts-nocheck
 
 function stopSelect(){
   document.body.style.webkitUserSelect = 'none';
@@ -158,21 +157,21 @@ type TEvent={
   event:MouseEvent,
   dir:Direction
 }
-
+import { mve } from 'mve-core/util'
 /**
  * 主要是拖拽放大。拖动只是辅助。如果只有拖动，不如另写
  * @param p 
  */
 export function dragResizeHelper(p:{
   border?:Node;
-  allow?():boolean;
+  forbidden?:mve.TValue<boolean>;
   addLeft(x:number):void
   addTop(x:number):void,
   addWidth(x:number):void,
   addHeight(x:number):void
 }){
   let event:TEvent=null
-  const allow=p.allow||function(){return true};
+	const forbidden=mve.valueOrCall(p.forbidden)
   const m={
     cancel(e){
       event=null;
@@ -180,7 +179,7 @@ export function dragResizeHelper(p:{
 			destroy()
     },
     move(e){
-      if(allow()){
+      if(!forbidden()){
 				const old_e=event.event as MouseEvent;
 				e=e||window.event;
 				event.event=e;
