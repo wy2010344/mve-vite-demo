@@ -12,6 +12,6 @@
     "vite": "^2.5.10"
   },
   "dependencies": {
-    "mve-dom": "^1.0.10"
+    "mve-dom": "^1.0.11"
   }
 }

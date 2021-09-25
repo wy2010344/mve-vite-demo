@@ -99,6 +99,7 @@ export interface DragResizePanelParam{
  * @returns 
  */
 export function dragResizePanel(render:(x:DragResizePanelParam)=>{
+	noResize?:mve.TValue<boolean>
 	width?:mve.Value<number>
 	height?:mve.Value<number>
 	top?:mve.Value<number>
@@ -165,6 +166,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 			},
 			contentWidth:sizeLocationCurrent.width
 		})
+		const noResize=mve.valueOrCall(p.noResize)
 		const max=p.max||mve.valueOf(false)
 		const top=p.top||mve.valueOf(0)
 		const left=p.left||mve.valueOf(0)
@@ -351,6 +353,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 				p.children,
 				resizeZoom({
 					resize:dragResizeHelper({
+						forbidden:noResize,
 						addHeight(x){
 							height(height()+x)
 						},

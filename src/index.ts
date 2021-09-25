@@ -15,6 +15,7 @@ import { flexSortAndFilter } from "./sortAndFilter/flexOrder";
 import { filterOnly } from "./sortAndFilter/filterOnly";
 import { filterCacheOnly } from "./sortAndFilter/filterCacheOnly";
 import { sameRootTree } from "./sameRootTree";
+import { moveFilter } from "./sortAndFilter/move";
 
 
 const index=createRouter(function(me,route){
@@ -81,6 +82,11 @@ const index=createRouter(function(me,route){
 						},[
 							dom("modelChildren，ArrayModel的过滤排序方案，使用flex-order")
 						]),
+						goLi("modelChildren-move过滤排序的解决方案",function(){
+							rootRoute.go("sortAndFilterMove",{})
+						},[
+							dom("modelChildren，ArrayModel的过滤排序方案，使用flex-order")
+						]),
 						goLi("filterChildren的过滤排序方案",function(){
 							rootRoute.go("sortAndFilterFilterChildren",{})
 						},[
@@ -141,6 +147,7 @@ export type MRootRouter={
 	tic_tac_toe_simplify:QueryWrapper
 	tic_tac_toe_my_style:QueryWrapper
 	sortAndFilterFlexOrder:QueryWrapper
+	sortAndFilterMove:QueryWrapper
 	sortAndFilterFilterChildren:QueryWrapper
 	sortAndFilterFilterCacheChildren:QueryWrapper
 	sameRootTree:QueryWrapper
@@ -175,6 +182,9 @@ export const rootRoute=createRouter<MRootRouter>(function(me,router){
 		}),
 		sortAndFilterFlexOrder:createRouter(function(me){
 			return flexSortAndFilter(me)
+		}),
+		sortAndFilterMove:createRouter(function(me){
+			return moveFilter(me)
 		}),
 		sortAndFilterFilterChildren:createRouter(function(me){
 			return filterOnly(me)

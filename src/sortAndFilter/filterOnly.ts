@@ -3,7 +3,7 @@
 
 import {mve} from 'mve-core/util'
 import { dom } from 'mve-dom'
-import { filterChildren } from 'mve-core/fiilterChildren'
+import { filterChildren } from 'mve-core/filterChildren'
 import { filterSortArea, SORTTYPE, totalData } from './base'
 
 
@@ -38,6 +38,11 @@ export function filterOnly(me:mve.LifeModel){
 			}),
 			dom({
 				type:"div",
+				style:{
+					'font-family':'Monaco',
+					'letter-spacing':'2px',
+					'text-align':'right'
+				},
 				children:filterChildren(
 					function(){
 						const x=filterSort()

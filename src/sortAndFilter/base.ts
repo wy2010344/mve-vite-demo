@@ -74,7 +74,7 @@ export function sortAndFilterBase(filterFactory:(text:string,dir:SORTTYPE,arr:mv
 			return {
         index:i,
         show:mve.valueOf(true),
-        order:mve.valueOf(i),
+        order:mve.valueOf(0),
         value:v
 			}
 		}))
@@ -101,7 +101,10 @@ export function sortAndFilterBase(filterFactory:(text:string,dir:SORTTYPE,arr:mv
           type:"div",
           style:{
             display:"flex",
-            'flex-direction':'column'
+            'flex-direction':'column',
+            'font-family':'Monaco',
+            'letter-spacing':'2px',
+            'text-align':'right'
           },
           children:modelChildren(list,function(me,row,i){
             return dom({

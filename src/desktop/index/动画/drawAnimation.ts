@@ -1,9 +1,9 @@
 import { mve } from 'mve-core/util'
 import { dom } from 'mve-dom/index'
-import { DrawOfBezier3 } from '../../../animate'
+import { drawOfBezier3, DrawOfBezier3 } from '../../../animate'
 
 //draw(drawOfBezier3(fn()))
-export function drawAnimation() {
+export function drawAnimation(fun:(v)=>void) {
   let canvas:HTMLCanvasElement,txt:HTMLTextAreaElement
   const locationY=mve.valueOf<DrawOfBezier3>({
     start:0,
@@ -11,8 +11,8 @@ export function drawAnimation() {
     end:0,
     c2:0
   })
-  return {
-    location: locationY,
+  return dom({
+    type:"div",
     init(){
       const  ctx = canvas.getContext("2d");
       let index = -1,
@@ -156,7 +156,7 @@ export function drawAnimation() {
         };
       };
     },
-    elements:[
+    children:[
       dom({
         type:"canvas",
         init(v){
@@ -168,6 +168,15 @@ export function drawAnimation() {
         },
         style:{
           cursor:"crosshair"
+        }
+      }),
+      dom({
+        type:"button",
+        text:"绘制",
+        event:{
+          click(){
+            fun(drawOfBezier3(locationY()))
+          }
         }
       }),
       dom({
@@ -183,5 +192,5 @@ export function drawAnimation() {
         }
       })
     ]
-  }
+  })
 }

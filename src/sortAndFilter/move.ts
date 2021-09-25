@@ -1,4 +1,4 @@
-import { sortAndFilterBase } from "./base";
+import { Row, sortAndFilterBase } from "./base";
 
 import { mve,BaseArray,SimpleArray } from 'mve-core/util'
 
@@ -8,22 +8,64 @@ import { mve,BaseArray,SimpleArray } from 'mve-core/util'
  * 还不如原始的重建、就地复用、key复用
  */
 
+function getNextShow(begin:number,array:mve.ArrayModel<Row>){
+  for(let i=begin;i<array.size();i++){
+    if(array.get(i).show()){
+      return i
+    }
+  }
+  return -1
+}
+
+function merge(fs:Row[],array:mve.ArrayModel<Row>){
+  for(let i=0;i<fs.length;i++){
+    const f=fs[i]
+    const idx=array.indexOf(f)
+    array.move(idx,i)
+  }
+}
+function mergeNew(fs:Row[],array:mve.ArrayModel<Row>){
+  let lastBegin=getNextShow(0,array)
+  for(let i=0;i<fs.length;i++){
+    const f=fs[i]
+    if(array.get(lastBegin)==f){
+      //相同不需要移动
+      lastBegin++
+    }else{
+      const idx=array.indexOf(f,lastBegin)
+      if(idx<lastBegin){
+        console.log("不应该出现的错误")
+      }
+      array.move(idx,lastBegin)
+      lastBegin=getNextShow(lastBegin+1,array)
+      if(lastBegin<0){
+        console.log("不应该出现的错误")
+        return
+      }
+    }
+  }
+}
+
 export const moveFilter=sortAndFilterBase(function(filter,dir,list){
-  list.forEach(v=>{
+  const fs=list.filter(v=>{
     if((v.value+"").startsWith(filter)){
       v.show(true)
+      return true
     }else{
       v.show(false)
+      return false
     }
   })
-  if(dir=='none'){
-
-  }else{
-    insertionSort(list,dir=='asc'?function(a,b){
-      return a.value < b.value
-    }:dir=='desc'?function(a,b){
-      return a.value > b.value
-    }:null)
+  if(dir=='asc'){
+    fs.sort(function(a,b){
+      return a.value - b.value
+    })
+    mergeNew(fs,list)
+  }else if(dir=='desc'){
+    fs.sort(function(a,b){
+      return b.value - a.value
+    })
+    mergeNew(fs,list)
   }
   console.log("执行完成")
   
