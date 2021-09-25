@@ -3,7 +3,7 @@ import { selectAnimation } from "./selectAnimation";
 import { viewAnimation } from "./viewAnimation";
 import { mve } from 'mve-core/util'
 import { drawAnimation } from "./drawAnimation";
-import { dom } from "mve-dom";
+import { dom } from "mve-dom/index";
 
 //draw(fnName(v.tween, v.easy));
 
