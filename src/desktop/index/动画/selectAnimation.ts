@@ -1,13 +1,11 @@
 
 
-import { Tween, DrawOfBezier3, drawOfBezier3, tweenAnimationOf } from '../../../animate'
+import { Tween } from '../../../animate'
 import { mve } from 'mve-core/util'
 import { dom, idOf } from 'mve-dom/index'
-import { ifChildren } from 'mve-core/ifChildren'
 import { filterChildren } from 'mve-core/filterChildren'
 
 const allTweens=Object.keys(Tween)
-const allEasys=["easeIn","easeOut","easeInOut"]
 
 export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 
@@ -29,10 +27,14 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 		const pkg=Tween[currentTween()]
 		return typeof(pkg)=='function'?[]:Object.entries(pkg)
 	})
+	selectV(allTweens[0])
 	return dom({
 		type:"div",
 		init(){
-			selectV(allTweens[0])
+			console.log("初始化")
+		},
+		destroy(){
+			console.log("销毁")
 		},
 		children:[
 			dom({

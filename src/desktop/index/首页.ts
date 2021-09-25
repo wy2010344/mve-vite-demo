@@ -1,5 +1,4 @@
 import { dom } from "mve-dom"
-import { moveFilter } from "../../sortAndFilter/move"
 import { ticTacToeUndoRedo } from "../../tic-tac-toe/undoRedo"
 import { dragResizePanel } from "../form"
 import { 关于我 } from "./关于我"
