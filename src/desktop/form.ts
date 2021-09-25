@@ -37,14 +37,17 @@ export function desktopOf(k:DeskTopParam){
 	const vs:PanelWithIndex[]=[]
 
 
+	function reOrder(idx:number){
+		for(let i=idx;i<vs.length;i++){
+			vs[i].index(i)
+		}
+	}
 	function bringToFront(row:PanelWithIndex){
 		const idx=vs.indexOf(row)
-		if(idx<vs.length-1){
+		if(idx>-1){
 			vs.push(row)
 			vs.splice(idx,1)
-			for(let i=idx;i<vs.length;i++){
-				vs[i].index(i)
-			}
+			reOrder(idx)
 		}
 	}
 
@@ -55,13 +58,13 @@ export function desktopOf(k:DeskTopParam){
 			bringToFront(old)
 		}else{
 			//不存在
-			const index=mve.valueOf(vs.length)
+			const index=mve.valueOf(panels.size())
 			const pw={
 				panel:v,
 				index
 			}
-			panels.push(pw)
 			vs.push(pw)
+			panels.push(pw)
 		}
 	}
 	return {
@@ -70,7 +73,10 @@ export function desktopOf(k:DeskTopParam){
 			return row.panel({
 				me,
 				remove(){
+					const order=row.index()
+					vs.splice(order,1)
 					panels.remove(i())
+					reOrder(order)
 				},
 				add,
 				desktop:k,

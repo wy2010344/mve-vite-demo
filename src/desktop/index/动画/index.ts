@@ -4,15 +4,14 @@ import { viewAnimation } from "./viewAnimation";
 import { mve } from 'mve-core/util'
 import { drawAnimation } from "./drawAnimation";
 import { dom } from "mve-dom";
-import { Tween, DrawOfBezier3, drawOfBezier3, tweenAnimationOf } from '../../../animate'
 
 //draw(fnName(v.tween, v.easy));
 
 export const 动画展示=dragResizePanel(function(x){
 	
 	function draw(v){
-		x.panel.add(动画面板)
 		if(v){
+			x.panel.add(动画面板)
 			va.draw(v)
 		}
 	}
