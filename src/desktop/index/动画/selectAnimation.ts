@@ -27,7 +27,9 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 		const pkg=Tween[currentTween()]
 		return typeof(pkg)=='function'?[]:Object.entries(pkg)
 	})
-	selectV(allTweens[0])
+	setTimeout(function(){
+		selectV(allTweens[0])
+	})
 	return dom({
 		type:"div",
 		init(){
