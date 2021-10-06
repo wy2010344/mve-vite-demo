@@ -1,7 +1,7 @@
 
 
 import { mve }from 'mve-core/util'
-import { dom } from 'mve-dom'
+import { dom, DOMNodeAll } from 'mve-dom'
 import { EOChildren }from 'mve-core/childrenBuilder'
 export function support(me:mve.LifeModel){
   return dom({
@@ -85,7 +85,7 @@ export function support(me:mve.LifeModel){
   })
 }
 
-export function linkSub(title:string,children:EOChildren<Node>){
+export function linkSub(title:DOMNodeAll,children:EOChildren<Node>){
   return dom({
     type:"li",
     children:[
