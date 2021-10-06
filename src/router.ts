@@ -2,15 +2,27 @@ import {EOChildren} from 'mve-core/childrenBuilder'
 import {modelChildren} from 'mve-core/modelChildren'
 import {mve} from 'mve-core/util'
 import { dom } from 'mve-dom'
+/**
+ * 创建视图
+ * @param me 
+ * @param router 
+ * @param createRoutes 
+ * @param other 
+ * @returns 
+ */
 export function routerView<T>(
-	me:mve.LifeModel,router:Router<T>,createRoutes:{[key in keyof T]:CreateSubRouter<T[key]>}
+	me:mve.LifeModel,router:Router<T>,createRoutes:{[key in keyof T]:CreateSubRouter<T[key]>},other?:{
+		notFoundView?:Router<any>
+	}
 ){
+	other=other||{}
 	const routes:{[key:string]:Router<T>}={}
 	Object.entries(createRoutes).forEach(function([k,v]){
 		const fun=v as CreateSubRouter<any>
 		routes[k]=fun(router.parentPath.concat(k))
 	})
-	const default404Router=default404FactoryRouter(router.parentPath.concat("404"))
+
+	const notFoundView=other.notFoundView||default404FactoryRouter(router.parentPath.concat("404"))
 	const currentRoute=mve.arrayModelOf<Router<T>>([])
 	function clear(){
 		if(currentRoute.size()>0){
@@ -27,7 +39,7 @@ export function routerView<T>(
 				const currentR=currentRoute.get(0)
 				if(first){
 					//有路径
-					const changeR=routes[first] || default404Router
+					const changeR=routes[first] || notFoundView
 					//并且能找到路由
 					if(currentR==changeR){
 						//并未发生改变
@@ -77,12 +89,21 @@ export class Router<T>{
 		return this.fun(me,this)
 	}
 	/**
+	 * 生成合适的路由
+	 * @param path 
+	 * @param query 
+	 * @returns 
+	 */
+	href<K extends keyof MSCircle<T>>(path:K,query:(MSCircle<T>[K] extends QueryWrapper? MSCircle<T>[K]['value']:never)){
+		return this.parentPath.concat(path as string).join('/')+queryToString(query as any)
+	}
+	/**
 	 * 中能在自己的下游路径漫游
 	 * @param path 
 	 * @param query 
 	 */
 	go<K extends keyof MSCircle<T>>(path:K,query:(MSCircle<T>[K] extends QueryWrapper? MSCircle<T>[K]['value']:never)){
-		location.hash=this.parentPath.concat(path as string).join('/')+queryToString(query as any)
+		location.hash=this.href(path,query)
 	}
 }
 
@@ -108,8 +129,8 @@ function queryToString(q?:QueryParam){
 export function createRouter<T>(
 	fun:(me:mve.LifeModel,router:Router<T>
 )=>EOChildren<Node>):CreateSubRouter<T>{
-	return function(parentPath){
-		return new Router(parentPath,fun)
+	return (parentPath)=>{
+		return new Router<T>(parentPath,fun)
 	}
 }
 const default404FactoryRouter=createRouter(function(me,router){
@@ -143,7 +164,7 @@ export class QueryWrapper<T extends QueryParam={}>{
 	constructor(public value:T){}
 }
 
-type MSCircle<T>=MCircle<T,QueryWrapper,'/'>
+export type MSCircle<T>=MCircle<T,QueryWrapper,'/'>
 ///////////////////////////////////////////////////////////////////////////////////
 
 /**
