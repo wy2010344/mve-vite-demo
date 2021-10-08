@@ -6,9 +6,9 @@ export function add(me:mve.LifeModel){
 		type:"button",
 		init(){
 			console.log("初始化")
-		},
-		destroy(){
-			console.log("销毁")
+			return function(){
+				console.log("销毁")
+			}
 		},
 		text(){return count()+""},
 		event:{

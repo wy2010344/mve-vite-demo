@@ -2,7 +2,7 @@ import {dom} from 'mve-dom/index'
 import { desktopOf } from './form'
 import { 首页 } from './index/首页'
 import { mve } from 'mve-core/util'
-import { createRouter } from '../router'
+import { createRouter } from 'mve-dom/router'
 
 const width=mve.valueOf(0)
 const height=mve.valueOf(0)

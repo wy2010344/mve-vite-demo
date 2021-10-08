@@ -34,9 +34,9 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 		type:"div",
 		init(){
 			console.log("初始化")
-		},
-		destroy(){
-			console.log("销毁")
+			return function(){
+				console.log("销毁")
+			}
 		},
 		children:[
 			dom({

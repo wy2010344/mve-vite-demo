@@ -1,5 +1,5 @@
 import { dom,DOMNodeAll } from "mve-dom";
-import { createRouter, MCircle, MSCircle, QueryWrapper, Router, routerView } from "./router";
+import { createRouter, MSCircle, QueryWrapper, Router, routerView } from "mve-dom/router";
 import { todoMVC, TodoRouter } from "./todo/index";
 import { 桌面 } from "./desktop";
 import { add } from "./simpleAdd";
@@ -8,8 +8,7 @@ import { todo } from "./todo";
 import { tree } from "./tree";
 import { ticTacToe } from "./tic-tac-toe";
 import { ticTacToeSimplify } from "./tic-tac-toe/simplify";
-import { aHref, linkSub, support } from "./support";
-import { EOChildren }from 'mve-core/childrenBuilder'
+import { support } from "./support";
 import { ticTacToeUndoRedo } from "./tic-tac-toe/undoRedo";
 import { flexSortAndFilter } from "./sortAndFilter/flexOrder";
 import { filterOnly } from "./sortAndFilter/filterOnly";

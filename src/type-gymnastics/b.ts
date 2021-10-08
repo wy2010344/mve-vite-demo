@@ -1,7 +1,7 @@
 
 /////////////
 
-import { QueryParam, QueryWrapper } from "../router"
+import { QueryParam, QueryWrapper } from "mve-dom/router"
 
 interface CRouter{
 	[key:string]:QueryWrapper<QueryParam> | CSubRouter
