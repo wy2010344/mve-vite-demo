@@ -1,4 +1,3 @@
-import { createRouter } from "../router";
 import { mve } from 'mve-core/util'
 import { dom } from "mve-dom";
 import { modelChildren } from 'mve-core/modelChildren'

@@ -80,9 +80,9 @@ export function viewAnimation(){
 				canvas=v
 				ctx= canvas.getContext("2d")
 				ctx.lineWidth = 2;
-			},
-			destroy(){
-				console.log("销毁1")
+				return function(){
+					console.log("销毁1")
+				}
 			},
 			attr:{
 				width:"600",

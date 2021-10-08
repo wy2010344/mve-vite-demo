@@ -10,7 +10,20 @@ interface List{
 const liClass=clsOf('li')
 
 export function simpleTodo(me:mve.LifeModel){
-	const list=mve.arrayModelOf<List>([])
+	const list=mve.arrayModelOf<List>([
+		{
+			content:mve.valueOf("ddd"),
+			complete:mve.valueOf(false)
+		},
+		{
+			content:mve.valueOf("aaa"),
+			complete:mve.valueOf(true)
+		},
+		{
+			content:mve.valueOf("ccc"),
+			complete:mve.valueOf(false)
+		}
+	])
 	let input:HTMLInputElement
 	return [
 		dom({
@@ -138,6 +151,12 @@ function modelChildrenRender(list:mve.ArrayModel<List>,me:mve.LifeModel,p:List,i
 	return dom({
 		type:"li",
 		cls:liClass,
+		init(){
+			console.log("初始化",p.content())
+			return function(){
+				console.log("销毁",p.content())
+			}
+		},
 		children:[
 			dom({
 				type:"input",init(v){checkbox=v},

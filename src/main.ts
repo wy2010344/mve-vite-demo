@@ -1,6 +1,8 @@
 import { clsOf, dom } from "mve-dom/index"
+import { orRun } from "mve-core/util"
 import { rootRoute } from "./index"
 import { initPrism } from "./prismHelper"
+import {locationHashBind} from 'mve-dom/router'
 const topAreaCls=clsOf("topArea")
 
 const root=dom.root(function(me){
@@ -25,40 +27,11 @@ const root=dom.root(function(me){
 	}
 })
 
-function hashChange(){
-	const hash=location.hash
-	const query={}
-	const path=[]
-	if(hash){
-		const [pathStr,queryStr]=hash.split("?")
-		pathStr.slice(1).split("/").forEach(v=>{
-			if(v){
-				path.push(v)
-			}
-		})
-		if(queryStr){
-			queryStr.split("&").forEach(kv=>{
-				const [k,v]=kv.split("=")
-				const oldV=query[k]
-				if(oldV){
-					oldV.push(v)
-				}else{
-					query[k]=v
-				}
-			})
-		}
-	}
-	if(path.length==0){
-		path.push("index")
-	}
-	rootRoute.param({path,query})
-}
-window.addEventListener("hashchange",hashChange)
-hashChange()
+locationHashBind(rootRoute)
+
 document.body.appendChild(root.element)
-if(root.init){
-	root.init()
-}
-if(root.destroy){
-	window.addEventListener("unload",root.destroy)
+
+const destroy=orRun(root.init)
+if(destroy){
+	window.addEventListener("unload",destroy)
 }

@@ -1,6 +1,6 @@
 
 import { dom } from "mve-dom"
-import { createRouter, QueryWrapper } from "../router"
+import { createRouter, QueryWrapper } from "mve-dom/router"
 import "./base.css"
 import "./index.less"
 import { mve }from 'mve-core/util'
