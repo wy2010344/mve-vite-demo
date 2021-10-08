@@ -136,7 +136,13 @@ const index=createRouter(function(me,route){
 				{
 					title:[href(['vue3+ant-design-vue+tsx的后台管理网站'],"https://wy2010344.gitee.io/vite-vue-ant-design-learn/",true)],
 					summary:[`
-					跟随github项目实现，移除对covue和covue-lib的依赖
+					跟随github项目实现，移除对covue和covue-lib的依赖。待补全
+					`]
+				},
+				{
+					title:[href(['个人文章收集'],'https://gitee.com/wy2010344/article',true)],
+					summary:[`
+					一些个人文章，不一定完成
 					`]
 				},
 				{

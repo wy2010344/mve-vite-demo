@@ -4,6 +4,7 @@ import { dragResizePanel } from "../form"
 import { mve } from 'mve-core/util'
 import { 动画展示 } from "./动画"
 import { 初始绑定scrollTop或scrollLeft } from "./初始绑定scrollTop或scrollLeft"
+import { marked示例 } from "./marked示例"
 
 
 export const 首页=dragResizePanel(function(x){
@@ -49,6 +50,24 @@ export const 首页=dragResizePanel(function(x){
 								left:mve.valueOf(e.clientX),
 								top:mve.valueOf(e.clientY),
 								children:初始绑定scrollTop或scrollLeft(x)
+							}
+						}))
+					}
+				}
+			}),
+			dom({
+				type:"button",
+				text:"marked示例",
+				event:{
+					click(e:MouseEvent){
+						x.panel.add(dragResizePanel(function(x){
+							return {
+								title:"marked示例",
+								width:mve.valueOf(800),
+								height:mve.valueOf(600),
+								left:mve.valueOf(e.clientX),
+								top:mve.valueOf(e.clientY),
+								children:marked示例(x)
 							}
 						}))
 					}
