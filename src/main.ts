@@ -1,11 +1,13 @@
 import { clsOf, dom } from "mve-dom/index"
 import { rootRoute } from "./index"
+import { initPrism } from "./prismHelper"
 const topAreaCls=clsOf("topArea")
 
 const root=dom.root(function(me){
 	return {
 		type:"div",
 		children:[
+			initPrism(),
 			dom({
 				type:"style",
 				text:`
