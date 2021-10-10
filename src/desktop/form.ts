@@ -5,7 +5,7 @@ import { resizeZoom } from './resize'
 import { dragMoveHelper, dragResizeHelper } from './drag'
 import { buildTitle } from './title'
 import { modelChildren} from 'mve-core/modelChildren'
-import { targetAnimationOf, Tween, tweenAnimationOf } from '../animate'
+import { targetAnimationOf, Animation } from 'mve-dom/animation'
 
 
 export interface FormPanelParam{
@@ -204,7 +204,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 							value:sizeLocationAnimate.height
 						}
 					],
-					change:Tween.Cubic.easeIn,
+					change:Animation.Cubic.easeIn,
 					duration:300,
 					end(){
 						sizeLocationAnimate.on(false)
@@ -282,7 +282,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 								begin(){
 									sizeLocationAnimate.on(true)
 								},
-								change:Tween.Cubic.easeIn,
+								change:Animation.Cubic.easeIn,
 								duration:300,
 								end(){
 									sizeLocationAnimate.on(false)
@@ -317,7 +317,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 								begin(){
 									sizeLocationAnimate.on(true)
 								},
-								change:Tween.Cubic.easeIn,
+								change:Animation.Cubic.easeIn,
 								duration:300,
 								end(){
 									sizeLocationAnimate.on(false)
@@ -344,7 +344,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 									value:sizeLocationAnimate.height
 								}
 							],
-							change:Tween.Cubic.easeOut,
+							change:Animation.Cubic.easeOut,
 							begin(){
 								sizeLocationAnimate.on(true)
 							},

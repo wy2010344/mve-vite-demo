@@ -138,7 +138,7 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 													if(todo==editTodo()){
 														vs.push('editing')
 													}
-													return vs.join(' ')
+													return vs
 												},
 												style:{
 													display(){

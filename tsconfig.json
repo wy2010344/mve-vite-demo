@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+		"jsx": "react",
+		"jsxFactory":"createElement",
     "target": "ESNext",
     "isolatedModules":true,
     "useDefineForClassFields": true,
@@ -14,6 +16,13 @@
     //"noUnusedLocals": true,
     //"noUnusedParameters": true,
     //"noImplicitReturns": true
+    // "moduleResolution": "Node",
+    // "allowSyntheticDefaultImports": true,
+    // "strict": true,
+    // "forceConsistentCasingInFileNames": true,
+    // "allowJs": false,
+    // "skipLibCheck": false,
+    // "resolveJsonModule": true,
   },
   "include": ["./src"]
 }

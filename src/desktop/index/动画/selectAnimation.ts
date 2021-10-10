@@ -1,11 +1,11 @@
 
 
-import { Tween } from '../../../animate'
+import { Animation } from 'mve-dom/animation'
 import { mve } from 'mve-core/util'
 import { dom, idOf } from 'mve-dom/index'
 import { filterChildren } from 'mve-core/filterChildren'
 
-const allTweens=Object.keys(Tween)
+const allTweens=Object.keys(Animation)
 
 export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 
@@ -14,7 +14,7 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 
 	function selectV(v:string){
 		currentTween(v)
-		const pkg=Tween[v]
+		const pkg=Animation[v]
 		const ease=typeof(pkg)=='function'?pkg:Object.values(pkg)[0]
 		currentEase(ease)
 		call(ease)
@@ -24,7 +24,7 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 	const idAnimationType=idOf("select-animation-type")
 
 	const easyList=me.Cache(function(){
-		const pkg=Tween[currentTween()]
+		const pkg=Animation[currentTween()]
 		return typeof(pkg)=='function'?[]:Object.entries(pkg)
 	})
 	setTimeout(function(){

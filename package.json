@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "marked": "^3.0.6",
-    "mve-dom": "^1.1.0"
+    "mve-dom": "^1.1.3"
   }
 }
