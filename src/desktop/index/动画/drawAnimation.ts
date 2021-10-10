@@ -1,6 +1,6 @@
 import { mve } from 'mve-core/util'
 import { dom } from 'mve-dom/index'
-import { drawOfBezier3, DrawOfBezier3 } from '../../../animate'
+import { drawOfBezier3, DrawOfBezier3 } from 'mve-dom/animation'
 
 //draw(drawOfBezier3(fn()))
 export function drawAnimation(fun:(v)=>void) {

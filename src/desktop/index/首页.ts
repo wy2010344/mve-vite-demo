@@ -5,6 +5,7 @@ import { mve } from 'mve-core/util'
 import { 动画展示 } from "./动画"
 import { 初始绑定scrollTop或scrollLeft } from "./初始绑定scrollTop或scrollLeft"
 import { marked示例 } from "./marked示例"
+import { 测试tsx } from "./测试tsx"
 
 
 export const 首页=dragResizePanel(function(x){
@@ -68,6 +69,24 @@ export const 首页=dragResizePanel(function(x){
 								left:mve.valueOf(e.clientX),
 								top:mve.valueOf(e.clientY),
 								children:marked示例(x)
+							}
+						}))
+					}
+				}
+			}),
+			dom({
+				type:"button",
+				text:"测试tsx",
+				event:{
+					click(e:MouseEvent){
+						x.panel.add(dragResizePanel(function(x){
+							return {
+								title:"测试tsx",
+								width:mve.valueOf(800),
+								height:mve.valueOf(600),
+								left:mve.valueOf(e.clientX),
+								top:mve.valueOf(e.clientY),
+								children:测试tsx(x)
 							}
 						}))
 					}

@@ -1,5 +1,5 @@
 
-import { Tween, DrawOfBezier3, drawOfBezier3, tweenAnimationOf } from '../../../animate'
+import { Animation, DrawOfBezier3, drawOfBezier3, animationOf } from 'mve-dom/animation'
 import { mve } from 'mve-core/util'
 import { dom } from 'mve-dom/index'
 
@@ -59,7 +59,7 @@ export function viewAnimation(){
 				ctx.restore();
 			}
 		
-			tweenAnimationOf({
+			animationOf({
 				duration,
 				max:yLen,
 				call(y,t){
