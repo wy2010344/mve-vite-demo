@@ -1,4 +1,4 @@
-import { dom } from "mve-dom"
+import { dom } from "mve-dom/index"
 import  "./index.less"
 import { mve } from 'mve-core/util'
 import { modelChildren } from 'mve-core/modelChildren'

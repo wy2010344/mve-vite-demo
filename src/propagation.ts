@@ -1,4 +1,4 @@
-import { dom } from "mve-dom";
+import { dom } from "mve-dom/index";
 
 
 

@@ -33,6 +33,8 @@ export const 桌面=createRouter(function(me,route){
 			top:"0",
 			left:"0"
 		},
-		children:desktop.render
+		children:[
+			desktop.render
+		]
 	})
 })

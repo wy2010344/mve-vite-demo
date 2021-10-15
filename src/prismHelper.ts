@@ -1,5 +1,6 @@
-import { dom } from "mve-dom"
+import { dom } from "mve-dom/index"
 import { mve,run } from 'mve-core/util'
+import {fragment } from 'mve-core/childrenBuilder'
 
 const prismPrefix='https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/'
 
@@ -33,29 +34,31 @@ export const currentPrismStyle=run(function(){
 })
 
 export function initPrism(){
-	return [
-		dom({
-			type:"link",
-			attr:{
-				href(){
-					const v=currentPrismStyle()
-					const pv=v==''?'':`-${v}`
-					return `${prismPrefix}themes/prism${pv}.css`
-				},
-				rel:"stylesheet"
-			}
-		}),
-		dom({
-			type:"script",
-			attr:{
-				src:`${prismPrefix}components/prism-core.min.js`
-			}
-		}),
-		dom({
-			type:"script",
-			attr:{
-				src:`${prismPrefix}plugins/autoloader/prism-autoloader.min.js`
-			}
-		})
-	]
+	return fragment({
+		children:[
+			dom({
+				type:"link",
+				attr:{
+					href(){
+						const v=currentPrismStyle()
+						const pv=v==''?'':`-${v}`
+						return `${prismPrefix}themes/prism${pv}.css`
+					},
+					rel:"stylesheet"
+				}
+			}),
+			dom({
+				type:"script",
+				attr:{
+					src:`${prismPrefix}components/prism-core.min.js`
+				}
+			}),
+			dom({
+				type:"script",
+				attr:{
+					src:`${prismPrefix}plugins/autoloader/prism-autoloader.min.js`
+				}
+			})
+		]
+	})
 }

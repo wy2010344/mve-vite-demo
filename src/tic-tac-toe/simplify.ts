@@ -1,5 +1,5 @@
 import { mve } from 'mve-core/util'
-import { dom } from "mve-dom";
+import { dom } from "mve-dom/index";
 import { modelChildren } from 'mve-core/modelChildren'
 import  "./index.less"
 
@@ -173,29 +173,31 @@ export function ticTacToeSimplify(me:mve.LifeModel){
 					//历史记录
           dom({
             type:"ol",
-            children:modelChildren(historys,function(me,history,i){
-              return dom({
-                type:"li",
-                children:[
-                  dom({
-                    type:"button",
-										style:{
-											color(){
-												return i()==stepNumber()?"blue":''
+            children:[
+							modelChildren(historys,function(me,history,i){
+								return dom({
+									type:"li",
+									children:[
+										dom({
+											type:"button",
+											style:{
+												color(){
+													return i()==stepNumber()?"blue":''
+												}
+											},
+											text(){
+												return i()?`Go to move #${i()}`:`Go to game start`
+											},
+											event:{
+												click(){
+													stepNumber(i())
+												}
 											}
-										},
-                    text(){
-                      return i()?`Go to move #${i()}`:`Go to game start`
-                    },
-                    event:{
-                      click(){
-                        stepNumber(i())
-                      }
-                    }
-                  })
-                ]
-              })
-            })
+										})
+									]
+								})
+							})
+						]
           })
         ]
       })

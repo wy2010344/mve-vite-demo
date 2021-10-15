@@ -3,6 +3,7 @@
 import { mve } from 'mve-core/util'
 import { dom } from 'mve-dom'
 import { modelChildren } from 'mve-core/modelChildren'
+import { fragment } from 'mve-core/childrenBuilder'
 
 
 
@@ -23,84 +24,86 @@ function treeBranch(
 	function childrenDisplay(){
 		return display() && expand()
 	}
-	return [
-		dom({
-			type:"tr",
-			style:{
-				display(){
-					return display()?"":"none"
-				}
-			},
-			children:[
-				dom({
-					type:"td",
-					children:[
-						dom({
-							type:"button",
-							style:{
-								width:"25px",
-								"margin-left":20 * indent + "px",
-								visibility(){
-									return children.size()==0?"hidden":''
+	return fragment({
+		children:[
+			dom({
+				type:"tr",
+				style:{
+					display(){
+						return display()?"":"none"
+					}
+				},
+				children:[
+					dom({
+						type:"td",
+						children:[
+							dom({
+								type:"button",
+								style:{
+									width:"25px",
+									"margin-left":20 * indent + "px",
+									visibility(){
+										return children.size()==0?"hidden":''
+									}
+								},
+								text(){
+									return expand()?"-":"+"
+								},
+								event:{
+									click(){
+										expand(!expand())
+									}
 								}
-							},
-							text(){
-								return expand()?"-":"+"
-							},
-							event:{
-								click(){
-									expand(!expand())
+							}),
+							dom({
+								type:"span",
+								text(){
+									return "第"+(indent+1)+"层"+(i()+1)+"元素"
 								}
-							}
-						}),
-						dom({
-							type:"span",
-							text(){
-								return "第"+(indent+1)+"层"+(i()+1)+"元素"
-							}
-						})
-					]
-				}),
-				dom({
-					type:"td",
-					text:"第二列"
-				}),
-				dom({
-					type:"td",
-					children:[
-						dom({
-							type:"button",
-							text:"追加1",
-							event:{
-								click(){
-									expand(true)
-									children.push({})
+							})
+						]
+					}),
+					dom({
+						type:"td",
+						text:"第二列"
+					}),
+					dom({
+						type:"td",
+						children:[
+							dom({
+								type:"button",
+								text:"追加1",
+								event:{
+									click(){
+										expand(true)
+										children.push({})
+									}
 								}
-							}
-						})
-					]
-				}),
-				dom({
-					type:"td",
-					children:[
-						dom({
-							type:"button",
-							text:"前加1",
-							event:{
-								click(){
-									expand(true)
-									children.unshift({})
+							})
+						]
+					}),
+					dom({
+						type:"td",
+						children:[
+							dom({
+								type:"button",
+								text:"前加1",
+								event:{
+									click(){
+										expand(true)
+										children.unshift({})
+									}
 								}
-							}
-						})
-					]
-				})
-			]
-		}),
-		modelChildren(children,function(me,row,i){
-			return treeBranch(me,row,i,indent+1,childrenDisplay)
-		})
-	]
+							})
+						]
+					})
+				]
+			}),
+			modelChildren(children,function(me,row,i){
+				return treeBranch(me,row,i,indent+1,childrenDisplay)
+			})
+		]
+	})
 }
 
 /**
@@ -123,9 +126,11 @@ export function sameRootTree(me:mve.LifeModel){
 				attr:{
 					border:1
 				},
-				children:modelChildren(root,function(me,row,i){
-					return treeBranch(me,row,i,0,()=>true)
-				})
+				children:[
+					modelChildren(root,function(me,row,i){
+						return treeBranch(me,row,i,0,()=>true)
+					})
+				]
 			})
 		]
 	})

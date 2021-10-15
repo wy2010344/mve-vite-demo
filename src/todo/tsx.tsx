@@ -6,6 +6,7 @@ import { mve }from 'mve-core/util'
 import { modelChildren} from 'mve-core/modelChildren'
 import * as DOM from 'mve-dom/DOM'
 import { createElement, Dom } from "mve-dom/tsxSupport"
+import { fragment } from 'mve-core/childrenBuilder'
 
 
 
@@ -199,17 +200,19 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 							 <Dom type="strong" text={()=>todos.filter(v=>!v.completed()).length}/> items left
 						 </Dom>
 						 <Dom type="ul" cls="filters">
-								{Object.entries(filterValue).map(([k,v])=>(
-									<Dom type="li">
-										<Dom type="a" cls={()=>getFirstKey()==k?'selected':''} attr={{href:"javascript:void(0)"}} text={k}
-											event={{
-												click(){
-													route.go(k as keyof TodoRouter,v)
-												}
-											}}
-										/>
-									</Dom>
-								))}
+								{fragment({
+									children:Object.entries(filterValue).map(([k,v])=>(
+										<Dom type="li">
+											<Dom type="a" cls={()=>getFirstKey()==k?'selected':''} attr={{href:"javascript:void(0)"}} text={k}
+												event={{
+													click(){
+														route.go(k as keyof TodoRouter,v)
+													}
+												}}
+											/>
+										</Dom>)
+									)
+								})}
 						 </Dom>
 						 <Dom type="button" cls="clear-completed" text="Clear completed" 
 						 	style={{display(){
