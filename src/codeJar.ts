@@ -394,9 +394,7 @@ export function codeJar(p:CodeJarOption){
 		}
 	}
 
-	const element:DOMNode=p.element||{
-		type:"pre"
-	}
+	const element=p.element||{type:"pre"}
 	element.event=element.event||{}
 	const action=element.event
 

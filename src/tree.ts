@@ -1,6 +1,7 @@
-import { dom } from "mve-dom";
+import { dom, domText } from "mve-dom/index";
 import { mve } from 'mve-core/util'
 import { modelChildren } from 'mve-core/modelChildren'
+import { fragment } from 'mve-core/childrenBuilder'
 
 
 
@@ -47,26 +48,34 @@ function treeBranch(me:mve.LifeModel,row:TreeRow,i:mve.GValue<number>) {
             return expand()?"":"none"
           }
         },
-        children:modelChildren(children,treeBranch)
-      })
+        children:[
+					modelChildren(children,treeBranch)
+				]
+			})
     ]
   })
 }
 export function tree(me:mve.LifeModel){
   const rootList=mve.arrayModelOf<TreeRow>([])
-	return [
-		dom("tree"),
-		dom({
-			type:"button",text:"追加根节点",
-			event:{
-				click(){
-					rootList.push({})
+	return fragment({
+		children:[
+			domText({
+				text:"tree"
+			}),
+			dom({
+				type:"button",text:"追加根节点",
+				event:{
+					click(){
+						rootList.push({})
+					}
 				}
-			}
-		}),
-		dom({
-			type:"ul",
-			children:modelChildren(rootList,treeBranch)
-		})
-	]
+			}),
+			dom({
+				type:"ul",
+				children:[
+					modelChildren(rootList,treeBranch)
+				]
+			})
+		]
+	})
 }

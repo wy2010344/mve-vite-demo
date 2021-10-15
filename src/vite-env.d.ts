@@ -5,3 +5,8 @@ declare namespace JSX {
 	type Element=import("mve-dom/tsxSupport").JSX.Element
 	type ElementChildrenAttribute=import('mve-dom/tsxSupport').JSX.ElementChildrenAttribute
 }
+
+declare module '*.mdx'{
+	let MDXComponent:import("./vite-mdx-mve-tsx-plugin/visitTsx").MdxAstType[]
+	export default MDXComponent
+}

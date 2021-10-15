@@ -2,6 +2,7 @@ import { mve,BaseArray,SimpleArray } from 'mve-core/util'
 import { dom } from 'mve-dom'
 
 import { modelChildren } from 'mve-core/modelChildren'
+import { fragment } from 'mve-core/childrenBuilder'
 
 
 
@@ -15,39 +16,41 @@ export type SORTTYPE=(typeof SORTDIR)[number]
 export function filterSortArea(filterFactory:(filter:string,dir:SORTTYPE)=>void){
 	let filterInput:HTMLInputElement
 	let sortSelect:HTMLSelectElement
-	return [
-		dom({
-			type:"input",
-			init(e){
-				filterInput=e
-			},
-		}),
-		dom({
-			type:"select",
-			init(e){sortSelect=e},
-			children:SORTDIR.map(v=>{
-				return dom({
-					type:"option",
-					text:v,
-					value:v
+	return fragment({
+		children:[
+			dom({
+				type:"input",
+				init(e){
+					filterInput=e
+				},
+			}),
+			dom({
+				type:"select",
+				init(e){sortSelect=e},
+				children:SORTDIR.map(v=>{
+					return dom({
+						type:"option",
+						text:v,
+						value:v
+					})
 				})
-			})
-		}),
-		dom({
-			type:"button",
-			text:"开始搜索",
-			event:{
-				click(){
-					const begin=Date.now()
-					const filter=filterInput.value
-					const dir=sortSelect.value as SORTTYPE
-					console.log(filter,dir)
-					filterFactory(filter,dir)
-					console.log("消耗时间",Date.now()-begin)
+			}),
+			dom({
+				type:"button",
+				text:"开始搜索",
+				event:{
+					click(){
+						const begin=Date.now()
+						const filter=filterInput.value
+						const dir=sortSelect.value as SORTTYPE
+						console.log(filter,dir)
+						filterFactory(filter,dir)
+						console.log("消耗时间",Date.now()-begin)
+					}
 				}
-			}
-		})
-	]
+			})
+		]
+	})
 }
 
 /**
@@ -106,42 +109,44 @@ export function sortAndFilterBase(filterFactory:(text:string,dir:SORTTYPE,arr:mv
             'letter-spacing':'2px',
             'text-align':'right'
           },
-          children:modelChildren(list,function(me,row,i){
-            return dom({
-              type:"div",
-              style:{
-                display(){
-                  return row.show()?"flex":'none'
-                },
-                "justify-content":"space-around",
-                order:row.order,
-                transition
-              },
-              children:[
-                dom({
-                  type:"span",
-                  style:{
-                    flex:1
-                  },
-                  text:i
-                }),
-                dom({
-                  type:"span",
-                  style:{
-                    flex:1
-                  },
-                  text:"随机数据"
-                }),
-                dom({
-                  type:"span",
-                  style:{
-                    flex:1
-                  },
-                  text:row.value
-                })
-              ]
-            })
-          })
+          children:[
+						modelChildren(list,function(me,row,i){
+							return dom({
+								type:"div",
+								style:{
+									display(){
+										return row.show()?"flex":'none'
+									},
+									"justify-content":"space-around",
+									order:row.order,
+									transition
+								},
+								children:[
+									dom({
+										type:"span",
+										style:{
+											flex:1
+										},
+										text:i
+									}),
+									dom({
+										type:"span",
+										style:{
+											flex:1
+										},
+										text:"随机数据"
+									}),
+									dom({
+										type:"span",
+										style:{
+											flex:1
+										},
+										text:row.value
+									})
+								]
+							})
+						})
+					]
         })
       ]
     })

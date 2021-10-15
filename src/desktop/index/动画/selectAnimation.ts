@@ -4,6 +4,7 @@ import { Animation } from 'mve-dom/animation'
 import { mve } from 'mve-core/util'
 import { dom, idOf } from 'mve-dom/index'
 import { filterChildren } from 'mve-core/filterChildren'
+import { fragment } from 'mve-core/childrenBuilder'
 
 const allTweens=Object.keys(Animation)
 
@@ -46,32 +47,34 @@ export function selectAnimation(me:mve.LifeModel,call:(v)=>void){
 						type:"h3",
 						text:"内置动画类型"
 					}),
-					allTweens.map(function(tween){
-						return dom({
-							type:"span",
-							children:[
-								dom({
-									type:"input",
-									attr:{
-										type:"radio",
-										name:idAnimation
-									},
-									prop:{
-										checked(){
-											return currentTween()==tween
+					fragment({
+							children:allTweens.map(function(tween){
+							return dom({
+								type:"span",
+								children:[
+									dom({
+										type:"input",
+										attr:{
+											type:"radio",
+											name:idAnimation
+										},
+										prop:{
+											checked(){
+												return currentTween()==tween
+											}
+										},
+										event:{
+											click(){
+												selectV(tween)
+											}
 										}
-									},
-									event:{
-										click(){
-											selectV(tween)
-										}
-									}
-								}),
-								dom({
-									type:"label",
-									text:tween
-								}),
-							]
+									}),
+									dom({
+										type:"label",
+										text:tween
+									}),
+								]
+							})
 						})
 					}),
 					dom({

@@ -1,4 +1,4 @@
-import { dom, ItemValue } from "mve-dom";
+import { dom, ItemValue } from "mve-dom/index";
 import {mve} from 'mve-core/util'
 
 export function buildTitle(p:{

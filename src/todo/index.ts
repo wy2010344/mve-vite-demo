@@ -1,5 +1,5 @@
 
-import { dom } from "mve-dom"
+import { dom } from "mve-dom/index"
 import { createRouter, QueryWrapper } from "mve-dom/router"
 import "./base.css"
 import "./index.less"
@@ -122,89 +122,91 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 									}),
 									dom({
 										type:"ul",cls:"todo-list",
-										children:modelChildren(todos,function(me,todo,i){
-											let checkbox:HTMLInputElement
-											let editInput:HTMLInputElement
-											function finishEdit(){
-												todo.title(editInput.value.trim())
-												editTodo(null)
-											}
-											return dom({
-												type:"li",cls(){
-													const vs=['todo']
-													if(todo.completed()){
-														vs.push('completed')
-													}
-													if(todo==editTodo()){
-														vs.push('editing')
-													}
-													return vs
-												},
-												style:{
-													display(){
-														return todo.show()?'':'none'
-													},
-													left(){
-														return todo.state()=='destroy'
-														?'100%'
-														:todo.state()=='init'
-														? '-100%'
-														:'0'
-													},
-													transition:`left ${animateS}s`
-												},
-												children:[
-													dom({type:"div",cls:"view",children:[
-														dom({type:"input",cls:"toggle",attr:{type:"checkbox"},init(e){checkbox=e},
-															prop:{
-																checked:todo.completed
-															},
-															event:{
-																change(){
-																	todo.completed(checkbox.checked)
-																}
-															}
-														}),
-														dom({type:"label",text:todo.title,event:{
-															dblclick(){
-																editTodo(todo)
-																editInput.focus()
-															}
-														}}),
-														dom({type:"button",cls:"destroy",event:{
-															click(){
-																todo.state("destroy")
-																setTimeout(function(){
-																	todos.remove(i())
-																},animateS*1000)
-															}
-														}})
-													]}),
-													dom({type:"input",cls:"edit",init(e){editInput=e},
-														attr:{
-															type:"text",
-															"todo-focus"(){
-																return todo==editTodo()
-															}
-														},
-														value:todo.title,
-														event:{
-															blur:finishEdit,
-															keyup(e:KeyboardEvent){
-																if(DOM.keyCode.ENTER(e)){
-																	finishEdit()
-																}else
-																if(e.key=='Escape'){
-																	editTodo(null)
-																	editInput.value=todo.title()
-																}
-																console.log(e)
-															}
+										children:[
+											modelChildren(todos,function(me,todo,i){
+												let checkbox:HTMLInputElement
+												let editInput:HTMLInputElement
+												function finishEdit(){
+													todo.title(editInput.value.trim())
+													editTodo(null)
+												}
+												return dom({
+													type:"li",cls(){
+														const vs=['todo']
+														if(todo.completed()){
+															vs.push('completed')
 														}
-													})
-												]
+														if(todo==editTodo()){
+															vs.push('editing')
+														}
+														return vs
+													},
+													style:{
+														display(){
+															return todo.show()?'':'none'
+														},
+														left(){
+															return todo.state()=='destroy'
+															?'100%'
+															:todo.state()=='init'
+															? '-100%'
+															:'0'
+														},
+														transition:`left ${animateS}s`
+													},
+													children:[
+														dom({type:"div",cls:"view",children:[
+															dom({type:"input",cls:"toggle",attr:{type:"checkbox"},init(e){checkbox=e},
+																prop:{
+																	checked:todo.completed
+																},
+																event:{
+																	change(){
+																		todo.completed(checkbox.checked)
+																	}
+																}
+															}),
+															dom({type:"label",text:todo.title,event:{
+																dblclick(){
+																	editTodo(todo)
+																	editInput.focus()
+																}
+															}}),
+															dom({type:"button",cls:"destroy",event:{
+																click(){
+																	todo.state("destroy")
+																	setTimeout(function(){
+																		todos.remove(i())
+																	},animateS*1000)
+																}
+															}})
+														]}),
+														dom({type:"input",cls:"edit",init(e){editInput=e},
+															attr:{
+																type:"text",
+																"todo-focus"(){
+																	return todo==editTodo()
+																}
+															},
+															value:todo.title,
+															event:{
+																blur:finishEdit,
+																keyup(e:KeyboardEvent){
+																	if(DOM.keyCode.ENTER(e)){
+																		finishEdit()
+																	}else
+																	if(e.key=='Escape'){
+																		editTodo(null)
+																		editInput.value=todo.title()
+																	}
+																	console.log(e)
+																}
+															}
+														})
+													]
+												})
 											})
-										})
+										]
 									})
 								]
 							}),
@@ -229,28 +231,26 @@ export const todoMVC=createRouter<TodoRouter>(function(me,route){
 									dom({
 										type:"ul",cls:"filters",
 										children:Object.entries(filterValue).map(([k,v])=>{
-											return [
-												dom({
-													type:"li",
-													children:[
-														dom({
-															type:"a",
-															cls(){
-																return getFirstKey()==k?'selected':''
-															},
-															attr:{
-																href:"javascript:void(0)"
-															},
-															text:k,
-															event:{
-																click(){
-																	route.go(k as keyof TodoRouter,v)
-																}
+											return dom({
+												type:"li",
+												children:[
+													dom({
+														type:"a",
+														cls(){
+															return getFirstKey()==k?'selected':''
+														},
+														attr:{
+															href:"javascript:void(0)"
+														},
+														text:k,
+														event:{
+															click(){
+																route.go(k as keyof TodoRouter,v)
 															}
-														})
-													]
-												})
-											]
+														}
+													})
+												]
+											})
 										})
 									}),
 									dom({

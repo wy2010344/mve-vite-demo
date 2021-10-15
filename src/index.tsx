@@ -1,4 +1,4 @@
-import { dom,DOMNodeAll } from "mve-dom";
+import { dom } from "mve-dom/index";
 import { createRouter , FlatRouter, QueryWrapper, Router, routerView } from "mve-dom/router";
 import { todoMVC, TodoRouter } from "./todo/index";
 import { todoMVC as tsxTodoMVC, TodoRouter as TSXTodoRouter } from "./todo/tsx";
@@ -16,13 +16,13 @@ import { filterOnly } from "./sortAndFilter/filterOnly";
 import { filterCacheOnly } from "./sortAndFilter/filterCacheOnly";
 import { sameRootTree } from "./sameRootTree";
 import { moveFilter } from "./sortAndFilter/move";
-import { createElement, Dom, TsxChildren, mergeFromTsxChildren, fromTsxChildren, Fragment } from "mve-dom/tsxSupport";
+import { createElement, Dom, TsxChild, mergeFromTsxChildren, fromTsxChild, Fragment } from "mve-dom/tsxSupport";
 
 interface Paragraph{
 	/**段落标题*/
-	title:TsxChildren
+	title:TsxChild
 	/**内容总结 */
-	summary?:TsxChildren
+	summary?:TsxChild
 	/**后续*/
 	children?:Paragraph[]
 }
@@ -30,8 +30,8 @@ interface Paragraph{
 function Href(p:{
 	href:string
 	link?:boolean
-	children?:TsxChildren
-},...children:TsxChildren[]){
+	children?:TsxChild
+},...children:TsxChild[]){
 	return dom({
 		type:"a",
 		attr:{
@@ -50,11 +50,15 @@ function toParagraph(vs:Paragraph[],i=1){
 			children:[
 				dom({
 					type:"h"+i,
-					children:fromTsxChildren(v.title)
+					children:[
+						fromTsxChild(v.title)
+					]
 				}),
 				dom({
 					type:"span",
-					children:fromTsxChildren(v.summary||'')
+					children:[
+						fromTsxChild(v.summary||'')
+					]
 				}),
 				toParagraph(v.children||[],i+1)
 			]

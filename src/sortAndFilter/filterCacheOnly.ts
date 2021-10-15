@@ -42,59 +42,61 @@ export function filterCacheOnly(me:mve.LifeModel){
 					'letter-spacing':'2px',
 					'text-align':'right'
 				},
-				children:filterCacheChildren(
-					function(){
-						const x=filterSort()
-						const vs=list().filter(v=>(v.value+"").startsWith(x.filter))
-						if(x.sort=='none'){
-							return vs
-						}else
-						if(x.sort=='asc'){
-							return vs.sort(function(a,b){
-								return a.value - b.value
-							})
-						}else
-						if(x.sort=='desc'){
-							return vs.sort(function(a,b){
-								return b.value - a.value
+				children:[
+					filterCacheChildren(
+						function(){
+							const x=filterSort()
+							const vs=list().filter(v=>(v.value+"").startsWith(x.filter))
+							if(x.sort=='none'){
+								return vs
+							}else
+							if(x.sort=='asc'){
+								return vs.sort(function(a,b){
+									return a.value - b.value
+								})
+							}else
+							if(x.sort=='desc'){
+								return vs.sort(function(a,b){
+									return b.value - a.value
+								})
+							}
+						},
+						function(me,row,i){
+							return dom({
+								type:"div",
+								style:{
+									display:"flex",
+									"justify-content":"space-around"
+								},
+								children:[
+									dom({
+										type:"span",
+										style:{
+											flex:1
+										},
+										text:i
+									}),
+									dom({
+										type:"span",
+										style:{
+											flex:1
+										},
+										text:"随机数据"
+									}),
+									dom({
+										type:"span",
+										style:{
+											flex:1
+										},
+										text(){
+											return row().value
+										}
+									})
+								]
 							})
 						}
-					},
-					function(me,row,i){
-						return dom({
-							type:"div",
-              style:{
-                display:"flex",
-                "justify-content":"space-around"
-              },
-							children:[
-                dom({
-                  type:"span",
-                  style:{
-                    flex:1
-                  },
-                  text:i
-                }),
-                dom({
-                  type:"span",
-                  style:{
-                    flex:1
-                  },
-                  text:"随机数据"
-                }),
-                dom({
-                  type:"span",
-                  style:{
-                    flex:1
-                  },
-                  text(){
-										return row().value
-									}
-                })
-							]
-						})
-					}
-				)
+					)
+				]
 			})
 		]
 	})

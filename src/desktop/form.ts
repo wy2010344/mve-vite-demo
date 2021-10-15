@@ -1,5 +1,5 @@
 import {mve} from 'mve-core/util'
-import {EOChildren} from 'mve-core/childrenBuilder'
+import {EOChild} from 'mve-core/childrenBuilder'
 import { dom } from 'mve-dom'
 import { resizeZoom } from './resize'
 import { dragMoveHelper, dragResizeHelper } from './drag'
@@ -20,7 +20,7 @@ export interface FormPanelParam{
 	bringToFront():void
 }
 export interface FormPanel{
-	(p:FormPanelParam):EOChildren<Node>
+	(p:FormPanelParam):EOChild<Node>
 }
 
 
@@ -114,7 +114,7 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 	hideClose?:mve.TValue<boolean>
 	hideMax?:mve.TValue<boolean>
 	title?:mve.TValue<string>,
-	children:EOChildren<Node>
+	content:EOChild<Node>
 }):FormPanel{
 	return function(x){
 		const titleHeight=30
@@ -250,113 +250,113 @@ export function dragResizePanel(render:(x:DragResizePanelParam)=>{
 						diffY(y){
 							top(top()+y)
 						}
-					}),
-					hideClose:p.hideClose,
-					max,
-					maxClick(){
-						if(max()){
-							//缩小
-							targetAnimationOf({
-								data:[
-									{
-										from:sizeLocationCurrent.width(),
-										to:width(),
-										value:sizeLocationAnimate.width
-									},
-									{
-										from:sizeLocationCurrent.height(),
-										to:height(),
-										value:sizeLocationAnimate.height
-									},
-									{
-										from:sizeLocationCurrent.left(),
-										to:left(),
-										value:sizeLocationAnimate.left
-									},
-									{
-										from:sizeLocationCurrent.top(),
-										to:top(),
-										value:sizeLocationAnimate.top
-									}
-								],
-								begin(){
-									sizeLocationAnimate.on(true)
-								},
-								change:Animation.Cubic.easeIn,
-								duration:300,
-								end(){
-									sizeLocationAnimate.on(false)
-									max(false)
-								}
-							})
-						}else{
-							//放大
-							targetAnimationOf({
-								data:[
-									{
-										from:sizeLocationCurrent.width(),
-										to:x.desktop.width(),
-										value:sizeLocationAnimate.width
-									},
-									{
-										from:sizeLocationCurrent.height(),
-										to:x.desktop.height(),
-										value:sizeLocationAnimate.height
-									},
-									{
-										from:sizeLocationCurrent.left(),
-										to:0,
-										value:sizeLocationAnimate.left
-									},
-									{
-										from:sizeLocationCurrent.top(),
-										to:0,
-										value:sizeLocationAnimate.top
-									}
-								],
-								begin(){
-									sizeLocationAnimate.on(true)
-								},
-								change:Animation.Cubic.easeIn,
-								duration:300,
-								end(){
-									sizeLocationAnimate.on(false)
-									max(true)		
-								}
-							})
-						}
-					},
-					hideMax: p.hideMax,
-					closeClick(){
-						//右上角关闭
-						sizeLocationAnimate.left(sizeLocationCurrent.left())
-						sizeLocationAnimate.top(sizeLocationCurrent.top())
+				}),
+				hideClose:p.hideClose,
+				max,
+				maxClick(){
+					if(max()){
+						//缩小
 						targetAnimationOf({
 							data:[
 								{
 									from:sizeLocationCurrent.width(),
-									to:0,
+									to:width(),
 									value:sizeLocationAnimate.width
 								},
 								{
 									from:sizeLocationCurrent.height(),
-									to:0,
+									to:height(),
 									value:sizeLocationAnimate.height
+								},
+								{
+									from:sizeLocationCurrent.left(),
+									to:left(),
+									value:sizeLocationAnimate.left
+								},
+								{
+									from:sizeLocationCurrent.top(),
+									to:top(),
+									value:sizeLocationAnimate.top
 								}
 							],
-							change:Animation.Cubic.easeOut,
 							begin(){
 								sizeLocationAnimate.on(true)
 							},
+							change:Animation.Cubic.easeIn,
 							duration:300,
 							end(){
 								sizeLocationAnimate.on(false)
-								x.remove()
+								max(false)
+							}
+						})
+					}else{
+						//放大
+						targetAnimationOf({
+							data:[
+								{
+									from:sizeLocationCurrent.width(),
+									to:x.desktop.width(),
+									value:sizeLocationAnimate.width
+								},
+								{
+									from:sizeLocationCurrent.height(),
+									to:x.desktop.height(),
+									value:sizeLocationAnimate.height
+								},
+								{
+									from:sizeLocationCurrent.left(),
+									to:0,
+									value:sizeLocationAnimate.left
+								},
+								{
+									from:sizeLocationCurrent.top(),
+									to:0,
+									value:sizeLocationAnimate.top
+								}
+							],
+							begin(){
+								sizeLocationAnimate.on(true)
+							},
+							change:Animation.Cubic.easeIn,
+							duration:300,
+							end(){
+								sizeLocationAnimate.on(false)
+								max(true)		
 							}
 						})
 					}
+				},
+				hideMax: p.hideMax,
+				closeClick(){
+					//右上角关闭
+					sizeLocationAnimate.left(sizeLocationCurrent.left())
+					sizeLocationAnimate.top(sizeLocationCurrent.top())
+					targetAnimationOf({
+						data:[
+							{
+								from:sizeLocationCurrent.width(),
+								to:0,
+								value:sizeLocationAnimate.width
+							},
+							{
+								from:sizeLocationCurrent.height(),
+								to:0,
+								value:sizeLocationAnimate.height
+							}
+						],
+						change:Animation.Cubic.easeOut,
+						begin(){
+							sizeLocationAnimate.on(true)
+						},
+						duration:300,
+						end(){
+							sizeLocationAnimate.on(false)
+							x.remove()
+						}
+					})
+				}
 				}),
-				p.children,
+				p.content,
 				resizeZoom({
 					resize:dragResizeHelper({
 						forbidden:noResize,
