@@ -17,6 +17,7 @@ import { filterCacheOnly } from "./sortAndFilter/filterCacheOnly";
 import { sameRootTree } from "./sameRootTree";
 import { moveFilter } from "./sortAndFilter/move";
 import { createElement, Dom, TsxChild, mergeFromTsxChildren, fromTsxChild, Fragment } from "mve-dom/tsxSupport";
+import { canvasReact } from "./canvasReact";
 
 interface Paragraph{
 	/**段落标题*/
@@ -82,6 +83,7 @@ export type MRootRouter={
 	sortAndFilterFilterChildren:QueryWrapper
 	sortAndFilterFilterCacheChildren:QueryWrapper
 	sameRootTree:QueryWrapper
+	canvasReact:QueryWrapper
 }
 
 export type ROOTFLAT=FlatRouter<MRootRouter>
@@ -125,7 +127,10 @@ export const rootRoute=createRouter<MRootRouter>(function(me,router){
 		sortAndFilterFilterCacheChildren:createRouter(function(me){
 			return filterCacheOnly(me)
 		}),
-		sameRootTree:createRouter(sameRootTree)
+		sameRootTree:createRouter(sameRootTree),
+		canvasReact:createRouter(function(me){
+			return canvasReact(me)
+		})
 	})
 })([]) as Router<MRootRouter>
 
@@ -232,6 +237,12 @@ const index=createRouter(function(me,route){
 							</Fragment>
 						}
 					]
+				},{
+					
+					title:<Href href={rootRoute.href("canvasReact",{})} >canvas做的GUI库</Href>,
+					summary:<Fragment>
+						深入canvas底层实现mvvm库
+					</Fragment>
 				}
 			]),
 			dom({type:"hr"}),

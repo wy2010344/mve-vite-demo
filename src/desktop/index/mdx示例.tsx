@@ -104,9 +104,8 @@ export function mdx示例(x:DragResizePanelParam){
 							currentPrismStyle(e.target.value)
 						}
 					}}
-				>
-					{prismStyle.map(v=><Dom type="option">{v}</Dom>)}
-				</Dom>
+					children={prismStyle.map(v=><Dom type="option">{v}</Dom>)}
+				/>
 			</Dom>
 			<Dom type="div">
 					<Dom type="div" style={cascadingStyle(partOverFlex)}>
