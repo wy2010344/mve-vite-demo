@@ -1,8 +1,8 @@
 import { BuildResult, getAsOne } from "./util";
 import { VirtualChild, VirtualChildParam } from "./virtualTreeChildren";
 
-export interface FragmentNode<EO> extends BuildResult {
-	children: EOChild<EO>[]
+export interface FragmentNode<T, EO> extends BuildResult<T> {
+	children: EOChild<T, EO>[]
 }
 /**
  * 片段自定义组件
@@ -10,10 +10,10 @@ export interface FragmentNode<EO> extends BuildResult {
  * @param children 
  * @returns 
  */
-export function fragment<EO>(p: FragmentNode<EO>): EOChild<EO> {
+export function fragment<T, EO>(p: FragmentNode<T, EO>): EOChild<T, EO> {
 	const children = p.children
 	return function (parent) {
-		const outs: BuildResult[] = []
+		const outs: BuildResult<T>[] = []
 		outs.push(p)
 		for (const child of children) {
 			const out = baseChildrenBuilder(child, parent)
@@ -24,7 +24,7 @@ export function fragment<EO>(p: FragmentNode<EO>): EOChild<EO> {
 		return getAsOne(outs)
 	}
 }
-export interface OriginalNode<EO> extends BuildResult {
+export interface OriginalNode<T, EO> extends BuildResult<T> {
 	children: EO[]
 }
 /**
@@ -32,7 +32,7 @@ export interface OriginalNode<EO> extends BuildResult {
  * @param config 
  * @param children 
  */
-export function original<EO>(p: OriginalNode<EO>): EOChild<EO> {
+export function original<T, EO>(p: OriginalNode<T, EO>): EOChild<T, EO> {
 	const children = p.children
 	return function (parent) {
 		for (const child of children) {
@@ -42,15 +42,15 @@ export function original<EO>(p: OriginalNode<EO>): EOChild<EO> {
 	}
 }
 /**重复的函数节点/组件封装成mve*/
-export interface EOChild<EO> {
-	(parent: VirtualChild<EO>): BuildResult | void
+export interface EOChild<T, EO> {
+	(parent: VirtualChild<EO>): BuildResult<T> | void
 }
 
-export function baseChildrenBuilder<EO>(children: EOChild<EO>, parent: VirtualChild<EO>) {
+export function baseChildrenBuilder<T, EO>(children: EOChild<T, EO>, parent: VirtualChild<EO>) {
 	return children(parent.newChildAtLast())
 }
-export function childrenBuilder<EO>(x: VirtualChildParam<EO>, children: EOChild<EO>[]) {
-	const outs: BuildResult[] = []
+export function childrenBuilder<T, EO>(x: VirtualChildParam<EO>, children: EOChild<T, EO>[]) {
+	const outs: BuildResult<T>[] = []
 	const root = VirtualChild.newRootChild(x)
 	for (const child of children) {
 		const out = baseChildrenBuilder(child, root)

@@ -1,16 +1,16 @@
 import { baseChildrenBuilder, EOChild } from "./childrenBuilder"
-import { CacheArrayModel, ArrayModelView, EmptyFun } from "./util"
+import { CacheArrayModel, ArrayModelView, EmptyFun, RefreshFun } from "./util"
 import { VirtualChild } from "./virtualTreeChildren"
 
 
 
-export function modelChildren<T, EO>(
-	array: CacheArrayModel<T>,
-	fun: (row: T, index: () => number) => EOChild<EO>
-): EOChild<EO> {
+export function modelChildren<D, T, EO>(
+	array: CacheArrayModel<D>,
+	fun: (row: D, index: () => number) => EOChild<T, EO>
+): EOChild<T, EO> {
 	return function (parent: VirtualChild<EO>) {
-		const views: ViewModel[] = []
-		const modelView: ArrayModelView<T> = {
+		const views: ViewModel<T>[] = []
+		const modelView: ArrayModelView<D> = {
 			insert(index, row) {
 				const view = ViewModel.of(index, row, parent, fun)
 				views.splice(index, 0, view)
@@ -43,24 +43,24 @@ export function modelChildren<T, EO>(
 				array.removeView(modelView)
 				views.length = 0
 			},
-			refresh() {
+			refresh(v) {
 				const length = views.length
 				for (let i = 0; i < length; i++) {
 					const view = views[i]
-					view.refresh()
+					view.refresh(v)
 				}
 			}
 		}
 	}
 }
 
-export function modelChildrenReverse<T, EO>(
-	array: CacheArrayModel<T>,
-	fun: (row: T, index: () => number) => EOChild<EO>
-): EOChild<EO> {
+export function modelChildrenReverse<D, T, EO>(
+	array: CacheArrayModel<D>,
+	fun: (row: D, index: () => number) => EOChild<T, EO>
+): EOChild<T, EO> {
 	return function (parent: VirtualChild<EO>) {
-		const views: ViewModel[] = []
-		const modelView: ArrayModelView<T> = {
+		const views: ViewModel<T>[] = []
+		const modelView: ArrayModelView<D> = {
 			insert(index, row) {
 				index = views.length - index
 				const view = ViewModel.of(index, row, parent, fun)
@@ -102,24 +102,24 @@ export function modelChildrenReverse<T, EO>(
 				array.removeView(modelView)
 				views.length = 0
 			},
-			refresh() {
+			refresh(v) {
 				for (let i = views.length - 1; i > -1; i--) {
 					const view = views[i]
-					view.refresh()
+					view.refresh(v)
 				}
 			}
 		}
 	}
 }
-class ViewModel {
+class ViewModel<T> {
 	private constructor(
 		public index: number
 	) { }
-	static of<T, EO>(
+	static of<D, T, EO>(
 		index: number,
-		row: T,
+		row: D,
 		parent: VirtualChild<EO>,
-		fun: (row: T, index: () => number) => EOChild<EO>
+		fun: (row: D, index: () => number) => EOChild<T, EO>
 	) {
 		const vm = parent.newChildAt(index)
 		const that = new ViewModel(index)
@@ -134,10 +134,10 @@ class ViewModel {
 		}
 		return that
 	}
-	private refreshValue: EmptyFun | void = undefined
-	refresh() {
+	private refreshValue: RefreshFun<T> | void = undefined
+	refresh(v: T) {
 		if (this.refreshValue) {
-			this.refreshValue()
+			this.refreshValue(v)
 		}
 	}
 	private destroyValue: EmptyFun | void = undefined
@@ -156,7 +156,7 @@ class ViewModel {
  * @param views 
  * @param index 
  */
-export function initUpdateIndex(views: ViewModel[], index: number) {
+export function initUpdateIndex<T>(views: ViewModel<T>[], index: number) {
 	for (let i = index + 1; i < views.length; i++) {
 		views[i].index = i
 	}
@@ -166,7 +166,7 @@ export function initUpdateIndex(views: ViewModel[], index: number) {
  * @param views 
  * @param index 
  */
-export function removeUpdateIndex(views: ViewModel[], index: number) {
+export function removeUpdateIndex<T>(views: ViewModel<T>[], index: number) {
 	for (let i = index; i < views.length; i++) {
 		views[i].index = i
 	}
@@ -177,7 +177,7 @@ export function removeUpdateIndex(views: ViewModel[], index: number) {
  * @param oldIndex 
  * @param newIndex 
  */
-export function moveUpdateIndex(views: ViewModel[], oldIndex: number, newIndex: number) {
+export function moveUpdateIndex<T>(views: ViewModel<T>[], oldIndex: number, newIndex: number) {
 	const sort = oldIndex < newIndex ? [oldIndex, newIndex] : [newIndex, oldIndex];
 	for (let i = sort[0]; i <= sort[1]; i++) {
 		views[i].index = i
@@ -188,7 +188,7 @@ export function moveUpdateIndex(views: ViewModel[], oldIndex: number, newIndex: 
  * @param views 
  * @param index 
  */
-export function initUpdateIndexReverse(views: ViewModel[], index: number) {
+export function initUpdateIndexReverse<T>(views: ViewModel<T>[], index: number) {
 	const s = views.length - 1
 	for (let i = index; i > -1; i--) {
 		views[i].index = s - i
@@ -199,7 +199,7 @@ export function initUpdateIndexReverse(views: ViewModel[], index: number) {
  * @param views 
  * @param index 
  */
-export function removeUpdateIndexReverse(views: ViewModel[], index: number) {
+export function removeUpdateIndexReverse<T>(views: ViewModel<T>[], index: number) {
 	const s = views.length - 1
 	for (let i = index - 1; i > -1; i--) {
 		views[i].index = s - i
@@ -211,7 +211,7 @@ export function removeUpdateIndexReverse(views: ViewModel[], index: number) {
  * @param oldIndex 
  * @param newIndex 
  */
-export function moveUpdateIndexReverse(views: ViewModel[], oldIndex: number, newIndex: number) {
+export function moveUpdateIndexReverse<T>(views: ViewModel<T>[], oldIndex: number, newIndex: number) {
 	const sort = oldIndex < newIndex ? [oldIndex, newIndex] : [newIndex, oldIndex];
 	const s = views.length - 1
 	for (let i = sort[0]; i <= sort[1]; i++) {

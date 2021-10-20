@@ -338,9 +338,9 @@ export function arrayRemoveWhere<T>(vs: BaseArray<T>, fun: (row: T, i: number) =
 export interface EmptyFun {
 	(): void
 }
-export interface BuildResult {
+export interface BuildResult<T> {
 	/**更新配置*/
-	refresh?(): void
+	refresh?(v: T): void
 	/**销毁事件函数*/
 	destroy?(): void
 }
@@ -355,15 +355,18 @@ export function orRun<T>(fun?: () => T) {
 		return fun()
 	}
 }
+export interface RefreshFun<T> {
+	(v: T): void
+}
 /**
  * 整合成一个初始化函数
  * @param vs 
  * @returns 
  */
-export function getAsOne(vs: BuildResult[]): BuildResult | void {
+export function getAsOne<T>(vs: BuildResult<T>[]): BuildResult<T> | void {
 	const size = vs.length
 	if (size > 1) {
-		const refreshs: EmptyFun[] = []
+		const refreshs: RefreshFun<T>[] = []
 		const destroys: EmptyFun[] = []
 		for (const v of vs) {
 			if (v.destroy) {
@@ -383,13 +386,13 @@ export function getAsOne(vs: BuildResult[]): BuildResult | void {
 				}
 			}
 		}
-		let refresh: EmptyFun | undefined = undefined
+		let refresh: RefreshFun<T> | undefined = undefined
 		if (refreshs.length == 1) {
 			refresh = refreshs[0]
 		} else if (refreshs.length > 1) {
-			refresh = function () {
+			refresh = function (v) {
 				for (const ref of refreshs) {
-					ref()
+					ref(v)
 				}
 			}
 		}
