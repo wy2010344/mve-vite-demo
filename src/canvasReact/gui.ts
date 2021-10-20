@@ -59,7 +59,7 @@
 
 import { VirtualCtx } from "./VirtualCtx"
 import { childrenBuilder, EOChild } from "./xvc/childrenBuilder"
-import { BuildResult, EmptyFun, quote, SimpleArray } from "./xvc/util"
+import { BuildResult, EmptyFun, quote, RefreshFun, SimpleArray } from "./xvc/util"
 import { VirtualChildParam } from "./xvc/virtualTreeChildren"
 
 export interface Rect {
@@ -79,10 +79,28 @@ export function equalRect(a: Rect, b: Rect) {
 }
 export function emptyRect(): Rect {
 	return {
-		x: 0, y: 0, width: 0, height: 0
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0
 	}
 }
+export interface ParentInfo extends Rect {
+	absoluteX: number
+	absoluteY: number
+}
 
+export type ReadParentInfo = Readonly<ParentInfo>
+function emptyParentInfo(): ParentInfo {
+	return {
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+		absoluteX: 0,
+		absoluteY: 0
+	}
+}
 /**
  * 点在矩形内部
  * @param row 
@@ -93,10 +111,11 @@ function inRect(row: Rect, p: Point) {
 	return p.x > 0 && p.y > 0 && p.x < row.width && p.y < row.height
 }
 
-
-export interface RectNode extends BuildResult {
+export interface RectNode extends BuildResult<ReadParentInfo> {
+	parent?: RectNode
 	cache: HTMLCanvasElement
-	readonly rect: Rect
+	/**相对位置*/
+	readonly rect: ParentInfo
 	/**鼠标下击*/
 	mousedown(e: Point, meetUserCall: () => void): boolean | void
 	/**鼠标举起事件 */
@@ -106,48 +125,68 @@ export interface RectNode extends BuildResult {
 	/**鼠标移动事件 */
 	mousemove(e: Point, meetUserCall: () => void): boolean | void
 }
-
+function copyLocation(that: RectNode, newRect: Rect) {
+	const rect = that.rect
+	copyRect(rect, newRect)
+	const parentRect = that.parent?.rect
+	if (parentRect) {
+		rect.absoluteX = parentRect.absoluteX + rect.x
+		rect.absoluteY = parentRect.absoluteY + rect.y
+	} else {
+		rect.absoluteX = rect.x
+		rect.absoluteX = rect.y
+	}
+}
 
 
 export class ArrayChildParam<EO> implements VirtualChildParam<EO>{
 	constructor(
 		private array: SimpleArray<EO>,
-		public toLeaf = quote as any
+		private afterInsert: (e: EO) => void,
+		private afterRemove: (e: EO) => void
 	) { }
 	remove(e: EO): void {
 		const idx = this.array.indexOf(e)
 		if (idx > -1) {
 			this.array.remove(idx)
+			this.afterRemove(e)
 		}
 	}
 	append(e: EO, isMove?: boolean): void {
 		this.array.push(e)
+		this.afterInsert(e)
 	}
 	insertBefore(e: EO, old: EO, isMove?: boolean): void {
 		const idxOld = this.array.indexOf(old)
 		if (idxOld > -1) {
 			this.array.insert(idxOld, e)
+			this.afterInsert(e)
 		}
 	}
 }
 
 export class ArrayChildReverseParam<EO> implements VirtualChildParam<EO>{
 	constructor(
-		private array: SimpleArray<EO>
+		private array: SimpleArray<EO>,
+		private afterInsert: (e: EO) => void,
+		private afterRemove: (e: EO) => void
 	) { }
 	remove(e: EO): void {
 		const idx = this.array.indexOf(e)
 		if (idx > -1) {
 			this.array.remove(idx)
+			this.afterRemove(e)
 		}
 	}
 	append(e: EO, isMove?: boolean): void {
 		this.array.insert(0, e)
+		this.afterInsert(e)
 	}
 	insertBefore(e: EO, old: EO, isMove?: boolean): void {
 		const idxOld = this.array.indexOf(old)
 		if (idxOld > -1) {
 			this.array.insert(idxOld + 1, e)
+			this.afterInsert(e)
 		}
 	}
 }
@@ -166,9 +205,9 @@ export interface BaseLeafNodeParam {
  * 叶子节点
  */
 export interface LeafNodeParam extends BaseLeafNodeParam {
-	config(ctx: VirtualCtx): Rect
+	config(ctx: VirtualCtx, parent: ReadParentInfo): Rect
 }
-export function leafNode(p: LeafNodeParam): EOChild<RectNode> {
+export function leafNode(p: LeafNodeParam): EOChild<ParentInfo, RectNode> {
 	return function (parent) {
 		const it = new BaseLeafNode(p)
 		parent.push(it)
@@ -187,18 +226,19 @@ export interface BaseBranchNodeParam {
 	mouseMoveAfter?(e: Point): boolean | void
 	wheelBefore?(e: PointWheel): boolean | void
 	wheelAfter?(e: PointWheel): boolean | void
-	children?: EOChild<RectNode>[]
+	children?: EOChild<ParentInfo, RectNode>[]
 	childrenReverse?: boolean
 }
 export interface BranchNodeParam extends BaseBranchNodeParam {
-	config(): Rect
+	config(parent: ReadParentInfo): Rect
 	destroy?(): void
 }
-class BaseBranchNode implements RectNode {
+class BaseBranchNode implements RectNode, BuildResult<ParentInfo> {
 	cache = shareCanvas
-	rect: Rect
+	rect: ParentInfo
+	location: Point
 	destroy: () => void
-	refresh: () => void
+	refresh: (v: ReadParentInfo) => void
 	mousedown(e: Point, meetUserCall: () => void): boolean | void {
 		let stop: boolean | void = false
 		if (this.p.mouseDownBefore) {
@@ -302,15 +342,22 @@ class BaseBranchNode implements RectNode {
 		return stop
 	}
 	private array: SimpleArray<RectNode>
+	parent?: RectNode
 	constructor(
 		private p: BranchNodeParam
 	) {
 		const array = SimpleArray.of<RectNode>()
 		this.array = array
-
-		const param = p.childrenReverse ? new ArrayChildReverseParam(array) : new ArrayChildParam(array)
+		const that = this
+		function afterInsert(e: RectNode) {
+			e.parent = that
+		}
+		function afterRemove(e: RectNode) {
+			e.parent = that
+		}
+		const param = p.childrenReverse ? new ArrayChildReverseParam(array, afterInsert, afterRemove) : new ArrayChildParam(array, afterInsert, afterRemove)
 		const out = childrenBuilder(param, p.children || [])
-		let childrenRefresh: EmptyFun | undefined = undefined
+		let childrenRefresh: RefreshFun<ParentInfo> | undefined = undefined
 		const destroys: EmptyFun[] = []
 		if (p.destroy) {
 			destroys.push(p.destroy)
@@ -332,19 +379,20 @@ class BaseBranchNode implements RectNode {
 		}
 
 		let oldFullSourceCtx = shareContext
-		const rect = emptyRect()
+		const rect = emptyParentInfo()
 		this.rect = rect
 		this.array = array
-		const that = this
-		this.refresh = function () {
+		const location = { x: 0, y: 0 }
+		this.location = location
+		this.refresh = function (parent) {
 			//合成视图容器
 			const fullSourceCtx = new VirtualCtx()
-			const newRect = p.config()
+			const newRect = p.config(parent)
 			const sizeChange = newRect.width != rect.width || newRect.height != rect.height
-			copyRect(rect, newRect)
+			copyLocation(that, newRect)
 			//更新子层的视图
 			if (childrenRefresh) {
-				childrenRefresh()
+				childrenRefresh(that.rect)
 			}
 			//回流汇总图片
 			for (let i = 0; i < array.size(); i++) {
@@ -361,18 +409,20 @@ class BaseBranchNode implements RectNode {
 	}
 }
 
-class BaseLeafNode implements RectNode {
+class BaseLeafNode implements RectNode, BuildResult<ParentInfo> {
 	constructor(private p: LeafNodeParam) {
 		this.destroy = p.destroy
 		let oldBackgroundCtx = shareContext
-		const rect = emptyRect()
+		const rect = emptyParentInfo()
 		this.rect = rect
 		const that = this
-		this.refresh = function () {
+		const location = { x: 0, y: 0 }
+		this.location = location
+		this.refresh = function (parent) {
 			const backgroundCtx = new VirtualCtx()
-			const newRect = p.config(backgroundCtx)
+			const newRect = p.config(backgroundCtx, parent)
 			const sizeChange = newRect.width != rect.width || newRect.height != rect.height
-			copyRect(rect, newRect)
+			copyLocation(that, newRect)
 			if (sizeChange || !backgroundCtx.equals(oldBackgroundCtx)) {
 				//尺寸变化或背景内容变化，更新当前背景
 				const canvas = backgroundCtx.redraw(newRect.width, newRect.height)
@@ -381,9 +431,11 @@ class BaseLeafNode implements RectNode {
 		}
 	}
 	cache = shareCanvas
-	rect: Rect
+	parent?: RectNode
+	rect: ParentInfo
+	location: Point
 	destroy: () => void
-	refresh: () => void
+	refresh: (parent: ReadParentInfo) => void
 	mousedown(e: Point, meetUserCall: () => void): boolean | void {
 		if (this.p.mouseDown) {
 			meetUserCall()
@@ -413,7 +465,7 @@ class BaseLeafNode implements RectNode {
  * 枝节点
  * @param p
  */
-export function breachNode(p: BranchNodeParam): EOChild<RectNode> {
+export function breachNode(p: BranchNodeParam): EOChild<ParentInfo, RectNode> {
 	return function (parent) {
 		const it = new BaseBranchNode(p)
 		parent.push(it)
@@ -428,15 +480,30 @@ export interface Point {
 export interface PointWheel extends Point {
 	deltaY: number
 }
-export interface GlobalParam {
-	width: number
-	height: number
+
+export interface InputValue {
+	value: string
+}
+export interface CanvasInputEvent {
+	/**绝对位置 */
+	location: Point,
+	input(e: InputValue): void
+}
+export interface GlobalParam extends ParentInfo {
+	/**设置输入事件 */
+	setInput(e: CanvasInputEvent): void
 	requestAnimationFrame(fun: () => void): number
 }
 
-export function CanvasGUI(draw: (rects: RectNode) => void) {
+export function CanvasGUI(config: {
+	draw(rects: RectNode): void
+	setInput(e: Point): void
+}) {
 	return function (fun: (g: GlobalParam) => BranchNodeParam) {
 		const g: GlobalParam = {
+			x: 0, y: 0,
+			absoluteX: 0,
+			absoluteY: 0,
 			width: 0,
 			height: 0,
 			requestAnimationFrame(fun) {
@@ -444,14 +511,29 @@ export function CanvasGUI(draw: (rects: RectNode) => void) {
 					fun()
 					render()
 				})
+			},
+			setInput(e) {
+				currentInput = e.input
+				config.setInput(e.location)
 			}
 		}
+		let currentInput: (e: InputValue) => void
 		const o = new BaseBranchNode(fun(g))
 		function render() {
-			o.refresh()
-			draw(o)
+			o.refresh(g)
+			config.draw(o)
 		}
 		return {
+			/**
+			 * 输入文字
+			 * @param e 
+			 */
+			input(e: InputValue) {
+				if (currentInput) {
+					currentInput(e)
+					render()
+				}
+			},
 			/**窗口变化事件，影响布局，重新计算布局 */
 			resize(e: {
 				width: number,

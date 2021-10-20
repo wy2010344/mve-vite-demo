@@ -37,7 +37,7 @@ export function testRoot(g: GlobalParam): BranchNodeParam {
 		children: [
 			leafNode({
 				config(ctx) {
-					ctx.fillRect(20, 20, 100, 20)
+					ctx.fillRect(0, 0, 200, 200)
 					return loc
 				},
 				mouseDown() {
@@ -46,7 +46,7 @@ export function testRoot(g: GlobalParam): BranchNodeParam {
 			}),
 			modelChildren(models, function (row, i) {
 				return leafNode({
-					config(ctx) {
+					config(ctx, parent) {
 						ctx.fillStyle(row)
 						ctx.fillRect(0, 0, 20, 15)
 						return {
@@ -74,4 +74,32 @@ export function testRoot(g: GlobalParam): BranchNodeParam {
 			}),
 		]
 	}
+}
+
+
+function textInput(g: GlobalParam) {
+	let width = 100
+	let height = 200
+	return breachNode({
+		config(parent) {
+			return {
+				x: 0, y: 0, width, height
+			}
+		},
+		children: [
+			leafNode({
+				config(ctx, parent) {
+					ctx.fillStyle('yellow')
+					ctx.fillRect(0, 0, 100, 200)
+					return {
+						x: 0, y: 0,
+						width,
+						height
+					}
+				},
+				mouseDown(e) {
+				}
+			})
+		]
+	})
 }
