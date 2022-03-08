@@ -1,5 +1,4 @@
 import { createMdxAstCompiler } from "@mdx-js/mdx"
-import unified from "unified"
 import { TreeLine } from "./treeLine"
 
 const compiler = createMdxAstCompiler()
@@ -20,306 +19,292 @@ const compiler = createMdxAstCompiler()
  * @returns 
  */
 
-export function mdxAst(v:string){
-	const ast=compiler.parse(v)
+export function mdxAst(v: string) {
+	const ast = compiler.parse(v)
 	return ast
 }
 
-export interface MdxVisitOption{
-	root?():JSX.Element
-	code?(content:string,lang:string,meta:string):JSX.Element
+export interface MdxVisitOption {
+	root?(): JSX.Element
+	code?(content: string, lang: string, meta: string): JSX.Element
 }
-export function mdxStringifyMve(v:string){
-	const ast=mdxAst(v)
-	const treeLine=TreeLine.root()
+export function mdxStringifyMve(v: string) {
+	const ast = mdxAst(v)
+	const treeLine = TreeLine.root()
 	treeLine.append('[')
-	const children=ast['children']
-	if(children){
-		for(const child of children){
-			circleVisit(child,treeLine)
+	const children = ast['children']
+	if (children) {
+		for (const child of children) {
+			circleVisit(child, treeLine)
 		}
 	}
 	treeLine.append(']')
 	return treeLine.toFile()
 }
 
-function circleVisit(ast:any,treeLine:TreeLine){
-	const type=ast.type
+function circleVisit(ast: any, treeLine: TreeLine) {
+	const type = ast.type
 	//子节点
-	if(type=="mdxjsEsm"){
+	if (type == "mdxjsEsm") {
 		//顶层 导入语句，如import { A } from '../A'
 		treeLine.append(ast.value)
-	}else
-	if(type=="heading"){
+	} else if (type == "heading") {
 		//顶层 h 标题
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"heading",`)
 		subTree.append(`depth:${ast.depth},`)
-		circleVisitChildren(ast,subTree)
+		circleVisitChildren(ast, subTree)
 		treeLine.append("},")
-	}else
-	if(type=="mdxFlowExpression"){
+	} else if (type == "mdxFlowExpression") {
 		//注释 如 {/*这是注释*/} 翻译成 /*这是注释*/ 可能在XML里不一样
 		treeLine.append(ast.value)
-	}else
-	if(type=="code"){
+	} else if (type == "code") {
 		//顶层元素 code
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"code",`)
-		if(ast.lang){
+		if (ast.lang) {
 			subTree.append(`lang:"${ast.lang}",`)
 		}
-		if(ast.meta){
+		if (ast.meta) {
 			subTree.append(`meta:"${ast.meta}",`)
 		}
 		subTree.append(`value:${JSON.stringify(ast.value)},`)
 		treeLine.append("},")
-	}else
-	if(type=="inlineCode"){
+	} else if (type == "inlineCode") {
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"inlineCode",`)
 		subTree.append(`value:${JSON.stringify(ast.value)},`)
 		treeLine.append("},")
-	}else
-	if(type=="paragraph"){
+	} else if (type == "paragraph") {
 		//顶层 p 元素
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"paragraph",`)
-		circleVisitChildren(ast,subTree)
+		circleVisitChildren(ast, subTree)
 		treeLine.append("},")
-	}else
-	if(type.startsWith("mdxJsx")){
+	} else if (type.startsWith("mdxJsx")) {
 		//xml元素，mve里不支持小写，先考虑全转成jsx
-		circleVisitXML(ast,treeLine)
-	}else
-	if(type=="text"){
+		circleVisitXML(ast, treeLine)
+	} else if (type == "text") {
 		//顶层文本
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"text",`)
 		subTree.append(`value:${JSON.stringify(ast.value)},`)
 		treeLine.append("},")
-	}else
-	if(type=="list"){
+	} else if (type == "list") {
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"list",`)
 		subTree.append(`ordered:${ast.ordered},`)
 		subTree.append(`start:${ast.start},`)
 		subTree.append(`spread:${ast.spread},`)
-		circleVisitChildren(ast,subTree)
+		circleVisitChildren(ast, subTree)
 		treeLine.append("},")
-	}else
-	if(type=="listItem"){
+	} else if (type == "listItem") {
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"listItem",`)
 		subTree.append(`spread:${ast.spread},`)
 		subTree.append(`checked:${ast.checked},`)
-		if(ast.children && ast.children.length>0){
-			const child=ast.children[0]
-			if(child.type=="paragraph"){
+		if (ast.children && ast.children.length > 0) {
+			const child = ast.children[0]
+			if (child.type == "paragraph") {
 				//需要移除
-				circleVisitChildren(child,subTree)
+				circleVisitChildren(child, subTree)
 			}
 			//后面可能跟别的列表
-			for(let i=1;i<ast.children.length;i++){
-				circleVisitChildren(ast.children[i],subTree)
+			for (let i = 1; i < ast.children.length; i++) {
+				circleVisitChildren(ast.children[i], subTree)
 			}
-		}else{
-			console.warn("children不准确",ast)
+		} else {
+			console.warn("children不准确", ast)
 		}
 		treeLine.append("},")
-	}else
-	if(type=="strong"){
+	} else if (type == "strong") {
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"strong",`)
-		circleVisitChildren(ast,subTree)
+		circleVisitChildren(ast, subTree)
 		treeLine.append("},")
-	}else
-	if(type=="thematicBreak"){
+	} else if (type == "thematicBreak") {
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"thematicBreak",`)
 		treeLine.append("},")
-	}else
-	if(type=="image"){
+	} else if (type == "image") {
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"image",`)
-		if(ast.title){
+		if (ast.title) {
 			subTree.append(`title:${ast.title},`)
 		}
-		if(ast.url){
+		if (ast.url) {
 			subTree.append(`url:${ast.url},`)
 		}
-		if(ast.alt){
+		if (ast.alt) {
 			subTree.append(`alt:${ast.alt},`)
 		}
 		treeLine.append("},")
-	}else
-	if(type=="link"){
+	} else if (type == "link") {
 		treeLine.append("{")
-		const subTree=treeLine.appendChild()
+		const subTree = treeLine.appendChild()
 		subTree.append(`type:"link",`)
-		if(ast.title){
+		if (ast.title) {
 			subTree.append(`title:${ast.title},`)
 		}
-		if(ast.url){
+		if (ast.url) {
 			subTree.append(`url:${ast.url},`)
 		}
-		circleVisitChildren(ast,subTree)
+		circleVisitChildren(ast, subTree)
 		treeLine.append("},")
-	}else{
-		console.warn("顶层不知道类型",ast)
+	} else {
+		console.warn("顶层不知道类型", ast)
 	}
 }
 
 
-function generateAttribute(attrs){
-	const vs=[]
-	for(const attr of attrs){
-		const {name,value}=attr
-		if(value){
-			if(typeof(value)=='string'){
+function generateAttribute(attrs) {
+	const vs = []
+	for (const attr of attrs) {
+		const { name, value } = attr
+		if (value) {
+			if (typeof (value) == 'string') {
 				vs.push(`${name}=${JSON.stringify(value)}`)
-			}else{
+			} else {
 				vs.push(`${name}={${value.value}}`)
 			}
-		}else{
+		} else {
 			vs.push(name)
 		}
 	}
 	return vs.join(' ')
 }
 
-function circleVisitXML(ast:any,treeLine:TreeLine){
-	const type=ast.type
-	if(type.startsWith("mdxJsx")){
+function circleVisitXML(ast: any, treeLine: TreeLine) {
+	const type = ast.type
+	if (type.startsWith("mdxJsx")) {
 		//复合结构
-		const tagName=ast.name
-		if(ast.children && ast.children.length!=0){
+		const tagName = ast.name
+		if (ast.children && ast.children.length != 0) {
 			treeLine.append(`<${tagName} ${generateAttribute(ast.attributes)}>`)
-			const subLine=treeLine.appendChild()
-			circleVisitXMLChildren(ast,subLine)
+			const subLine = treeLine.appendChild()
+			circleVisitXMLChildren(ast, subLine)
 			treeLine.append(`</${tagName}>`)
-		}else{
+		} else {
 			treeLine.append(`<${tagName} ${generateAttribute(ast.attributes)}/>`)
 		}
-	}else
-	if(type=="text"){
-		//嵌入文本
-		treeLine.append(ast.value)
-	}else
-	if(type=="mdxTextExpression"){
-		//表达式
-		treeLine.append(`{${ast.value}}`)
-	}else
-	if(type=="paragraph"){
-		//这里应该允许？
-		circleVisitXMLChildren(ast,treeLine)
-	}else
-	{
-		console.warn("XML不知道类型",ast)
-	}
+	} else
+		if (type == "text") {
+			//嵌入文本
+			treeLine.append(ast.value)
+		} else
+			if (type == "mdxTextExpression") {
+				//表达式
+				treeLine.append(`{${ast.value}}`)
+			} else
+				if (type == "paragraph") {
+					//这里应该允许？
+					circleVisitXMLChildren(ast, treeLine)
+				} else {
+					console.warn("XML不知道类型", ast)
+				}
 }
 
-function circleVisitChildren(ast:any,treeLine:TreeLine){
-	if('children' in ast){
-		const children=ast.children
-		if(children){
+function circleVisitChildren(ast: any, treeLine: TreeLine) {
+	if ('children' in ast) {
+		const children = ast.children
+		if (children) {
 			treeLine.append('children:[')
-			for(const child of children){
-				circleVisit(child,treeLine.appendChild())
+			for (const child of children) {
+				circleVisit(child, treeLine.appendChild())
 			}
 			treeLine.append('],')
 		}
 	}
 }
 
-function circleVisitXMLChildren(ast:any,treeLine:TreeLine){
-	if('children' in ast){
-		const children=ast.children
-		if(children){
-			for(const child of children){
-				circleVisitXML(child,treeLine.appendChild())
+function circleVisitXMLChildren(ast: any, treeLine: TreeLine) {
+	if ('children' in ast) {
+		const children = ast.children
+		if (children) {
+			for (const child of children) {
+				circleVisitXML(child, treeLine.appendChild())
 			}
 		}
 	}
 }
-export type HeadingDepth=1|2|3|4|5|6|7
-interface MDXHeading<T>{
-	type:"heading"
-	depth:HeadingDepth
+export type HeadingDepth = 1 | 2 | 3 | 4 | 5 | 6 | 7
+interface MDXHeading<T> {
+	type: "heading"
+	depth: HeadingDepth
 	children: BaseMdxAstType<T>[]
 }
-interface MDXText{
-	type:"text"
-	value:string
+interface MDXText {
+	type: "text"
+	value: string
 }
-interface MDXParagraph<T>{
-	type:"paragraph"
-	children:BaseMdxAstType<T>[]
+interface MDXParagraph<T> {
+	type: "paragraph"
+	children: BaseMdxAstType<T>[]
 }
-interface MDXStrong<T>{
-	type:"strong"
-	children:BaseMdxAstType<T>[]
+interface MDXStrong<T> {
+	type: "strong"
+	children: BaseMdxAstType<T>[]
 }
-interface MDXCode{
-	type:"code"
-	lang?:string
-	meta?:string
-	value:string
+interface MDXCode {
+	type: "code"
+	lang?: string
+	meta?: string
+	value: string
 }
-interface MDXList<T>{ 	
-	type:"list"
-	ordered:boolean
-	start:number | null
-	spread:boolean
-	children:MDXListItem<T>[]
+interface MDXList<T> {
+	type: "list"
+	ordered: boolean
+	start: number | null
+	spread: boolean
+	children: MDXListItem<T>[]
 }
-interface MDXListItem<T>{
-	type:"listItem"
-	spread:boolean
-	checked:boolean | null
-	children:BaseMdxAstType<T>[]
+interface MDXListItem<T> {
+	type: "listItem"
+	spread: boolean
+	checked: boolean | null
+	children: BaseMdxAstType<T>[]
 }
-interface MDXThematicBreak{
-	type:"thematicBreak"
+interface MDXThematicBreak {
+	type: "thematicBreak"
 }
-interface MDXInlineCode{
-	type:"inlineCode"
-	value:string
+interface MDXInlineCode {
+	type: "inlineCode"
+	value: string
 }
-interface MDXImage{
-	type:"image"
-	title:string
-	url:string
-	alt:string
+interface MDXImage {
+	type: "image"
+	title: string
+	url: string
+	alt: string
 }
-interface MDXLink<T>{
-	type:"link"
-	title?:string
-	url?:string
-	children:BaseSubMdxAstType<T>[]
+interface MDXLink<T> {
+	type: "link"
+	title?: string
+	url?: string
+	children: BaseSubMdxAstType<T>[]
 }
 /**内嵌级的元素 */
-export type BaseSubMdxAstType<T>= MDXInlineCode
-| MDXStrong<T>
-| MDXText 
-| MDXImage
-| MDXLink<T>
-| MDXList<T>
-| T
+export type BaseSubMdxAstType<T> = MDXInlineCode
+	| MDXStrong<T>
+	| MDXText
+	| MDXImage
+	| MDXLink<T>
+	| MDXList<T>
+	| T
 /**顶级的元素 */
-export type BaseTopMdxAstType<T>=MDXHeading<T>
-| MDXParagraph<T>
-| MDXCode  
-| MDXThematicBreak 
-| BaseSubMdxAstType<T>
+export type BaseTopMdxAstType<T> = MDXHeading<T>
+	| MDXParagraph<T>
+	| MDXCode
+	| MDXThematicBreak
+	| BaseSubMdxAstType<T>
 export type BaseMdxAstType<T> = BaseTopMdxAstType<T> | MDXListItem<T>
