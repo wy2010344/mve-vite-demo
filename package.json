@@ -16,6 +16,6 @@
   "dependencies": {
     "@mdx-js/mdx": "^2.0.0-ci.53",
     "marked": "^3.0.6",
-    "mve-dom": "^1.2.1"
+    "mve-dom": "^1.2.2"
   }
 }

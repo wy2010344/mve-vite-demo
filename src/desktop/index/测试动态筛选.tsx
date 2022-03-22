@@ -1,8 +1,7 @@
 import { dragResizePanel } from "../form";
 
-import { createElement, Dom, Fragment } from 'mve-dom/tsxSupport'
-import { delayMap } from "mve-dom/delayMap";
-import { delayIf } from "mve-dom/delayIf"
+import { createElement, DelayMap, Dom, Fragment } from 'mve-dom/tsxSupport'
+import { delayMap, delayIf, nextTick } from "mve-dom/delayCall";
 import { mve } from 'mve-core/util'
 
 
@@ -11,6 +10,10 @@ const list = Array(100).fill('').map((v, i) => i)
 export const 测试动态筛选 = dragResizePanel(function (x) {
 
   const filter = mve.valueOf(2)
+
+  nextTick(function () {
+    console.log("nextTick")
+  })
   return {
     title: "测试动态筛选",
     content: <Fragment>
@@ -35,24 +38,25 @@ export const 测试动态筛选 = dragResizePanel(function (x) {
         }
       )}
 
-      {delayMap(
-        () => {
+      <DelayMap
+        array={() => {
           const vs = list.filter(v => v % filter() == 0)
           if (filter() % 2 == 0) {
             vs.reverse()
           }
           return vs
-        },
-        v => v,
-        function (me, row, i) {
+        }}
+        key={v => v}
+        children={(me, row, i) => {
           return <Dom type="div">
             {row} --- {i()}
             <Dom type="input" />
           </Dom>
-        }
-      )}
-
-
+        }}
+      />
+      <Dom type="div">
+        文字
+      </Dom>
     </Fragment>
   }
 })
