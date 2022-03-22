@@ -504,10 +504,10 @@ mve-core@^1.2.1:
   resolved "https://registry.yarnpkg.com/mve-core/-/mve-core-1.2.1.tgz#ab34587d811d1686cb066731eabdb1e36a05e463"
   integrity sha512-ClSHHE5x8CsajUrSY93U7xgWhMIFinxGCOxe27nTJu4Bif3EbC+WqfA3oC+uJWeYe5T+Sp6hk6sfFRzckoXN7Q==
 
-mve-dom@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/mve-dom/-/mve-dom-1.2.1.tgz#f91c015acd0f13b0a61c2bb3431dc688780f3f5d"
-  integrity sha512-Q1N271tBFHlqMZsvonVOBWSoxwJsEKhVEwY9MO/FkmqU8pi9wGuV9faMDFiPtw4hkc7t9RftLagwFtokLGrvtA==
+mve-dom@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/mve-dom/-/mve-dom-1.2.2.tgz#eacb9e9c24bec331c6c6158c6797c980eac2fb62"
+  integrity sha512-iBIlTb2Up7x5aMTjnJpZRzgSdx4zmdaP3xhIs0MLpB4crNXR07h9JdFJdrEj73xtkP30fVtdWrg3sZnteiFhow==
   dependencies:
     mve-core "^1.2.1"
 
