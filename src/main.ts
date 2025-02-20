@@ -24,10 +24,12 @@ import forceDemo4 from './d3/force/demo4'
 import exitAnimate from './exitAnimate'
 import demo2 from './demos/demo2'
 import calendar from './demos/calendar'
+import dailycost from './dailycost'
 const app = document.querySelector<HTMLDivElement>('#app')!
 
 const destroy = createRoot(app, () => {
-  calendar()
+  dailycost()
+  // calendar()
   // demo2()
   // scrollerDemo1()
   // reorderDemo()

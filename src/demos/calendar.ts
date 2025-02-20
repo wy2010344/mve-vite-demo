@@ -1,5 +1,5 @@
 import { fdom, FDomAttributes } from "mve-dom";
-import { renderIf } from "mve-helper";
+import { hookTrackSignal, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { signalAnimateFrame, subscribeEventListener } from "wy-dom-helper";
 import { batchSignalEnd, cacheVelocity, createSignal, dateFromYearMonthDay, DAYMILLSECONDS, easeFns, emptyFun, extrapolationClamp, getInterpolate, getSpringBaseAnimationConfig, getTweenAnimationConfig, GetValue, getWeekOfMonth, memo, MomentumIScroll, MonthFullDay, PagePoint, run, SignalAnimateFrameValue, startScroll, StoreRef, tw, ValueOrGet, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView } from "wy-helper";
@@ -34,9 +34,11 @@ export default function () {
   const transY = signalAnimateFrame(0)
   let content: HTMLElement
   const bs = MomentumIScroll.get()
-  const showWeek = createSignal(false)
+  function perSize() {
+    return window.innerWidth / 7
+  }
+  const showWeek = memo(() => transY.get() <= -5 * perSize());
   const transX = signalAnimateFrame(0)
-
   /**
    * 
    * @param direction 1向左,-1向右
@@ -58,7 +60,7 @@ export default function () {
     }
   }
   function updateDirectionScroll(direction: number) {
-    if (showWeek.get()) {
+    if (showWeek()) {
       const m = dateFromYearMonthDay(date.get())
       if (direction < 0) {
         m.setTime(m.getTime() - WEEKTIMES)
@@ -158,23 +160,13 @@ export default function () {
 
 
               if (out.type == "scroll") {
-                const perWidth = window.innerWidth / 7
-                if (out.target < -perWidth * 3) {
+                if (out.target < -perSize() * 3) {
                   //进入week模式
-                  showWeek.set(true)
-                  transY.changeTo(Math.min(-perWidth * 5, out.target), getTweenAnimationConfig(out.duration, easeFns.out(easeFns.circ)))
+                  transY.changeTo(Math.min(-perSize() * 5, out.target), getTweenAnimationConfig(out.duration, easeFns.out(easeFns.circ)))
                 } else {
-                  showWeek.set(false)
                   transY.changeTo(0, getTweenAnimationConfig(out.duration, easeFns.out(easeFns.circ)))
                 }
               } else {
-                if (out.target < 0) {
-                  //进入month模式
-                  showWeek.set(true)
-                } else {
-                  //进入week模式==0
-                  showWeek.set(false)
-                }
                 if (out.type == "scroll-edge") {
                   //到达边界外
                   transY.changeTo(out.target, getTweenAnimationConfig(out.duration, easeFns.out(easeFns.circ)), {
@@ -247,7 +239,7 @@ export default function () {
               fdom.div({
                 childrenType: "text",
                 children() {
-                  return showWeek.get() ? '周' : '月'
+                  return showWeek() ? '周' : '月'
                 }
               })
             }
@@ -280,11 +272,10 @@ export default function () {
           })
 
           const interpolateH = run(() => {
-            const perHeight = window.innerWidth / 7
-            const moveHeight = perHeight * 5
+            const moveHeight = perSize() * 5
             return getInterpolate({
-              0: perHeight * 6,
-              [-moveHeight]: perHeight
+              0: perSize() * 6,
+              [-moveHeight]: perSize()
             }, extrapolationClamp)
           })
           fdom.div({
@@ -319,11 +310,13 @@ export default function () {
                       month: c.month,
                       day: fd.day
                     })
-                    updateDirection(dir, 0)
+                    if (!showWeek()) {
+                      updateDirection(dir, 0)
+                    }
                   }
 
                   //前一部分
-                  renderIf(showWeek.get, () => {
+                  renderIf(showWeek, () => {
                     renderWeek(() => week().beforeWeek(), date, 0)
                   }, () => {
                     //显示月份
@@ -348,7 +341,7 @@ export default function () {
 
                   //后面部分
                   //前一部分
-                  renderIf(showWeek.get, () => {
+                  renderIf(showWeek, () => {
                     renderWeek(() => week().nextWeek(), date, 2)
                   }, () => {
                     //显示月份
@@ -374,7 +367,7 @@ function renderCalendarView(
   date: StoreRef<DateModel>,
   setCalenderData: (v: MonthFullDay) => void,
   transY: SignalAnimateFrameValue,
-  showWeek: StoreRef<boolean>,
+  showWeek: GetValue<boolean>,
   i: number
 ) {
   function selectCurrent() {
@@ -437,7 +430,7 @@ function renderCalendarView(
               lunarDay,
               selected,
               hide() {
-                if (showWeek.get()) {
+                if (showWeek()) {
                   return false
                 }
                 return fullday().type != 'this'
