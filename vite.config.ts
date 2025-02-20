@@ -1,32 +1,16 @@
-import { defineConfig, PluginOption, transformWithEsbuild } from 'vite'
+import { defineConfig } from 'vite'
+import vitePluginRequire from "vite-plugin-require";
+import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
 	server: {
-		port: 4000
-	},
-	base: './',
-	plugins: [
-		viteMveMdxPlugin()
-	]
-})
-
-import mdx from '@mdx-js/mdx'
-import { mdxStringifyMve } from './src/vite-mdx-mve-tsx-plugin/mdxTransFier'
-function viteMveMdxPlugin(): PluginOption {
-	const compiler = mdx.createMdxAstCompiler()
-	return {
-		name: "vite-mve-mdx-tsx-plugin",
-		enforce: "pre",
-		async transform(code, id) {
-			if (/\.mdx?$/.test(id)) {
-				const node = compiler.parse(code)
-				const nCode = ` 
-import {Dom,createElement,Svg} from 'mve-dom/tsxSupport'
-export default ${mdxStringifyMve(code)}
-				`
-				console.log(nCode)
-				const out = await transformWithEsbuild(nCode, id + ".tsx")
-				return out
-			}
+		watch: {
+			usePolling: true,
+			interval: 1000,
+			ignored: ['**/node_modules/**'], // 忽略 node_modules 目录
 		}
-	}
-}
+	},
+	plugins: [
+		tailwindcss(),
+		// vitePluginRequire.default(),
+	],
+})
