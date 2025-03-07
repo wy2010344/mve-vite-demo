@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker"
 import { fdom } from "mve-dom"
 import { renderArrayToArray } from "mve-helper"
 import { moveEdgeScroll, signalAnimateFrame, subscribeEventListener, subscribeScroller } from "wy-dom-helper"
-import { AbsAnimateFrameValue, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, getTweenAnimationConfig, PointKey, reorderCheckTarget, SignalAnimateFrameValue, StoreRef } from "wy-helper"
+import { AbsAnimateFrameValue, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, getTweenAnimationConfig, reorderCheckTarget, SignalAnimateFrameValue, StoreRef } from "wy-helper"
 
 export const dataList = Array(30).fill(1).map((_, i) => {
   return {
@@ -101,7 +101,7 @@ export default function () {
               },
               children() {
                 fdom.img({
-                  a_src: v.avatar,
+                  src: v.avatar,
                 })
                 fdom.span({
                   childrenType: "text",

@@ -1,5 +1,4 @@
-import { render } from 'mve-core';
-import { renderDom } from 'mve-dom';
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'

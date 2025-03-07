@@ -1,4 +1,4 @@
-import { dom, renderDom } from "mve-dom";
+import { dom, fdom } from "mve-dom";
 import { hookTrackSignal, renderArray } from "mve-helper";
 import { cns, cssMap } from "wy-dom-helper";
 import { arrayCountCreateWith, batchSignalEnd, createSignal, quote, scrollerSignal } from "wy-helper";
@@ -27,7 +27,7 @@ export default function () {
   transform: translateZ(0);
   `
     }).render(() => {
-      renderDom("div", {
+      fdom.div({
         className() {
           const x = placeState.get()
           return cns(s.refresh, x)
@@ -44,7 +44,7 @@ export default function () {
         }
       })
       renderArray(list.get, function (value, getIndex) {
-        renderDom("div", {
+        fdom.div({
           className: s.row,
           s_backgroundColor() {
             return getIndex() % 2 ? "#ddd" : ""

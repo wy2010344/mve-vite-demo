@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { fdom } from "mve-dom";
-import { hookDraw, renderCanvas } from "mve-dom-helper";
+import { hookDraw, renderCanvas } from "mve-dom-helper/canvasRender";
 import { hookDestroy, renderArray } from "mve-helper";
 import { subscribeRequestAnimationFrame } from "wy-dom-helper";
 import { asLazy, batchSignalEnd, createSignal, emptyArray, memo, run, toProxySignal } from "wy-helper";
@@ -10,8 +10,8 @@ export default function () {
 
 
   const canvas = fdom.canvas({
-    a_width: 800,
-    a_height: 800
+    width: 800,
+    height: 800
   })
   const width = 800
   const data = run(() => {

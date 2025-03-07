@@ -1,14 +1,14 @@
-import { renderDom } from "mve-dom";
 import { renderCode } from "mve-dom-helper";
-import { hookTrackSignal, hookTrackSignal } from "mve-helper";
 import { contentEditableText, initContentEditableModel } from "wy-dom-helper/contentEditable";
 import { createSignal, emptyFun } from "wy-helper";
 import { parseSentence } from "./parse";
 import { runParse } from "wy-helper/tokenParser";
 import { evalTree } from "./evalTree";
+import { fdom } from "mve-dom";
+import { hookTrackSignal } from "mve-helper";
 
 export default function () {
-  renderDom("div", {
+  fdom.div({
     className: "flex",
     children() {
       renderInputArea("A1")
@@ -41,13 +41,13 @@ function renderInputArea(saveKey: string) {
       // hookAddDestroy()(() => {
       //   console.log("销毁", value)
       // })
-      const div = renderDom("pre", {
+      const div = fdom.pre({
         className: "flex-1 min-h-4 whitespace-pre",
-        a_contentEditable: contentEditableText,
+        contentEditable: contentEditableText,
         ...a,
-        a_spellcheck: false,
+        spellcheck: false,
         children() {
-          renderDom("span", {
+          fdom.span({
             childrenType: "text",
             children: value
           })

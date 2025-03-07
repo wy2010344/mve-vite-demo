@@ -1,6 +1,6 @@
 import { EmptyFun, ValueOrGet, valueOrGetToGet } from "wy-helper";
 import * as THREE from 'three'
-import { hookDestroy, hookTrackSignalMemo } from "mve-helper";
+import { hookDestroy, hookTrackSignal } from "mve-helper";
 import { withParent } from "./context";
 
 
@@ -16,14 +16,14 @@ export function renderM3D(o: THREE.Mesh, arg: {
 }) {
   if (arg.geometry) {
     const getGemoetry = valueOrGetToGet(arg.geometry)
-    hookTrackSignalMemo(getGemoetry, v => {
+    hookTrackSignal(getGemoetry, v => {
       o.geometry.dispose()
       o.geometry = v
     })
   }
   if (arg.material) {
     const getMaterial = valueOrGetToGet(arg.material)
-    hookTrackSignalMemo(getMaterial, v => {
+    hookTrackSignal(getMaterial, v => {
       disposeMaterial(o)
       o.material = v
     })

@@ -1,14 +1,14 @@
 import { fdom } from "mve-dom"
-import { CanvasMouseEvent, hookDraw, renderADom, renderCanvas } from "mve-dom-helper";
+import { hookDraw, renderCanvas } from "mve-dom-helper/canvasRender";
 import { hookDestroy, renderArray } from "mve-helper";
-import { subscribeDragMove, subscribeMove, subscribeRequestAnimationFrame } from "wy-dom-helper";
+import { subscribeMove, subscribeRequestAnimationFrame } from "wy-dom-helper";
 import { asLazy, batchSignalEnd, createSignal, emptyArray, memo, run, toProxySignal } from "wy-helper";
 import { createSignalForceDir, emptySignalForceDir, forceLink, ForceLink, forceManybody, ForceNode, initForceConfig, initToNode, mergeNodesAndLinks, SignalForceDir, tickForce } from "wy-helper/forceLayout";
 
 export default function () {
   const canvas = fdom.canvas({
-    a_width: 800,
-    a_height: 800
+    width: 800,
+    height: 800
   })
   const width = 800
 
@@ -148,12 +148,11 @@ export default function () {
           // node.x.f = e.original.clientX - width / 2
           // node.y.f = e.original.clientY - height / 2
         },
-        draw(ctx) {
-          const path = new Path2D()
+        withPath: true,
+        draw(ctx, path) {
           path.arc(0, 0, 3, 0, 2 * Math.PI)
 
           return {
-            path,
             operates: [
               {
                 type: "fill",

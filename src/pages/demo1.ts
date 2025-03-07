@@ -1,6 +1,6 @@
-import { emptyArray, quote, createSignal, trackSignal, memo, StoreRef, emptyFun, addEffect } from "wy-helper"
-import { createRoot, dom, renderDom, renderSvg, svg } from 'mve-dom'
-import { hookTrackSignal, renderArray } from 'mve-helper'
+import { emptyArray, createSignal, trackSignal, memo, StoreRef, addEffect } from "wy-helper"
+import { dom, fdom, fsvg, svg } from 'mve-dom'
+import { renderArray } from 'mve-helper'
 import { hookAddDestroy } from "mve-core"
 import { renderContentEditable, renderInput, renderInputBool } from "mve-dom-helper"
 import { contentEditableText } from "wy-dom-helper/contentEditable"
@@ -93,38 +93,39 @@ export default () => {
       height: 300,
     }).render()
   })
-  renderSvg("svg", {
+
+  fsvg.svg({
     children() {
-      renderSvg("rect", {
-        a_width: 89,
-        a_height: 33,
+      fsvg.rect({
+        width: 89,
+        height: 33,
         s_fill: "red",
         s_stroke: "blue",
         s_strokeWidth: 9
       })
     }
   })
-  renderDom("button", {
+  fdom.button({
     s_display: "flex",
     children() {
-      renderDom("div", {
+      fdom.div({
         childrenType: "text",
         children: "abc"
       })
-      renderDom("div", {
+      fdom.div({
         childrenType: "text",
         children: "bbb"
       })
-      renderSvg("svg", {
+      fsvg.svg({
         children() {
-          renderSvg("rect", {
-            a_x: 9,
-            a_y: 8,
+          fsvg.rect({
+            x: 9,
+            y: 8,
             css_abc: 98
           })
         }
       })
-      renderDom("button", {
+      fdom.button({
         childrenType: "text",
         onClick() {
           console.log("点击")
@@ -153,7 +154,7 @@ export default () => {
   renderContentEditable("pre", {
     value: text.get,
     className: "min-w-1",
-    a_contentEditable: contentEditableText,
+    contentEditable: contentEditableText,
     onValueChange(v: string) {
       if (isNaN(Number(v))) {
         return
@@ -164,7 +165,7 @@ export default () => {
 
   const checked = createSignal(false)
   renderInputBool({
-    a_type: "checkbox",
+    type: "checkbox",
     checked: checked.get,
     onInput(e) {
       checked.set(e.currentTarget.checked)
@@ -220,7 +221,7 @@ function getOnClick() {
     return [a.get(), b.get(), m.get()]
   })
 
-  renderDom("button", {
+  fdom.button({
     onClick() {
       a.set(a.get() + 1)
       b.set(b.get() + 1)
