@@ -10,6 +10,7 @@ export default defineConfig({
 		}
 	},
 	build: {
+		outDir: './docs',
 		commonjsOptions: {
 			transformMixedEsModules: true, // 处理混合模块
 		}
