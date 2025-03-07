@@ -9,6 +9,7 @@ export default defineConfig({
 			ignored: ['**/node_modules/**'], // 忽略 node_modules 目录
 		}
 	},
+	base: './',
 	build: {
 		outDir: './docs',
 		commonjsOptions: {
