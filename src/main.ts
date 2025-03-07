@@ -32,7 +32,7 @@ import { getToasts } from './toast'
 import { IconContext } from "mve-icons";
 import { emptyFun } from 'wy-helper'
 const app = document.querySelector<HTMLDivElement>('#app')!
-
+const ROUTE_PREFIX = '/mve-vite-demo/'
 const destroy = createRoot(app, () => {
   //@ts-ignore
   IconContext.provide({
@@ -49,8 +49,13 @@ const destroy = createRoot(app, () => {
 
 
   const { get, loading } = hookPromiseSignal(() => {
-    const pathname = historyState.get().location.pathname
-    const load = (route as any)[pathname.slice(1) || 'index'];
+    let pathname = historyState.get().location.pathname
+    if (pathname.startsWith(ROUTE_PREFIX)) {
+      pathname = pathname.slice(ROUTE_PREFIX.length)
+    } else {
+      pathname = pathname.slice(1)
+    }
+    const load = (route as any)[pathname || 'index'];
     return load
   })
   renderIf(loading, () => {
