@@ -50,9 +50,7 @@ const destroy = createRoot(app, () => {
 
   const { get, loading } = hookPromiseSignal(() => {
     let pathname = historyState.get().location.pathname
-    if (pathname.startsWith(ROUTE_PREFIX)) {
-      pathname = pathname.slice(ROUTE_PREFIX.length)
-    } else {
+    if (pathname.startsWith('/')) {
       pathname = pathname.slice(1)
     }
     const load = (route as any)[pathname || 'index'];
@@ -63,7 +61,6 @@ const destroy = createRoot(app, () => {
       className: 'absolute left-1 top-1 daisy-loading daisy-loading-spinner daisy-loading-xl',
     })
   })
-
   fdom.div({
     className: "daisy-toast daisy-toast-top daisy-toast-center",
     children() {

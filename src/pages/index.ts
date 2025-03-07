@@ -4,6 +4,7 @@ import { CiCircleInfo } from "mve-icons/ci";
 import { EmptyFun } from "wy-helper";
 import { FaArrowRight } from "mve-icons/fa";
 import { renderSizeSvg } from "../mve-icon";
+import { fLink } from "../history";
 
 
 export default function () {
@@ -13,12 +14,12 @@ export default function () {
 
 function renderCard() {
   card({
-    href: './magnified-dock',
+    href: '/magnified-dock',
     title: `magnified-dock`,
     description: `一个类似mac上的dock的实现`
   })
   card({
-    href: './calendar',
+    href: '/calendar',
     title: `拖拽日历`,
     description: `简单拖拽日历`
   })
@@ -34,7 +35,7 @@ function card({
   description: string
 }) {
 
-  fdom.a({
+  fLink({
     href: href,
     className: 'daisy-card bg-primary text-primary-content w-96',
     children() {
