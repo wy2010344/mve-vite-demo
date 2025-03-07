@@ -93,7 +93,7 @@ export default function () {
                       s_boxShadow: `inset 2px 2px 6px rgba(255,255,255,0.6),
 		inset -2px -2px 6px rgba(0,0,0,0.6),
 		0 1px 8px rgba(0,0,0,0.8)`,
-                      a_src: faker.image.urlLoremFlickr({
+                      src: faker.image.urlLoremFlickr({
                         width: 140,
                         height: 200
                       })

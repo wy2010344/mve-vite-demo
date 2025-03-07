@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "module": "CommonJS",
+    "module": "ESNext", // 使用 ESNext 模块系统
+    "moduleResolution": "bundler", // 使用 Node.js 的模块解析策略
+    "target": "ES6", // 编译目标为 ESNext
     "lib": [
-      "ESNext",
-      "DOM"
-    ],
+      "DOM",
+      "ESNext"
+    ], // 包含 DOM 和 ESNext 库
+    "esModuleInterop": true, // 允许兼容 CommonJS 模块
+    "resolveJsonModule": true, // 支持导入 JSON 文件
+    "allowSyntheticDefaultImports": true, // 允许合成默认导入
+    "useDefineForClassFields": true,
     "strict": true,
     "sourceMap": true,
-    "resolveJsonModule": true,
     "isolatedModules": true,
-    "esModuleInterop": true,
     "noEmit": true,
     "allowJs": true,
     "skipLibCheck": true,

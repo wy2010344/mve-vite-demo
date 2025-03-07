@@ -1,14 +1,13 @@
-import { hookDraw } from "mve-dom-helper";
-import { drawText, drawTextWrap, measureTextWrap } from 'wy-dom-helper'
+import { hookDraw } from "mve-dom-helper/canvasRender";
+import { drawText, drawTextWrap, measureTextWrap } from 'wy-dom-helper/canvas'
 export default function () {
   hookDraw({
     x: 150,
     y: 500,
-    draw(ctx) {
-      const path = new Path2D()
+    withPath: true,
+    draw(ctx, path) {
       path.rect(0, 0, 300, 300)
       return {
-        path,
         operates: [
           { type: "stroke", width: 10, style: "green" },
           { type: "stroke", width: 10, style: "blue" },
@@ -36,15 +35,14 @@ export default function () {
   hookDraw({
     x: 500,
     y: 500,
+    withPath: true,
     onPointerDown(e) {
       console.log("inPath", e.inPath, 'inStroke', e.inStroke)
     },
-    draw(ctx) {
-      const path = new Path2D()
+    draw(ctx, path) {
       path.rect(0, 0, 300, 300)
       // path.ellipse(0, 0, 500, 500, 0, 0, 0)
       return {
-        path,
         operates: [
           {
             type: "stroke",

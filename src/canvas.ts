@@ -1,5 +1,5 @@
 import { dom } from "mve-dom";
-import { hookDraw, PathResult, renderCanvas } from "mve-dom-helper";
+import { hookDraw, PathResult, renderCanvas } from "mve-dom-helper/canvasRender";
 import { renderArray } from "mve-helper";
 import { createSignal, PointKey, quote } from "wy-helper";
 /**
@@ -29,11 +29,9 @@ export default function () {
     }).renderText`列表数量${() => list.get().length}`
 
     function colorRectPath(strokeStyle = "blue", clip?: boolean) {
-      return function rectPath(): PathResult {
-        const path = new Path2D()
+      return function rectPath(ctx: any, path: Path2D): PathResult {
         path.rect(0, 30, 100, 100)
         const rs: PathResult = {
-          path,
           operates: [
             {
               type: "stroke",
@@ -62,6 +60,7 @@ export default function () {
       hookDraw({
         x: 100,
         y: 100,
+        withPath: true,
         draw: colorRectPath(),
         // draw(ctx, x, y) {
         //   const p = new Path2D()
@@ -83,16 +82,19 @@ export default function () {
           hookDraw({
             x: 10,
             y: 10,
+            withPath: true,
             draw: colorRectPath(),
           })
           hookDraw({
             x: 40,
             y: 40,
+            withPath: true,
             draw: colorRectPath("yellow", true),
             children() {
               hookDraw({
                 x: 0,
                 y: 10,
+                withPath: true,
                 draw: colorRectPath('orange'),
               })
 
@@ -100,12 +102,14 @@ export default function () {
               hookDraw({
                 x: 0,
                 y: 30,
+                withPath: true,
                 draw: colorRectPath('yellow'),
               })
             }
           })
           renderArray(list.get, (row, getIndex) => {
             hookDraw({
+              withPath: true,
               x() {
                 return getIndex() * 20 + 100
               },

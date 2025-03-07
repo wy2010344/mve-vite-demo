@@ -10,7 +10,7 @@ export default function () {
 
 type TreeModel = {
   id: number
-  text: string
+  text: StoreRef<string>
 }
 
 function treeItem(item: TreeModel, onDelete: () => void) {
@@ -26,23 +26,20 @@ function treeItem(item: TreeModel, onDelete: () => void) {
         input = dom.input({
         }).render()
         hookDestroy(() => {
-          console.log("销毁...", item.get().text)
+          console.log("销毁...", item.text)
         })
         hookTrackSignal(() => {
-          input.value = item.get().text
+          input.value = item.text.get()
         }, emptyFun)
       }, () => {
-        dom.span().renderTextContent(() => item.get().text)
+        dom.span().renderTextContent(item.text.get)
       })
       dom.button({
         onClick() {
           if (edit.get()) {
             const value = input.value.trim()
             if (value) {
-              item.set({
-                ...item.get(),
-                text: value
-              })
+              item.text.set(value)
             } else {
               onDelete()
             }
@@ -66,19 +63,10 @@ function treeItem(item: TreeModel, onDelete: () => void) {
 
 function renderList() {
   const list = createSignal<TreeModel[]>(emptyArray as any[])
-  renderArray(list.get, (get) => {
-    treeItem({
-      get() {
-        return get().item
-      },
-      set(v) {
-        const vs = list.get().slice()
-        vs[get().index] = v
-        list.set(vs)
-      },
-    }, () => {
+  renderArray(list.get, (item, getIndex) => {
+    treeItem(item, () => {
       const vs = list.get().slice()
-      vs.splice(get().index, 1)
+      vs.splice(getIndex(), 1)
       list.set(vs)
     })
   })
@@ -98,7 +86,7 @@ function renderList() {
         if (value) {
           list.set(list.get().concat({
             id: Date.now(),
-            text: value
+            text: createSignal(value)
           }))
           input.value = ''
         }

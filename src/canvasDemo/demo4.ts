@@ -1,6 +1,6 @@
 import { addEffect, createSignal, flexDisplayUtil, memo } from "wy-helper";
 import data from "./data";
-import { AbsoluteNode, hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage } from "mve-dom-helper";
+import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage } from "mve-dom-helper/canvasRender";
 
 import Scroller from 'scroller';
 import { hookTrackSignal } from "mve-helper";
@@ -52,11 +52,9 @@ export default function () {
         gap: 30
       })
     },
-    draw(ctx, n) {
-      const path = new Path2D()
+    draw(ctx, n, path) {
       path.rect(0, 0, n.width(), n.height())
       return {
-        path,
         operates: [
           {
             type: "fill",
@@ -90,8 +88,7 @@ export default function () {
                   direction: "x"
                 })
               },
-              draw(ctx, n) {
-                const path = new Path2D()
+              draw(ctx, n, path) {
                 path.rect(0, 0, n.width(), n.height())
                 return {
                   path,

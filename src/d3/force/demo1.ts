@@ -13,9 +13,9 @@ type NLink = typeof data.links[number]
 const alphaMin = 0.001
 export default function () {
   const svg = fsvg.svg({
-    a_width: width,
-    a_height: height,
-    a_viewBox: `${-width / 2} ${-height / 2} ${width} ${height}`,
+    width: width,
+    height: height,
+    viewBox: `${-width / 2} ${-height / 2} ${width} ${height}`,
     s_maxWidth: '100%',
     s_height: 'auto',
     children() {
@@ -82,15 +82,15 @@ export default function () {
 
       renderArray(() => getNodesAndLinks().links, link =>
         fsvg.g({
-          a_stroke: "#999",
-          a_strokeOpacity: 0.6,
+          stroke: "#999",
+          strokeOpacity: 0.6,
           children() {
             fsvg.line({
-              a_x1: link.source.x.dSignal.get,
-              a_y1: link.source.y.dSignal.get,
-              a_x2: link.target.x.dSignal.get,
-              a_y2: link.target.y.dSignal.get,
-              a_strokeWidth: Math.sqrt(link.value.value)
+              x1: link.source.x.dSignal.get,
+              y1: link.source.y.dSignal.get,
+              x2: link.target.x.dSignal.get,
+              y2: link.target.y.dSignal.get,
+              strokeWidth: Math.sqrt(link.value.value)
             })
           }
         })
@@ -98,14 +98,14 @@ export default function () {
 
       renderArray(() => getNodesAndLinks().nodes, node =>
         fsvg.g({
-          a_stroke: "#fff",
-          a_strokeWidth: 1.5,
+          stroke: "#fff",
+          strokeWidth: 1.5,
           children() {
             fsvg.circle({
-              a_r: 5,
-              a_cx: node.x.dSignal.get,
-              a_cy: node.y.dSignal.get,
-              a_fill: color(node.value.group),
+              r: 5,
+              cx: node.x.dSignal.get,
+              cy: node.y.dSignal.get,
+              fill: color(node.value.group),
               ...(dragInit(e => {
                 const rec = svg.getBoundingClientRect()
                 const halfX = rec.left + rec.width / 2

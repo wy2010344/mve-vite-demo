@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { absoluteDisplay, AbsoluteNode, renderAbsoulte, renderADom } from "mve-dom-helper";
 import { createSignal, emptyArray, flexDisplayUtil, quote, StoreRef } from "wy-helper";
 import { renderArray } from "mve-helper";
-import { renderSvg, fsvg } from "mve-dom";
+import { fsvg } from "mve-dom";
 
 
 /**
@@ -17,15 +17,15 @@ import { renderSvg, fsvg } from "mve-dom";
  */
 export default function (app: HTMLElement) {
   fsvg.svg({
-    a_width: 500,
-    a_height: 500,
+    width: 500,
+    height: 500,
     children() {
-      renderSvg("rect", {
-        a_x: 100,
-        a_y: 100,
-        a_width: 300,
-        a_height: 200,
-        a_stroke: "green"
+      fsvg.rect({
+        x: 100,
+        y: 100,
+        width: 300,
+        height: 200,
+        stroke: "green"
       })
     }
   })
@@ -52,8 +52,8 @@ export default function (app: HTMLElement) {
         // }
       },
       css_dddd: 89,
-      data_abc: "abc",
-      aria_hidden: true,
+      // databc: "abc",
+      // arihidden: true,
       onClick() {
 
       },

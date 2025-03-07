@@ -1,14 +1,14 @@
 import { hookAddDestroy } from "mve-core";
-import { renderDom } from "mve-dom";
-import { renderCanvas } from "mve-dom-helper";
 import { createSignal } from "wy-helper";
-import demo3 from "./demo3";
+import demo3 from "../canvasDemo/demo3";
 import { hookDestroy } from "mve-helper";
-import demo4 from "./demo4";
-import demo5 from "./demo5";
-import demo6 from "./demo6";
-import demo1 from "./demo1";
-import demo2 from "./demo2";
+import demo4 from "../canvasDemo/demo4";
+import demo5 from "../canvasDemo/demo5";
+import demo6 from "../canvasDemo/demo6";
+import demo1 from "../canvasDemo/demo1";
+import demo2 from "../canvasDemo/demo2";
+import { fdom } from "mve-dom";
+import { renderCanvas } from "mve-dom-helper/canvasRender";
 
 export default function () {
 
@@ -22,19 +22,19 @@ export default function () {
   hookDestroy(() => {
     window.removeEventListener("resize", resize)
   })
-  const canvas = renderDom("canvas", {
-    a_width: w.get,
-    a_height: h.get
+  const canvas = fdom.canvas({
+    width: w.get,
+    height: h.get
   })
 
   console.log("dddd")
   renderCanvas(canvas, () => {
-    // demo2()
     // demo1()
-    demo3()
-    // demo6()
+    // demo2()
+    // demo3()
     // demo4()
     // demo5()
+    demo6()
   }, {
 
     beforeDraw(ctx: CanvasRenderingContext2D) {

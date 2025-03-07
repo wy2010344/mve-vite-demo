@@ -1,4 +1,4 @@
-import { hookDraw } from "mve-dom-helper"
+import { hookDraw } from "mve-dom-helper/canvasRender"
 
 export default function () {
 
@@ -6,13 +6,11 @@ export default function () {
   hookDraw({
     x: 100,
     y: 100,
-    draw(ctx) {
-
-      const path = new Path2D()
+    withPath: true,
+    draw(ctx, path) {
       path.rect(0, 0, 300, 300)
 
       return {
-        path,
         operates: [
           { type: "stroke", width: 10, style: "green" },
         ],
@@ -23,16 +21,13 @@ export default function () {
       hookDraw({
         x: -30,
         y: -30,
+        withPath: true,
         onPointerDown(e) {
           console.log("before-click", e)
         },
-        draw(ctx) {
-
-          const path = new Path2D()
+        draw(ctx, path) {
           path.rect(0, 0, 300, 300)
-
           return {
-            path,
             operates: [
               { type: "stroke", width: 10, style: "yellow" },
             ]
@@ -47,13 +42,11 @@ export default function () {
         onPointerDown(e) {
           console.log("click", e)
         },
-        draw(ctx) {
-
-          const path = new Path2D()
+        withPath: true,
+        draw(ctx, path) {
           path.rect(0, 0, 300, 300)
 
           return {
-            path,
             operates: [
               { type: "stroke", width: 10, style: "blue" },
             ]

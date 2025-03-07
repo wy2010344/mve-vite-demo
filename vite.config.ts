@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
-import vitePluginRequire from "vite-plugin-require";
 import tailwindcss from '@tailwindcss/vite'
+
 export default defineConfig({
 	server: {
 		watch: {
@@ -9,8 +9,12 @@ export default defineConfig({
 			ignored: ['**/node_modules/**'], // 忽略 node_modules 目录
 		}
 	},
+	build: {
+		commonjsOptions: {
+			transformMixedEsModules: true, // 处理混合模块
+		}
+	},
 	plugins: [
-		tailwindcss(),
-		// vitePluginRequire.default(),
+		tailwindcss()
 	],
 })

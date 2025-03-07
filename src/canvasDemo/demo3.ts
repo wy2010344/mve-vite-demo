@@ -1,5 +1,5 @@
 import { memo, ValueOrGet, valueOrGetToGet } from "wy-helper"
-import { AbsoluteNode, hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage } from "mve-dom-helper";
+import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage } from "mve-dom-helper/canvasRender";
 
 
 export default function () {
@@ -47,8 +47,7 @@ export default function () {
         // ext: {
         //   grow: 1,
         // },
-        draw(ctx, n) {
-          const path = new Path2D()
+        draw(ctx, n, path) {
           path.rect(0, 0, n.width(), n.height())
           return {
             path,
@@ -67,8 +66,7 @@ export default function () {
         // ext: {
         //   grow: 2,
         // },
-        draw(ctx, n) {
-          const path = new Path2D()
+        draw(ctx, n, path) {
           path.rect(0, 0, n.width(), n.height())
           return {
             path,

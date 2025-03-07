@@ -150,7 +150,7 @@ function createTree() {
       //会自动恢复
       console.log(JSON.stringify(renderer.info), renderer.info)
     }
-  }, 'click')
+  } as any, 'click')
 }
 
 

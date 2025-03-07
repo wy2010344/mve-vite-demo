@@ -1,5 +1,5 @@
 import { addEffect, createSignal, emptyArray } from "wy-helper";
-import { AbsoluteNode, hookDrawRect, simpleFlex, hookDrawText, CanvasRectNode } from "mve-dom-helper";
+import { hookDrawRect, simpleFlex, hookDrawText, CanvasRectNode } from "mve-dom-helper/canvasRender";
 import { renderArray } from "mve-helper";
 import { dom, renderPortal } from "mve-dom";
 import { hookAlterStateHolder, hookCurrentStateHolder } from "mve-core";
