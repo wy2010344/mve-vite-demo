@@ -117,15 +117,14 @@ export default function () {
       hookDraw({
         x: link.source.x.dSignal.get,
         y: link.source.y.dSignal.get,
-        draw(ctx) {
-          const path = new Path2D()
+        withPath: true,
+        draw(ctx, path) {
           path.moveTo(0, 0)
           path.lineTo(
             link.target.x.d - link.source.x.d,
             link.target.y.d - link.source.y.d,
           )
           return {
-            path,
             operates: [
               {
                 type: "stroke",

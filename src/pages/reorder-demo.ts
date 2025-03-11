@@ -8,11 +8,7 @@ export const dataList = Array(30).fill(1).map((_, i) => {
   return {
     index: i,
     name: faker.person.fullName(),
-    avatar: faker.image.urlLoremFlickr({
-      width: 50,
-      height: 50,
-      category: 'orchid'
-    })
+    avatar: faker.image.avatar()
   }
 })
 
@@ -102,6 +98,8 @@ export default function () {
               children() {
                 fdom.img({
                   src: v.avatar,
+                  s_width: '50px',
+                  s_height: '50px'
                 })
                 fdom.span({
                   childrenType: "text",
