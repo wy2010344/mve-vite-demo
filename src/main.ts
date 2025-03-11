@@ -15,12 +15,7 @@ import scrollDemo1p from './scroller-demo/demo1p'
 import pagingx from './scroller-demo/pagingx'
 import snapDemo from './scroller-demo/snapDemo'
 import scrollerDemo1 from './demos/scrollerDemo1'
-import reorderDemo from './demos/reorderDemo'
-import forceDemo from './d3/force/demo1'
-import forceDemo2 from './d3/force/demo2'
-import forceDemo3 from './d3/force/demo3'
-import forceDemo4 from './d3/force/demo4'
-import exitAnimate from './exitAnimate'
+import reorderDemo from './pages/reorder-demo'
 import demo2 from './demos/demo2'
 import calendar from './pages/calendar'
 import dailycost from './dailycost'
@@ -32,7 +27,6 @@ import { getToasts } from './toast'
 import { IconContext } from "mve-icons";
 import { emptyFun } from 'wy-helper'
 const app = document.querySelector<HTMLDivElement>('#app')!
-const ROUTE_PREFIX = '/mve-vite-demo/'
 const destroy = createRoot(app, () => {
   //@ts-ignore
   IconContext.provide({

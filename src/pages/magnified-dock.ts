@@ -5,6 +5,7 @@ import { batchSignalEnd, createSignal, cubicBezier, extrapolationClamp, getInter
 import explain from "../explain";
 import { tw } from 'wy-helper'
 import { onlyMobile } from "../onlyMobile";
+import markdown from "../markdown";
 const APPS = [
   'Safari',
   'Mail',
@@ -42,14 +43,10 @@ const scaleMap = getInterpolate({
  */
 export default () => {
   explain(function () {
-    renderText`参考:`
-    fdom.a({
-      href: 'https://buildui.com/recipes/magnified-dock',
-      target: '_blank',
-      children() {
-        renderText`https://buildui.com/recipes/magnified-dock`
-      }
-    })
+
+    markdown`
+参考[https://buildui.com/recipes/magnified-dock](https://buildui.com/recipes/magnified-dock)
+    `
   })
   const mouseLeft = createSignal(-Infinity)
   const mouseRight = createSignal(-Infinity)

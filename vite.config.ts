@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
-
+import myRoute from './src/vite-plugin-my-route'
 export default defineConfig({
 	server: {
 		watch: {
@@ -17,6 +17,7 @@ export default defineConfig({
 		}
 	},
 	plugins: [
-		tailwindcss()
+		tailwindcss(),
+		myRoute()
 	],
 })

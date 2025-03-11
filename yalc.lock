@@ -2,12 +2,12 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "47d1ec26fe70eda9c0496bac179cb377",
+      "signature": "cf41470ee6b44ccb9c4741903b7ac8ff",
       "file": true,
       "replaced": "^0.1.12"
     },
     "wy-dom-helper": {
-      "signature": "4e48dbb868151929b03fd1d3441a9d05",
+      "signature": "3a3b903b266dec24a9998d01e49b4b52",
       "file": true,
       "replaced": "^0.1.10"
     },

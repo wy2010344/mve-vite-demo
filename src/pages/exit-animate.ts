@@ -1,10 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { animate } from "motion";
-import { hookAddResult } from "mve-core";
-import { fdom } from "mve-dom";
+import { hookAddResult, render } from "mve-core";
+import { fdom, renderText } from "mve-dom";
 import { renderExitArrayClone } from "mve-dom-helper";
-import { ExitModel, getExitAnimateArray, renderArray, renderIf } from "mve-helper";
+import { ExitModel, getExitAnimateArray, hookTrackSignal, renderArray, renderIf } from "mve-helper";
 import { createSignal, emptyArray, GetValue } from "wy-helper";
+import explain from "../explain";
+import markdown from "../markdown";
 
 
 /**
@@ -14,28 +16,43 @@ import { createSignal, emptyArray, GetValue } from "wy-helper";
 export default function () {
   const list = createSignal<{
     time: number
-  }[]>(emptyArray as any[])
+  }[]>([
+    {
+      time: Date.now()
+    }
+  ])
 
-
+  explain(function () {
+    markdown`
+# 数据驱动的退出动画
+* mode
+    * pop: 退出元素在最后
+    * shift: 退出元素在最前
+* wait 
+    * normal: 同时进出
+    * in-out: 选进后出
+    * out-in: 先出后进
+    `
+  })
 
   function renderRow(row: ExitModel<RowModel>, getIndex: GetValue<number>) {
-    const div = fdom.div({
-      s_display: 'flex',
-      s_gap: '10px',
+    const div = fdom.li({
+      className: 'daisy-list-row',
       children() {
         fdom.span({
+          className: 'text-4xl font-thin opacity-30 tabular-nums',
           childrenType: "text",
           children: getIndex
         })
         fdom.span({
+          className: 'list-col-grow',
           childrenType: "text",
           children: row.value.time + ''
         })
         fdom.button({
           childrenType: "text",
           children: "x",
-          s_paddingInline: '10px',
-          s_background: 'gray',
+          className: 'daisy-btn',
           onClick() {
             list.set(list.get().filter(x => x != row.value))
           }
@@ -43,8 +60,7 @@ export default function () {
         fdom.button({
           childrenType: "text",
           children: "替换",
-          s_paddingInline: '10px',
-          s_background: 'gray',
+          className: 'daisy-btn daisy-btn-accent',
           onClick() {
             list.set(
               list.get().map(v => {
@@ -68,6 +84,7 @@ export default function () {
     s_display: 'flex',
     s_flexDirection: 'column',
     s_alignItems: 'center',
+    s_gap: '10px',
     children() {
 
       const modeIdx = createSignal(0)
@@ -99,6 +116,7 @@ export default function () {
         s_gap: "10px",
         children() {
           fdom.button({
+            className: 'daisy-btn',
             childrenType: "text",
             onClick() {
               modeIdx.set(modeIdx.get() + 1)
@@ -108,6 +126,7 @@ export default function () {
             }
           })
           fdom.button({
+            className: 'daisy-btn',
             childrenType: "text",
             onClick() {
               waitIdx.set(waitIdx.get() + 1)
@@ -119,35 +138,47 @@ export default function () {
         }
       })
 
-      renderExitArrayClone(getList, (row, getIndex) => {
-        const div = renderRow(row, getIndex)
-        animate(div, {
-          x: ['100%', 0]
-        }).finished.then(row.resolve)
-        return {
-          node: div,
-          applyAnimate(node) {
-            animate(node as HTMLDivElement, {
-              x: [0, '100%']
+      fdom.ul({
+        className: 'daisy-list rounded-box shadow-md',
+        children() {
+          markdown`
+退出元素使用的数据,是最后状态的数据
+          `
+          renderArray(getList, (row, getIndex) => {
+            const div = renderRow(row, getIndex)
+            hookTrackSignal(row.step, function (value) {
+              if (value == 'enter') {
+                animate(div, {
+                  x: ['100%', 0]
+                }).finished.then(row.resolve)
+              } else if (value == 'exiting') {
+                animate(div, {
+                  x: [0, '100%']
+                }).finished.then(row.resolve)
+              }
+            })
+          })
+
+
+          markdown`
+退出时,采用对旧元素clone的方式,使元素内的数据保持不变
+          `
+          renderExitArrayClone(getList, (row, getIndex) => {
+            const div = renderRow(row, getIndex)
+            animate(div, {
+              x: ['100%', 0]
             }).finished.then(row.resolve)
-          },
+            return {
+              node: div,
+              applyAnimate(node) {
+                animate(node as HTMLDivElement, {
+                  x: [0, '100%']
+                }).finished.then(row.resolve)
+              },
+            }
+          })
         }
       })
-      // renderArray(() => {
-
-      //   const rw = getList()
-      //   console.log("rw", rw)
-      //   return rw
-      // }, (row, getIndex) => {
-      //   const div = renderRow(row, getIndex)
-      //   console.log("render", row)
-      //   hookTrackSignal(row.exiting, (v) => {
-      //     console.log("ss", row, v)
-      //     animate(div, {
-      //       x: v ? [0, '100%'] : ['100%', 0]
-      //     }).finished.then(row.resolve)
-      //   })
-      // })
 
       fdom.button({
         onClick() {
@@ -162,6 +193,7 @@ export default function () {
           rows.splice(idx, 0, row)
           list.set(rows)
         },
+        className: 'daisy-btn daisy-btn-primary',
         childrenType: "text",
         children: "随机增加"
       })
