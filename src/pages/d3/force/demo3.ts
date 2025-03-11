@@ -88,11 +88,10 @@ export default function () {
       hookDraw({
         x: node.x.dSignal.get,
         y: node.y.dSignal.get,
-        draw(ctx) {
-          const path = new Path2D()
+        withPath: true,
+        draw(ctx, path) {
           path.arc(0, 0, node.value.r, 0, 2 * Math.PI)
           return {
-            path,
             operates: getIndex() ? [
               {
                 type: "fill",

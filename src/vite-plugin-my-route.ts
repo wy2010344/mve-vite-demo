@@ -44,22 +44,33 @@ function generateRouteContent(files: string[], pagesDir: string): string {
 }
 
 export default function myVitePlugin(): Plugin {
+
+  const watchFolder = path.resolve(__dirname, './pages')
+
+  function rebuild() {
+
+    const outputFile = path.resolve(__dirname, './route.ts'); // 输出文件路径
+
+    // 扫描 pages 目录
+    const files = scanPagesDir(watchFolder);
+
+    // 生成 route.ts 内容
+    const content = generateRouteContent(files, watchFolder);
+
+    // 写入 route.ts 文件
+    fs.writeFileSync(outputFile, content);
+
+    console.log('Generated route.ts successfully!');
+  }
   return {
     name: 'vite-plugin-my-routes',
     buildStart() {
-      const pagesDir = path.resolve(__dirname, './pages'); // src/pages 目录
-      const outputFile = path.resolve(__dirname, './route.ts'); // 输出文件路径
-
-      // 扫描 pages 目录
-      const files = scanPagesDir(pagesDir);
-
-      // 生成 route.ts 内容
-      const content = generateRouteContent(files, pagesDir);
-
-      // 写入 route.ts 文件
-      fs.writeFileSync(outputFile, content);
-
-      console.log('Generated route.ts successfully!');
+      rebuild()
+    },
+    watchChange(id, change) {
+      if (id.startsWith(watchFolder) && change.event != 'update') {
+        rebuild()
+      }
     },
   };
 }

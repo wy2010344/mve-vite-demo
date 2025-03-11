@@ -5,8 +5,26 @@ export default {
   'canvas-demo'() {
     return import('./pages/canvas-demo');
   },
+  'd3/force/demo1'() {
+    return import('./pages/d3/force/demo1');
+  },
+  'd3/force/demo2'() {
+    return import('./pages/d3/force/demo2');
+  },
+  'd3/force/demo3'() {
+    return import('./pages/d3/force/demo3');
+  },
+  'd3/force/demo4'() {
+    return import('./pages/d3/force/demo4');
+  },
+  'dailycost'() {
+    return import('./pages/dailycost');
+  },
   'demo1'() {
     return import('./pages/demo1');
+  },
+  'exit-animate'() {
+    return import('./pages/exit-animate');
   },
   'html2f'() {
     return import('./pages/html2f');
@@ -16,6 +34,9 @@ export default {
   },
   'magnified-dock'() {
     return import('./pages/magnified-dock');
+  },
+  'reorder-demo'() {
+    return import('./pages/reorder-demo');
   },
   'tree'() {
     return import('./pages/tree');
