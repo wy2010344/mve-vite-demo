@@ -2,11 +2,11 @@ import { fdom, FDomAttributes, renderText, renderTextContent } from "mve-dom";
 import { hookTrackSignal, renderIf, renderOne } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, signalAnimateFrame, subscribeEventListener } from "wy-dom-helper";
-import { addEffect, batchSignalEnd, cacheVelocity, createSignal, dateFromYearMonthDay, DAYMILLSECONDS, easeFns, emptyFun, extrapolationClamp, getInterpolate, getSpringBaseAnimationConfig, getTweenAnimationConfig, GetValue, getWeekOfMonth, memo, MomentumIScroll, MonthFullDay, PagePoint, run, SignalAnimateFrameValue, startScroll, StoreRef, tw, ValueOrGet, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView } from "wy-helper";
+import { addEffect, batchSignalEnd, cacheVelocity, createSignal, dateFromYearMonthDay, DAYMILLSECONDS, destinationWithMarginTrans, easeFns, emptyFun, extrapolationClamp, getInterpolate, getSpringBaseAnimationConfig, getTweenAnimationConfig, GetValue, getWeekOfMonth, memo, MomentumIScroll, MonthFullDay, PagePoint, run, SignalAnimateFrameValue, startScroll, StoreRef, tw, ValueOrGet, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView } from "wy-helper";
 import explain from "../explain";
 import { onlyMobile } from "../onlyMobile";
 import { animate } from "motion";
-import { pointerMoveDirWithLock } from "../components/pointer-move";
+import { pointerMoveDirWithLock } from "wy-dom-helper";
 
 
 
@@ -31,7 +31,7 @@ export default function () {
       fdom.div({
         className: 'w-full h-full',
         children() {
-          calendar(window.innerWidth)
+          calendar(window.innerWidth, true)
         }
       })
 
@@ -67,7 +67,7 @@ export default function () {
 }
 
 const selectShadowCell = 'select-cell'
-function calendar(fullWidth: number) {
+function calendar(fullWidth: number, fullScreen?: boolean) {
   const date = createSignal(createYM())
   const yearMonth = memo(() => {
     const d = date.get()
@@ -248,41 +248,17 @@ function calendar(fullWidth: number) {
           },
           finish(v) {
             const out = bs.destinationWithMargin(v)
-            if (out.type == "scroll") {
-              if (out.target < -perSize() * 3) {
-                //进入week模式
-                transY.changeTo(
-                  Math.min(-perSize() * 5, out.target),
-                  getTweenAnimationConfig(out.duration, easeFns.out(easeFns.circ)),
-                  {
-                    onFinish: onScrollEnd
-                  })
-              } else {
-                transY.changeTo(
-                  0,
-                  getTweenAnimationConfig(out.duration, easeFns.out(easeFns.circ)),
-                  {
-                    onFinish: onScrollEnd
-                  }
-                )
+            destinationWithMarginTrans(out, transY, {
+              targetSnap(n) {
+                if (n < -perSize() * 3) {
+                  return Math.min(-perSize() * 5, out.target)
+                }
+                return 0
+              },
+              event: {
+                onFinish: onScrollEnd
               }
-            } else {
-              if (out.type == "scroll-edge") {
-                //到达边界外
-                transY.changeTo(out.target, getTweenAnimationConfig(out.duration, easeFns.out(easeFns.circ)), {
-                  onFinish(v) {
-                    transY.changeTo(out.finalPosition, getTweenAnimationConfig(300, easeFns.out(easeFns.circ)), {
-                      onFinish: onScrollEnd
-                    })
-                  },
-                })
-              } else if (out.type == "edge-back") {
-                //已经在边界外
-                transY.changeTo(out.target, getTweenAnimationConfig(300, easeFns.out(easeFns.circ)), {
-                  onFinish: onScrollEnd
-                })
-              }
-            }
+            })
           }
         })
         m.move(e.pageY)
@@ -303,7 +279,7 @@ function calendar(fullWidth: number) {
           return `translateY(${transY.get()}px)`
         },
         // 至少要折叠到星期
-        s_minHeight: `calc(100% + 500vw / 7)`,
+        s_minHeight: `calc(100% + ${fullScreen ? '500vw' : fullWidth * 5 + 'px'} / 7)`,
         children() {
           //header
           fdom.div({
