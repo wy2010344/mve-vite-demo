@@ -38,6 +38,9 @@ export default {
   'reorder-demo'() {
     return import('./pages/reorder-demo');
   },
+  'three/css3d-periodictable'() {
+    return import('./pages/three/css3d-periodictable');
+  },
   'tree'() {
     return import('./pages/tree');
   },

@@ -1,6 +1,9 @@
-import { hookDestroy } from "mve-helper";
+import { fdom, renderText } from "mve-dom";
+import { hookDestroy, renderOne } from "mve-helper";
 import { subscribeEventListener } from "wy-dom-helper";
 import { createSignal } from "wy-helper";
+import fixRightTop from "./fixRightTop";
+import themeDropdown from "./themeDropdown";
 
 
 /**
@@ -9,7 +12,7 @@ import { createSignal } from "wy-helper";
  * mobile 只能作为手机屏幕
  * not-mobile 不是手机屏幕的比例,也不能包含手机屏幕
  */
-type ShowModelType = 'contain-mobile' | 'also-mobile' | 'mobile' | 'not-mobile'
+type ShowModelType = 'fake-and-mobile' | 'also-mobile' | 'mobile' | 'not-mobile'
 export function onlyMobile() {
 
 
@@ -19,12 +22,12 @@ export function onlyMobile() {
     if (w / h > 3 / 4) {
       //非mobile形状
       if (h > 879) {
-        return 'contain-mobile'
+        return 'fake-and-mobile'
       } else {
         return 'not-mobile'
       }
     } else {
-      if (h > 879) {
+      if (w > 424) {
         return 'also-mobile'
       }
       return 'mobile'
@@ -35,4 +38,47 @@ export function onlyMobile() {
     showMobile.set(judgeMobile())
   }))
   return showMobile.get
+}
+
+
+export function renderMobileView(
+  renderDisplay: (width: number, fullWidth?: boolean) => void,
+) {
+  const isMobile = onlyMobile()
+  renderOne(isMobile, function (showType) {
+    if (showType == 'mobile') {
+      fdom.div({
+        className: 'w-full h-full',
+        children() {
+          renderDisplay(window.innerWidth, true)
+        }
+      })
+    } else if (showType == 'fake-and-mobile' || showType == 'also-mobile') {
+      fdom.div({
+        className: 'daisy-mockup-phone',
+        children() {
+          fdom.div({
+            className: 'daisy-mockup-phone-camera'
+          })
+          fdom.div({
+            className: 'daisy-mockup-phone-display bg-base-100 daisy-card flex flex-col items-stretch',
+            children() {
+              fdom.div({
+                className: 'h-10'
+              })
+              fdom.div({
+                className: 'flex-1 min-h-0 relative',
+                children() {
+                  renderDisplay(390)
+                }
+              })
+            }
+          })
+        }
+      })
+    } else {
+      renderText`屏幕比例不支持,需要小于3/4`
+    }
+  })
+
 }
