@@ -1,4 +1,4 @@
-import{f as h}from"./chunk-LSEVNFON-G8OzWBoO.js";import{c as m,f as t,T as x,F as y,b as g}from"./index-BnPd4ZD8.js";import{d as b}from"./index-cyRrFiJz.js";import{e as v}from"./explain-D1zP_xNe.js";import{m as p}from"./markdown-BI2ySM4I.js";import{a as c}from"./animate.es-CuPzepd-.js";import"./canvasRender-hz9keZru.js";import"./iconBase-nb2zDood.js";function I(){const i=m([{time:Date.now()}]);v(function(){p`
+import{f as h}from"./chunk-LSEVNFON-G8OzWBoO.js";import{c as m,f as t,T as x,F as y,b as g}from"./index-DKe6Phur.js";import{d as b}from"./index-aOSIW610.js";import{e as v}from"./explain-DIzxETBw.js";import{m as p}from"./markdown-Bpczn2O-.js";import{a as c}from"./animate.es-CuPzepd-.js";import"./canvasRender-DtxVckr-.js";import"./iconBase-pNPgz5cT.js";function I(){const i=m([{time:Date.now()}]);v(function(){p`
 # 数据驱动的退出动画
 * mode
     * pop: 退出元素在最后
