@@ -1,8 +1,9 @@
 import { PointerDirMoveUp } from "wy-dom-helper"
-import { AbsAnimateFrameValue, addEffect, AnimateFrameEvent, batchSignalEnd, cacheVelocity, EmptyFun, getSpringBaseAnimationConfig, GetValue, MomentumIScroll } from "wy-helper"
+import { AbsAnimateFrameValue, addEffect, AnimateFrameEvent, batchSignalEnd, cacheVelocity, EmptyFun, FrictionalFactory, getSpringBaseAnimationConfig, GetValue, MomentumIScroll } from "wy-helper"
 
 export function movePage(
   scrollX: AbsAnimateFrameValue,
+  // fc: FrictionalFactory,
   getWidth: GetValue<number>,
   event?: AnimateFrameEvent,
 ) {
@@ -12,6 +13,7 @@ export function movePage(
     pointerDown(
       initE: PointerEvent,
       bs: MomentumIScroll,
+
       callback: (direction: 1 | -1, velocity: number) => void
     ): PointerDirMoveUp {
       //左右滑动
@@ -32,7 +34,9 @@ export function movePage(
         onPointerUp(e) {
           didMove(e, true)
           const velocity = -velocityX.get()
-
+          // const dis = bc.getFromVelocity(velocity)
+          // const targetDis = dis.maxDistance + scrollX.get()
+          // console.log("targetDis", velocity, dis.maxDistance, scrollX.get(), getWidth() / 2)
           const dis = bs.getWithSpeedIdeal(velocity)
           const targetDis = dis.distance + scrollX.get()
           const absTargetDis = Math.abs(targetDis)
@@ -40,8 +44,12 @@ export function movePage(
             //恢复原状
             scrollX.changeTo(
               0,
+              // (deltax) => {
+              //   return fc.getFromDistance(deltax).animationConfig()
+              // },
               getSpringBaseAnimationConfig({
-                initialVelocity: velocity
+                initialVelocity: velocity,
+                displacementThreshold: 1
               }),
               event)
           } else {
@@ -58,8 +66,12 @@ export function movePage(
         const diffWidth = direction * getWidth()
         scrollX.changeTo(
           diffWidth,
+          // deltax => {
+          //   return fc.getFromDistance(deltax).animationConfig()
+          // },
           getSpringBaseAnimationConfig({
-            initialVelocity: globalDirectionVelocity
+            initialVelocity: globalDirectionVelocity,
+            displacementThreshold: 1
           }),
           event)
         globalDirectionVelocity = 0

@@ -70,9 +70,11 @@ const destroy = createRoot(app, () => {
         try {
           value.default()
         } catch (err) {
-          renderError(`该资源${historyState.get().location.pathname}不是正常的组件`)
+          console.error(err)
+          renderError(`该资源${historyState.get().location.pathname}执行失败 ${err}`)
         }
       } else {
+        console.error(result.value)
         renderError(`加载资源失败${historyState.get().location.pathname}, ${result.value}`)
       }
     } else {

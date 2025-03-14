@@ -38,6 +38,9 @@ export default {
   'reorder-demo'() {
     return import('./pages/reorder-demo');
   },
+  'spring-animation-view'() {
+    return import('./pages/spring-animation-view');
+  },
   'three/css3d-periodictable'() {
     return import('./pages/three/css3d-periodictable');
   },

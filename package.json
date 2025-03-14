@@ -35,6 +35,7 @@
     "mve-dom-helper": "file:.yalc/mve-dom-helper",
     "mve-helper": "file:.yalc/mve-helper",
     "mve-icons": "file:.yalc/mve-icons",
+    "reflect-metadata": "^0.2.2",
     "tailwindcss": "^4.0.13",
     "three": "^0.171.0",
     "tyme4ts": "^1.2.1",
