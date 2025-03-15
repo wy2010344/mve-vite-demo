@@ -2,12 +2,12 @@ import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, destinationWithMarginTrans, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, MomentumIScroll, run, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, startScroll, EmptyFun, getWeekOfYear, YearMonthDay, addEffect } from "wy-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, destinationWithMarginTrans, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, MomentumIScroll, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, } from "wy-helper";
 import explain from "../explain";
 import { renderMobileView } from "../onlyMobile";
 import hookTrackLayout from "../dailycost/hookTrackLayout";
 import { movePage } from "../dailycost/movePage";
-import firstDayOfWeek, { firstDayOfWeekIndex, WEEKS } from "../dailycost/firstDayOfWeek";
+import firstDayOfWeek, { firstDayOfWeekIndex, WEEKS, WEEKTIMES } from "../dailycost/firstDayOfWeek";
 import fixRightTop from "../fixRightTop";
 import themeDropdown from "../themeDropdown";
 import demoList from "../dailycost/demoList";
@@ -15,7 +15,6 @@ import { faker } from "@faker-js/faker";
 
 
 
-const WEEKTIMES = 7 * DAYMILLSECONDS
 export default function () {
   explain(() => {
 
@@ -24,40 +23,39 @@ export default function () {
 }
 
 const selectShadowCell = 'select-cell'
-function calendar(fullWidth: number, fullScreen?: boolean) {
-  if (!fullScreen) {
+function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
+  if (mock) {
     fixRightTop(function () {
       firstDayOfWeek()
       themeDropdown()
     })
   }
-  const date = createSignal(YearMonthDayVirtualView.fromDate(new Date()))
-
+  const date = createSignal(YearMonthDayVirtualView.fromDate(new Date()), simpleEqualsNotEqual)
   const yearMonth = memo<YearMonthVirtualView>((m) => {
     const d = date.get()
     return new YearMonthVirtualView(d.year, d.month, firstDayOfWeekIndex.get())
+  })
+  const week = memo(() => {
+    const d = date.get()
+    return WeekVirtualView.from(d.year, d.month, d.day, firstDayOfWeekIndex.get())
   })
   //debug
   const w = window as any
   w.__date = date
 
-  const week = memo(() => {
-    const d = date.get()
-    return WeekVirtualView.from(d.year, d.month, d.day, firstDayOfWeekIndex.get())
-  })
   const scrollY = signalAnimateFrame(0)
   let content: HTMLElement
   const bs = MomentumIScroll.get()
   function perSize() {
-    return fullWidth / 7
+    return getFullWidth() / 7
   }
   const showWeek = memo(() => scrollY.get() >= 5 * perSize());
   const calendarScrollX = signalAnimateFrame(0)
 
-  const interpolateY = memo(() => {
+  const interpolateY = memoFun(() => {
     const perHeight = perSize()
     const moveHeight = perHeight * 5
-    const weekOfMonth = getWeekOfMonth(dateFromYearMonthDay(date.get())) - 1
+    const weekOfMonth = getWeekOfMonth(dateFromYearMonthDay(date.get()), firstDayOfWeekIndex.get()) - 1
     return getInterpolate({
       0: 0,
       [moveHeight]: -perHeight * weekOfMonth
@@ -102,20 +100,14 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
   const mp = movePage(calendarScrollX, getContainerWidth)
   hookTrackLayout(date.get, selectShadowCell)
 
-  const interpolateH = run(() => {
+  const interpolateH = memoFun(() => {
     const moveHeight = perSize() * 5
     return getInterpolate({
       0: perSize() * 7,
       [moveHeight]: perSize() * 2
     }, extrapolationClamp)
   })
-  // const interpolateHeaderY=run(()=>{
-  //   const moveHeight=perSize()*5
-  //   return getInterpolate({
-  //     0:0,
-  //     [moveHeight]:
-  //   },extrapolationClamp)
-  // })
+
   const container = fdom.div({
     s_height: '100%',
     s_overflow: 'hidden',
@@ -126,21 +118,22 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
     onPointerDown: pointerMoveDir(function (e, dir) {
       if (dir == 'y') {
         //上下滑动
-        const m = startScroll(e.pageY, {
-          containerSize() {
-            return container.clientHeight
+        const m = ScrollFromPage.from(e, {
+          getPage: eventGetPageY,
+          scrollDelta(delta) {
+            const y = scrollY.get()
+            scrollY.changeTo(
+              y +
+              overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
+            )
           },
-          contentSize() {
-            return content.offsetHeight
-          },
-          getCurrentValue() {
-            return scrollY.get()
-          },
-          changeTo(value) {
-            scrollY.changeTo(value)
-          },
-          finish(v) {
-            const out = bs.destinationWithMargin(v)
+          onFinish(velocity) {
+            const out = bs.destinationWithMargin({
+              velocity,
+              current: scrollY.get(),
+              containerSize: container.clientHeight,
+              contentSize: content.offsetHeight
+            })
             const snap = dragSnapWithList([
               {
                 beforeForce: 1,
@@ -155,10 +148,10 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
         })
         return {
           onPointerMove(e) {
-            m.move(e.pageY)
+            m.move(e)
           },
           onPointerUp(e) {
-            m.end(e.pageY)
+            m.end(e)
           },
         }
       }
@@ -170,7 +163,9 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
         },
         className: 'flex flex-col',
         // 至少要折叠到星期
-        s_minHeight: `calc(100% + ${fullScreen ? '500vw' : fullWidth * 5 + 'px'} / 7)`,
+        s_minHeight() {
+          return `calc(100% + ${getFullWidth()}px * 5 / 7)`
+        },
         children() {
           //header
           fdom.div({
@@ -375,7 +370,7 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
         const i = getIndex()
         if (i == 1) {
           const y = scrollY.get()
-          v.s_transform = ` translateY(${interpolateY()(y)}px)`
+          v.s_transform = ` translateY(${interpolateY(y)}px)`
         } else {
           v.s_position = 'absolute'
           v.s_inset = 0
@@ -385,7 +380,7 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
       children() {
         renderWeekHeader(() => {
           const y = scrollY.get()
-          const ty = - interpolateY()(y)
+          const ty = - interpolateY(y)
           return `translateY(${ty}px)`
         })
         fdom.div({

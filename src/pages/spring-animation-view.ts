@@ -41,6 +41,16 @@ function renderDivNumber({
   className?: string
   value: GetValue<number>, setValue: SetValue<number>
 }) {
+  // renderInput("input", {
+  //   value,
+  //   onValueChange(v: string) {
+  //     const n = Number(v)
+  //     if (isNaN(n)) {
+  //       return
+  //     }
+  //     setValue(n)
+  //   },
+  // })
   renderContentEditable(type, {
     value,
     className: cns("flex-0 daisy-input", className),
@@ -148,7 +158,11 @@ export default function () {
     max: 1,
     step: 0.01
   })
-  const velocityThreshold = new NumberRange(2)
+  const velocityThreshold = new NumberRange(2, {
+    min: 0.01,
+    max: 10,
+    step: 0.01
+  })
   const zta = new NumberRange(1, {
     min: 0.1,
     max: 8,
