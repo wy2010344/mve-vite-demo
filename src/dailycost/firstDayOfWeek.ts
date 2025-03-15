@@ -1,6 +1,7 @@
 import { fdom } from "mve-dom";
-import { createSignal } from "wy-helper";
+import { createSignal, DAYMILLSECONDS } from "wy-helper";
 
+export const WEEKTIMES = 7 * DAYMILLSECONDS
 export const WEEKS = ["一", "二", "三", "四", "五", "六", "日"]
 export const firstDayOfWeekIndex = createSignal(7)
 export default function () {

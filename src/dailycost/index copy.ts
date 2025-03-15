@@ -1,6 +1,6 @@
 import { fdom, mdom } from "mve-dom";
 import { renderMobileView } from "../onlyMobile";
-import { addEffect, batchSignalEnd, createSignal, dateFromYearMonthDay, DAYMILLSECONDS, defaultSpringBaseAnimationConfig, destinationWithMarginTrans, dragSnapWithList, extrapolationClamp, FrictionalFactory, getInterpolate, memo, MomentumIScroll, numberIntFillWithN0, run, simpleEqualsEqual, startScroll, tw, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
+import { addEffect, batchSignalEnd, createSignal, dateFromYearMonthDay, DAYMILLSECONDS, defaultSpringBaseAnimationConfig, destinationWithMarginTrans, dragSnapWithList, extrapolationClamp, FrictionalFactory, getInterpolate, memo, memoFun, MomentumIScroll, numberIntFillWithN0, run, simpleEqualsEqual, startScroll, tw, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { SolarDay } from "tyme4ts";
 import { cns, pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
@@ -18,8 +18,8 @@ const selectShadowCell = 'select-cell'
 const bs = MomentumIScroll.get()
 export default function () {
 
-  renderMobileView(function (fullWidth, fullScreen) {
-    if (!fullScreen) {
+  renderMobileView(function (fullWidth, mock) {
+    if (mock) {
       fixRightTop(function () {
         firstDayOfWeek()
         themeDropdown()
@@ -35,7 +35,9 @@ export default function () {
     hookTrackLayout(date.get, selectShadowCell)
     const scrollY = signalAnimateFrame(0)
     //打开日历的高度
-    const TRANSY_OPEN_CALENDAR = 6 * fullWidth / 7
+    function TRANSY_OPEN_CALENDAR() {
+      return 6 * fullWidth() / 7
+    }
     const showCalendar = createSignal(false)
 
     hookTrackSignal(showCalendar.get, function (show) {
@@ -43,7 +45,7 @@ export default function () {
         //展开
         addEffect(() => {
           scrollY.changeTo(0, defaultSpringBaseAnimationConfig, {
-            from: TRANSY_OPEN_CALENDAR
+            from: TRANSY_OPEN_CALENDAR()
           })
         })
       }
@@ -51,7 +53,7 @@ export default function () {
 
     hookTrackSignal(() => {
       if (showCalendar.get()) {
-        if (scrollY.get() > TRANSY_OPEN_CALENDAR) {
+        if (scrollY.get() > TRANSY_OPEN_CALENDAR()) {
           //向下滚动
           return true
         }
@@ -69,7 +71,7 @@ export default function () {
     })
 
     function perSize() {
-      return fullWidth / 7
+      return fullWidth() / 7
     }
     let content: HTMLElement
 
@@ -138,7 +140,7 @@ export default function () {
           className: 'flex flex-col',
           s_minHeight() {
             if (showCalendar.get()) {
-              return `calc(100% + ${fullScreen ? '600vw' : fullWidth * 6 + 'px'} / 7)`
+              return `calc(100% + ${fullWidth()}px * 6 / 7)`
             }
             return '100%'
           },
@@ -185,7 +187,7 @@ export default function () {
                     return ym
                   }))
                   const mp = movePage(scrollX, getContainerWidth)
-                  const interpolateH = run(() => {
+                  const interpolateH = memoFun(() => {
                     const moveHeight = perSize() * 6
                     return getInterpolate({
                       0: perSize() * 6,
@@ -317,8 +319,8 @@ export default function () {
               s_transform() {
                 if (showCalendar.get()) {
                   const y = scrollY.get()
-                  if (y > TRANSY_OPEN_CALENDAR) {
-                    return `translateY(${y - TRANSY_OPEN_CALENDAR}px)`
+                  if (y > TRANSY_OPEN_CALENDAR()) {
+                    return `translateY(${y - TRANSY_OPEN_CALENDAR()}px)`
                   }
                   return `translateY(0px)`
                 } else {
@@ -349,7 +351,7 @@ export default function () {
                     }
                     if (showCalendar.get()) {
                       //为了使越界触发
-                      scrollY.animateTo(TRANSY_OPEN_CALENDAR + 1)
+                      scrollY.animateTo(TRANSY_OPEN_CALENDAR() + 1)
                     } else {
                       showCalendar.set(true)
                     }
@@ -400,6 +402,14 @@ export default function () {
             }))
             const bodyScrollX = signalAnimateFrame(0)
             const mp2 = movePage(bodyScrollX, getContainerWidth)
+
+            // 这种是立即变0
+            // hookTrackSignal(date.get, function () {
+            //   addEffect(() => {
+            //     scrollY.changeTo(0)
+            //   })
+            // })
+
             let lastSaveDate = date.get()
             hookTrackSignal(() => bodyScrollX.getAnimateConfig(), function (c) {
               /**
@@ -407,6 +417,9 @@ export default function () {
                * 理想状态
                * 以天为单位,每一天有一个滚动容器
                * 日历是独立于滚动容器之外的,但受当前滚动容器的影响
+               * 
+               * 但如果每个容器独立,则滚动出去后,恢复回来还是旧位置
+               * 就需要左右滚动完成后,恢复成0,则可以在回来后,仍然是0进入,独立的滚动进度
                */
               if (!c) {
                 const thisDate = date.get()

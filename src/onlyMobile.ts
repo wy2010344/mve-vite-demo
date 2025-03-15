@@ -1,7 +1,7 @@
 import { fdom, renderText } from "mve-dom";
 import { hookDestroy, renderOne } from "mve-helper";
 import { subscribeEventListener } from "wy-dom-helper";
-import { createSignal } from "wy-helper";
+import { createSignal, GetValue } from "wy-helper";
 import fixRightTop from "./fixRightTop";
 import themeDropdown from "./themeDropdown";
 
@@ -42,15 +42,19 @@ export function onlyMobile() {
 
 
 export function renderMobileView(
-  renderDisplay: (width: number, fullWidth?: boolean) => void,
+  renderDisplay: (width: GetValue<number>, mock?: boolean) => void,
 ) {
   const isMobile = onlyMobile()
   renderOne(isMobile, function (showType) {
     if (showType == 'mobile') {
+      const width = createSignal(window.innerWidth)
+      hookDestroy(subscribeEventListener(window, 'resize', e => {
+        width.set(window.innerWidth)
+      }))
       fdom.div({
         className: 'w-full h-full',
         children() {
-          renderDisplay(window.innerWidth, true)
+          renderDisplay(width.get)
         }
       })
     } else if (showType == 'fake-and-mobile' || showType == 'also-mobile') {
@@ -69,7 +73,7 @@ export function renderMobileView(
               fdom.div({
                 className: 'flex-1 min-h-0 relative',
                 children() {
-                  renderDisplay(390)
+                  renderDisplay(() => 390, true)
                 }
               })
             }

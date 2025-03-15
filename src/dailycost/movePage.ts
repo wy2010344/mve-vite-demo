@@ -21,6 +21,7 @@ export function movePage(
       velocityX.append(initE.timeStamp, initE.pageX)
       let lastPageX = initE.pageX
       function didMove(e: PointerEvent, ignore?: boolean) {
+        // console.log("didMove---", e)
         //需要正数
         scrollX.changeTo(lastPageX - e.pageX + scrollX.get())
         if (ignore) {
