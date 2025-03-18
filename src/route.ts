@@ -1,4 +1,7 @@
 export default {
+  'animation-view'() {
+    return import('./pages/animation-view');
+  },
   'calendar'() {
     return import('./pages/calendar');
   },
@@ -17,11 +20,17 @@ export default {
   'd3/force/demo4'() {
     return import('./pages/d3/force/demo4');
   },
-  'dailycost'() {
-    return import('./pages/dailycost');
+  'daily-record'() {
+    return import('./pages/daily-record');
   },
   'demo1'() {
     return import('./pages/demo1');
+  },
+  'demos/demo2'() {
+    return import('./pages/demos/demo2');
+  },
+  'demos/scrollerDemo1'() {
+    return import('./pages/demos/scrollerDemo1');
   },
   'exit-animate'() {
     return import('./pages/exit-animate');
@@ -37,6 +46,12 @@ export default {
   },
   'reorder-demo'() {
     return import('./pages/reorder-demo');
+  },
+  'rich-text'() {
+    return import('./pages/rich-text');
+  },
+  'three/css3d-periodictable'() {
+    return import('./pages/three/css3d-periodictable');
   },
   'tree'() {
     return import('./pages/tree');

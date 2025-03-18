@@ -1,5 +1,5 @@
 import { memo, ValueOrGet, valueOrGetToGet } from "wy-helper"
-import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage } from "mve-dom-helper/canvasRender";
+import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap } from "mve-dom-helper/canvasRender";
 
 
 export default function () {
@@ -79,7 +79,7 @@ export default function () {
           }
         },
       })
-      hookDrawText({
+      hookDrawTextWrap({
         width: 50,
         config: {
           text: "abwefw aef aew awe awe awe awefewf aefawe ",

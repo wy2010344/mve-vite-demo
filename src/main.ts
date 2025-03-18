@@ -14,11 +14,11 @@ import scrollDemo1 from './scroller-demo/demo1'
 import scrollDemo1p from './scroller-demo/demo1p'
 import pagingx from './scroller-demo/pagingx'
 import snapDemo from './scroller-demo/snapDemo'
-import scrollerDemo1 from './demos/scrollerDemo1'
+import scrollerDemo1 from './pages/demos/scrollerDemo1'
 import reorderDemo from './pages/reorder-demo'
-import demo2 from './demos/demo2'
+import demo2 from './pages/demos/demo2'
 import calendar from './pages/calendar'
-import dailycost from './dailycost'
+import dailycost from './daily-record'
 import { history, historyState } from './history'
 import { hookDestroy, hookPromiseSignal, promiseSignal, renderArray, renderIf, renderOne } from 'mve-helper'
 import route from './route'
@@ -28,15 +28,16 @@ import { IconContext } from "mve-icons";
 import { emptyFun } from 'wy-helper'
 const app = document.querySelector<HTMLDivElement>('#app')!
 const destroy = createRoot(app, () => {
-  //@ts-ignore
   IconContext.provide({
-    renderItem(tag: any, attrs: any, children: any) {
+    renderItem(tag, attrs, children) {
       svg[tag as 'svg'](attrs).render(children)
     },
-    renderRoot(attrs: any, children: any) {
+    renderRoot(attrs, children) {
       svg.svg({
         ...attrs,
-        fill: "currentColor"
+        fill: "currentColor",
+        stroke: 'currentColor',
+        strokeWidth: '0'
       }).render(children)
     }
   })
@@ -64,74 +65,6 @@ const destroy = createRoot(app, () => {
     }
   })
 
-  fdom.div({
-    className: 'absolute right-1 top-1 daisy-dropdown mb-72',
-    children() {
-      fdom.div({
-        className: 'daisy-dropdown daisy-dropdown-end ',
-        children() {
-          fdom.div({
-            tabIndex: 0,
-            role: 'button',
-            className: 'daisy-btn m-1',
-            children() {
-              renderText`Theme`
-              fsvg.svg({
-                width: '12px',
-                height: '12px',
-                className: 'inline-block h-2 w-2 fill-current opacity-60',
-                xmlns: 'http://www.w3.org/2000/svg',
-                viewBox: '0 0 2048 2048',
-                children() {
-                  fsvg.path({
-                    d: 'M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z',
-                  })
-                }
-              })
-            }
-          })
-          fdom.ul({
-            tabIndex: 0,
-            className: 'daisy-dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl',
-            children() {
-              for (const theme of themes) {
-                fdom.li({
-                  className: 'relative flex items-center',
-                  children() {
-                    fdom.div({
-                      data_theme: theme,
-                      className: 'grid grid-cols-2 gap-0.5 p-1 rounded-md shadow-sm shrink-0 bg-base-100 absolute right-0 z-10',
-                      children() {
-                        fdom.div({
-                          className: 'size-1 rounded-full bg-base-content',
-                        })
-                        fdom.div({
-                          className: 'size-1 rounded-full bg-primary',
-                        })
-                        fdom.div({
-                          className: 'size-1 rounded-full bg-secondary',
-                        })
-                        fdom.div({
-                          className: 'size-1 rounded-full bg-accent',
-                        })
-                      }
-                    })
-                    fdom.input({
-                      type: 'radio',
-                      name: 'theme-dropdown',
-                      className: 'theme-controller daisy-btn daisy-btn-sm daisy-btn-block daisy-btn-ghost justify-start',
-                      aria_label: theme,
-                      value: theme,
-                    })
-                  }
-                })
-              }
-            }
-          })
-        }
-      })
-    }
-  })
   renderOne(get, function (result) {
     if (result) {
       if (result.type == 'success') {
@@ -139,9 +72,11 @@ const destroy = createRoot(app, () => {
         try {
           value.default()
         } catch (err) {
-          renderError(`该资源${historyState.get().location.pathname}不是正常的组件`)
+          console.error(err)
+          renderError(`该资源${historyState.get().location.pathname}执行失败 ${err}`)
         }
       } else {
+        console.error(result.value)
         renderError(`加载资源失败${historyState.get().location.pathname}, ${result.value}`)
       }
     } else {

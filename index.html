@@ -12,21 +12,20 @@
         width: 100%;
         height: 100%;
         max-width: 100%;
+        overflow: hidden;
       }
-
       #app {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        flex-direction: column;
-        position: relative;
         gap: 10px;
       }
     </style>
-    <link rel="stylesheet" href="app.css" />
+    <script type="module" src="./src/main.ts"></script>
+    <link rel="stylesheet" href="./app.css" />
   </head>
   <body>
-    <script type="module" src="/src/main.ts"></script>
     <div id="app"></div>
   </body>
 </html>
