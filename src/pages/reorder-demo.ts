@@ -3,6 +3,8 @@ import { fdom } from "mve-dom"
 import { renderArrayToArray } from "mve-helper"
 import { moveEdgeScroll, signalAnimateFrame, subscribeEventListener, subscribeScroller } from "wy-dom-helper"
 import { AbsAnimateFrameValue, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, getTweenAnimationConfig, reorderCheckTarget, SignalAnimateFrameValue, StoreRef } from "wy-helper"
+import themeDropdown, { randomTheme } from "../themeDropdown"
+import fixRightTop from "../fixRightTop"
 
 export const dataList = Array(30).fill(1).map((_, i) => {
   return {
@@ -15,6 +17,9 @@ export const dataList = Array(30).fill(1).map((_, i) => {
 type Row = typeof dataList[0]
 const ease1 = getTweenAnimationConfig(600, easeFns.out(easeFns.circ))
 export default function () {
+  fixRightTop(function () {
+    themeDropdown()
+  })
   const orderList = createSignal(dataList)
   const onDrag = createSignal<Row | undefined>(undefined)
   fdom.div({
@@ -30,6 +35,7 @@ export default function () {
         s_overflow: 'auto',
         s_marginInline: 'auto',
         s_position: 'relative',
+        className: 'daisy-list',
         s_userSelect() {
           return onDrag.get() ? 'none' : 'auto'
         },
@@ -39,15 +45,15 @@ export default function () {
             const transY = signalAnimateFrame(0)
             const marginTop = 10//Math.floor(Math.random() * 10 + 5)
             const div = fdom.div({
+              className: 'daisy-row daisy-card flex-row',
+              data_theme: randomTheme(),
               s_display: 'flex',
               s_alignItems: 'center',
               s_marginTop() {
                 return getIndex() ? marginTop + 'px' : '0px'
               },
-              s_border: '1px solid black',
-              s_background: '#ffff003d',
               s_position: 'relative',
-              s_height: h + 'px',
+              s_minHeight: h + 'px',
               s_zIndex() {
                 return onDrag.get() == v ? '1' : '0'
               },

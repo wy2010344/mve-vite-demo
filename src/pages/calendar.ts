@@ -1,198 +1,132 @@
-import { fdom, FDomAttributes, renderText, renderTextContent } from "mve-dom";
-import { hookTrackSignal, renderIf, renderOne } from "mve-helper";
+import { fdom, mdom } from "mve-dom";
+import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
-import { cns, signalAnimateFrame, subscribeEventListener } from "wy-dom-helper";
-import { addEffect, batchSignalEnd, cacheVelocity, createSignal, dateFromYearMonthDay, DAYMILLSECONDS, destinationWithMarginTrans, easeFns, emptyFun, extrapolationClamp, getInterpolate, getSpringBaseAnimationConfig, getTweenAnimationConfig, GetValue, getWeekOfMonth, memo, MomentumIScroll, MonthFullDay, PagePoint, run, SignalAnimateFrameValue, startScroll, StoreRef, tw, ValueOrGet, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView } from "wy-helper";
+import { cns, pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, destinationWithMarginTrans, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, getSpringBaseAnimationConfig, FrictionalFactory, } from "wy-helper";
 import explain from "../explain";
-import { onlyMobile } from "../onlyMobile";
-import { animate } from "motion";
-import { pointerMoveDirWithLock } from "wy-dom-helper";
+import { renderMobileView } from "../onlyMobile";
+import hookTrackLayout from "../daily-record/hookTrackLayout";
+import { movePage } from "../daily-record/movePage";
+import firstDayOfWeek, { firstDayOfWeekIndex, WEEKS, WEEKTIMES } from "../daily-record/firstDayOfWeek";
+import fixRightTop from "../fixRightTop";
+import themeDropdown from "../themeDropdown";
+import demoList from "../daily-record/demoList";
+import { faker } from "@faker-js/faker";
 
 
 
-const WEEKS = ["一", "二", "三", "四", "五", "六", "日"]
-const WEEKTIMES = 7 * DAYMILLSECONDS
-function createYM() {
-  const d = new Date()
-  return {
-    year: d.getFullYear(),
-    month: d.getMonth() + 1,
-    day: d.getDate()
-  }
-}
 export default function () {
   explain(() => {
 
   })
-  const isMobile = onlyMobile()
-  renderOne(isMobile, function (showType) {
-    console.log("showType", showType)
-    if (showType == 'mobile') {
-      fdom.div({
-        className: 'w-full h-full',
-        children() {
-          calendar(window.innerWidth, true)
-        }
-      })
-
-    } else if (showType == 'contain-mobile' || showType == 'also-mobile') {
-      fdom.div({
-        className: 'daisy-mockup-phone',
-        children() {
-          fdom.div({
-            className: 'daisy-mockup-phone-camera'
-          })
-          fdom.div({
-            className: 'daisy-mockup-phone-display bg-base-100 daisy-card flex flex-col items-stretch',
-            children() {
-              fdom.div({
-                className: 'h-10'
-              })
-              fdom.div({
-                className: 'flex-1 min-h-0',
-                children() {
-
-                  calendar(390)
-                }
-              })
-            }
-          })
-        }
-      })
-    } else {
-
-    }
-  })
-
+  renderMobileView(calendar)
 }
 
 const selectShadowCell = 'select-cell'
-function calendar(fullWidth: number, fullScreen?: boolean) {
-  const date = createSignal(createYM())
-  const yearMonth = memo(() => {
+function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
+  if (mock) {
+    fixRightTop(function () {
+      firstDayOfWeek()
+      themeDropdown()
+    })
+  }
+  const date = createSignal(YearMonthDayVirtualView.fromDate(new Date()), simpleEqualsNotEqual)
+  const yearMonth = memo<YearMonthVirtualView>((m) => {
     const d = date.get()
-    return new YearMonthVirtualView(d.year, d.month, 0)
+    return new YearMonthVirtualView(d.year, d.month, firstDayOfWeekIndex.get())
   })
   const week = memo(() => {
     const d = date.get()
-    return WeekVirtualView.from(d.year, d.month, d.day, 0)
+    return WeekVirtualView.from(d.year, d.month, d.day, firstDayOfWeekIndex.get())
   })
-  const transY = signalAnimateFrame(0)
+  //debug
+  const w = window as any
+  w.__date = date
+
+  const scrollY = signalAnimateFrame(0)
   let content: HTMLElement
-  const bs = MomentumIScroll.get()
+  const bs = FrictionalFactory.get()
   function perSize() {
-    return fullWidth / 7
+    return getFullWidth() / 7
   }
-  const showWeek = memo(() => transY.get() <= -5 * perSize());
-  const transX = signalAnimateFrame(0)
-  /**
-   * 
-   * @param direction 1向左,-1向右
-   * @param velocity 
-   */
-  function updateDirection(direction: number, velocity = 0) {
-    if (direction) {
-      const diffWidth = direction * container.clientWidth
-      transX.changeTo(
-        -diffWidth,
-        getSpringBaseAnimationConfig({
-          initialVelocity: velocity
-        }),
-        {
-          onFinish: onScrollEnd
-        })
-      transX.slientDiff(diffWidth)
-    } else {
-      transX.changeTo(
-        0,
-        getSpringBaseAnimationConfig({
-          initialVelocity: velocity
-        }),
-        {
-          onFinish: onScrollEnd
-        })
-    }
-  }
-  function updateDirectionScroll(direction: number) {
-    if (showWeek()) {
-      const m = dateFromYearMonthDay(date.get())
-      if (direction < 0) {
-        m.setTime(m.getTime() - WEEKTIMES)
-      } else if (direction > 0) {
-        m.setTime(m.getTime() + WEEKTIMES)
-      }
-      if (direction) {
-        date.set({
-          year: m.getFullYear(),
-          month: m.getMonth() + 1,
-          day: m.getDate()
-        })
-      }
-    } else {
-      if (direction < 0) {
-        toggleCalendar(yearMonth().lastMonth())
-      } else if (direction > 0) {
-        toggleCalendar(yearMonth().nextMonth())
-      }
-    }
-  }
-  function toggleCalendar(c: YearMonthVirtualView) {
-    if (date.get().day > c.days) {
-      date.set({
-        year: c.year,
-        month: c.month,
-        day: c.days
-      })
-    } else {
-      date.set({
-        year: c.year,
-        month: c.month,
-        day: date.get().day
-      })
-    }
-  }
-  function setCalenderData(fd: MonthFullDay) {
-    let c: YearMonthVirtualView = yearMonth()
-    let dir = 0
-    if (fd.type == 'last') {
-      c = yearMonth().lastMonth()
-      dir = -1
-    } else if (fd.type == 'next') {
-      c = yearMonth().nextMonth()
-      dir = 1
-    }
-    date.set({
-      year: c.year,
-      month: c.month,
-      day: fd.day
-    })
-    if (!showWeek()) {
-      onScroll.set('x')
-      updateDirection(dir, 0)
-    }
-  }
+  const showWeek = memo(() => scrollY.get() >= 5 * perSize());
+  const calendarScrollX = signalAnimateFrame(0)
 
-  const onScroll = createSignal<'x' | 'y' | undefined>(undefined)
-  function onScrollEnd() {
-    onScroll.set(undefined)
-  }
+  const interpolateY = memoFun(() => {
+    const perHeight = perSize()
+    const moveHeight = perHeight * 5
+    const weekOfMonth = getWeekOfMonth(dateFromYearMonthDay(date.get()), firstDayOfWeekIndex.get()) - 1
+    return getInterpolate({
+      0: 0,
+      [moveHeight]: -perHeight * weekOfMonth
+    }, extrapolationClamp)
+  })
 
-  hookTrackSignal(date.get, () => {
-    const beforeCell = document.getElementById(selectShadowCell)
-    if (beforeCell) {
-      const box = beforeCell.getBoundingClientRect()
-      addEffect(() => {
-        const currentCell = document.getElementById(selectShadowCell)
-        if (currentCell) {
-          const box2 = currentCell.getBoundingClientRect()
-          animate(currentCell, {
-            x: [box.left - box2.left, 0],
-            y: [box.top - box2.top, 0]
-          })
-        }
-      }, 3)
+  const bodyScrollX = signalAnimateFrame(0)
+
+
+  let lastDate = date.get()
+  hookTrackSignal(() => bodyScrollX.getAnimateConfig(), function (c) {
+    if (!c) {
+      if (!lastDate.equals(date.get())) {
+        addEffect(() => {
+          if (showWeek()) {
+            scrollY.animateTo(perSize() * 5, getSpringBaseAnimationConfig({
+              config: {
+                zta: 0.7,
+                omega0: 20,
+              }
+            }))
+          } else {
+            scrollY.animateTo(0, getSpringBaseAnimationConfig({
+              config: {
+                zta: 0.7,
+                omega0: 20,
+              }
+            }))
+          }
+          // setTimeout(() => {
+          // }, 200)
+        })
+      }
+      lastDate = date.get()
     }
   })
+  hookTrackSignal(memo<YearMonthVirtualView>(oldMonth => {
+    const ym = yearMonth()
+    if (oldMonth && !showWeek()) {
+      const direction = Math.sign(ym.toNumber() - oldMonth.toNumber())
+      if (direction) {
+        mp.changePage(direction)
+      }
+    }
+    return ym
+  }))
+  hookTrackSignal(memo<WeekVirtualView>(oldWeek => {
+    const w = week()
+    if (oldWeek && showWeek()) {
+      const direction = Math.sign(w.cells[0].toNumber() - oldWeek.cells[0].toNumber())
+      if (direction) {
+        mp.changePage(direction)
+      }
+    }
+    return w
+  }))
+
+  function getContainerWidth() {
+    return container.clientWidth
+  }
+  const mp = movePage(calendarScrollX, getContainerWidth)
+  hookTrackLayout(date.get, selectShadowCell)
+
+  const interpolateH = memoFun(() => {
+    const moveHeight = perSize() * 5
+    return getInterpolate({
+      0: perSize() * 7,
+      [moveHeight]: perSize() * 2
+    }, extrapolationClamp)
+  })
+
   const container = fdom.div({
     s_height: '100%',
     s_overflow: 'hidden',
@@ -200,113 +134,79 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
     onTouchMove(e) {
       e.preventDefault()
     },
-    onPointerDown: pointerMoveDirWithLock(onScroll, function (initE, e, dir) {
-      if (dir == 'x') {
-        //左右滑动
-        const velocityX = cacheVelocity()
-        velocityX.append(initE.timeStamp, initE.pageX)
-        let lastPageX = initE.pageX
-        function didMove(e: PointerEvent) {
-          velocityX.append(e.timeStamp, e.pageX)
-          transX.changeTo(e.pageX - lastPageX + transX.get())
-          lastPageX = e.pageX
-        }
-        didMove(e)
-        const destroyMove = subscribeEventListener(document, 'pointermove', didMove)
-        const destroyEnd = subscribeEventListener(document, 'pointerup', e => {
-          // velocityX.append(e.timeStamp, e.pageX)
-          transX.changeTo(e.pageX - lastPageX + transX.get())
-          const dis = bs.getWithSpeedIdeal(velocityX.get())
-          const targetDis = dis.distance + transX.get()
-          const absTargetDis = Math.abs(targetDis)
-          if (absTargetDis < container.clientWidth / 2) {
-            //恢复原状
-            updateDirection(0, velocityX.get())
-          } else {
-            const direction = targetDis < 0 ? 1 : -1
-            updateDirectionScroll(direction)
-            updateDirection(direction, velocityX.get())
-            batchSignalEnd()
-          }
-          destroyMove()
-          destroyEnd()
-        })
-      } else {
+    onPointerDown: pointerMoveDir(function (e, dir) {
+      if (dir == 'y') {
         //上下滑动
-        const m = startScroll(initE.pageY, {
-          containerSize() {
-            return container.clientHeight
+        return ScrollFromPage.from(e, {
+          getPage: eventGetPageY,
+          scrollDelta(delta) {
+            const y = scrollY.get()
+            scrollY.changeTo(
+              y +
+              overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
+            )
           },
-          contentSize() {
-            return content.offsetHeight
-          },
-          getCurrentValue() {
-            return transY.get()
-          },
-          changeTo(value) {
-            transY.changeTo(value)
-          },
-          finish(v) {
-            const out = bs.destinationWithMargin(v)
-            destinationWithMarginTrans(out, transY, {
-              targetSnap(n) {
-                if (n < -perSize() * 3) {
-                  return Math.min(-perSize() * 5, out.target)
-                }
-                return 0
-              },
-              event: {
-                onFinish: onScrollEnd
+          onFinish(velocity) {
+            const out = bs.destinationWithMarginIscroll({
+              velocity,
+              current: scrollY.get(),
+              containerSize: container.clientHeight,
+              contentSize: content.offsetHeight
+            })
+            const snap = dragSnapWithList([
+              {
+                beforeForce: 0.005,
+                size: perSize() * 5,
+                afterForce: 0.005
               }
+            ])
+            destinationWithMarginTrans(out, scrollY, {
+              targetSnap: snap
             })
           }
         })
-        m.move(e.pageY)
-        const destroyMove = subscribeEventListener(document, 'pointermove', e => {
-          m.move(e.pageY)
-        })
-        const destroyEnd = subscribeEventListener(document, 'pointerup', e => {
-          m.end(e.pageY)
-          destroyMove()
-          destroyEnd()
-        })
       }
-    })
-    ,
+    }),
     children() {
       content = fdom.div({
         s_transform() {
-          return `translateY(${transY.get()}px)`
+          return `translateY(${-scrollY.get()}px)`
         },
+        className: 'flex flex-col',
         // 至少要折叠到星期
-        s_minHeight: `calc(100% + ${fullScreen ? '500vw' : fullWidth * 5 + 'px'} / 7)`,
+        s_minHeight() {
+          return `calc(100% + ${getFullWidth()}px * 5 / 7)`
+        },
         children() {
           //header
           fdom.div({
+            className: "bg-base-100 relative z-10",
             s_display: 'flex',
             s_alignItems: 'stretch',
             s_transform() {
-              const ty = Math.min(transY.get(), 0)
-              return `translateY(${-ty}px)`
+              const ty = Math.max(scrollY.get(), 0)
+              return `translateY(${ty}px)`
             },
             children() {
               fdom.h1({
+                className: 'text-display-large',
                 childrenType: "text",
-                s_fontSize: '48px',
-                s_lineHeight: '48px',
                 children() {
                   return date.get().month
                 }
               })
               fdom.div({
+                className: 'flex flex-col items-start justify-center',
                 children() {
                   fdom.div({
+                    className: 'text-title-large',
                     childrenType: "text",
                     children() {
                       return date.get().year
                     }
                   })
                   fdom.div({
+                    className: 'text-title-medium',
                     childrenType: "text",
                     children() {
                       return `月 ${date.get().day}日`
@@ -323,81 +223,140 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
             }
           })
 
-          //星期
+
+
           fdom.div({
-            s_display: 'flex',
-            s_alignItems: 'center',
-            s_justifyContent: 'space-between',
-            s_transform() {
-              const ty = Math.min(transY.get(), 0)
-              return `translateY(${-ty}px)`
+            s_zIndex: 1,
+            s_position: 'relative',
+            s_height() {
+              //容器本身的高度
+              return perSize() * 7 + 'px'
             },
             children() {
-              for (let i = 0; i < 7; i++) {
-                fdom.div({
-                  s_flex: 1,
-                  s_aspectRatio: 1,
-                  s_display: 'flex',
-                  s_alignItems: 'center',
-                  s_justifyContent: 'center',
-                  childrenType: "text",
-                  children() {
-                    return WEEKS[yearMonth().weekDay(i)]
+
+              fdom.div({
+                className: "bg-base-300",
+                s_overflow: 'hidden',
+                s_height() {
+                  const y = scrollY.get()
+                  return interpolateH(y) + 'px'
+                },
+                s_transform() {
+                  const ty = Math.max(scrollY.get(), 0)
+                  return `translateY(${ty}px)`
+                },
+                onPointerDown: pointerMoveDir(function (e, dir) {
+                  if (dir == 'x') {
+                    return mp.pointerDown(e, bs, (direction) => {
+                      if (showWeek()) {
+                        //星期
+                        const m = dateFromYearMonthDay(date.get())
+                        m.setTime(m.getTime() + direction * WEEKTIMES)
+                        if (direction) {
+                          date.set(YearMonthDayVirtualView.fromDate(m))
+                        }
+                      } else {
+                        //月份
+                        const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
+                        if (date.get().day > c.days) {
+                          date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
+                        } else {
+                          date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
+                        }
+                      }
+                    })
                   }
-                })
-              }
+                }),
+                children() {
+                  fdom.div({
+                    s_position: 'relative',
+                    s_transform() {
+                      return `translateX(${-calendarScrollX.get()}px)`
+                    },
+                    children() {
+                      renderIf(showWeek, function () {
+
+                        renderArray(memoArray(() => {
+                          const w = week()
+                          return [w.beforeWeek(), w, w.nextWeek()]
+                        }, simpleEqualsEqual), function (w, i) {
+                          renderWeek(w, i)
+                        })
+                      }, function () {
+                        renderArray(memoArray(() => {
+                          const ym = yearMonth()
+                          return [ym.lastMonth(), ym, ym.nextMonth()]
+                        }, simpleEqualsEqual), function (m, i) {
+                          renderCalendarView(m, i)
+                        })
+                      })
+                    }
+                  })
+                }
+              })
             }
           })
 
-          const interpolateH = run(() => {
-            const moveHeight = perSize() * 5
-            return getInterpolate({
-              0: perSize() * 6,
-              [-moveHeight]: perSize()
-            }, extrapolationClamp)
-          })
+
+          hookTrackSignal(memo<YearMonthDayVirtualView>((lastDate) => {
+            const d = date.get()
+            if (lastDate) {
+              const lastTime = dateFromYearMonthDay(lastDate).valueOf()
+              const thisTime = dateFromYearMonthDay(d).valueOf()
+              const diff = thisTime - lastTime
+              let direction = 0
+              if (diff >= DAYMILLSECONDS) {
+                direction = 1
+              } else if (diff <= -DAYMILLSECONDS) {
+                direction = -1
+              }
+              if (direction) {
+                mp2.changePage(direction)
+              }
+            }
+            return d
+          }))
+          const mp2 = movePage(bodyScrollX, getContainerWidth)
           fdom.div({
-            s_overflow: 'hidden',
-            s_height() {
-              const y = transY.get()
-              return interpolateH(y) + 'px'
-            },
-            s_transform() {
-              const ty = Math.min(transY.get(), 0)
-              return `translateY(${-ty}px)`
-            },
+            className: ' flex-1',
+            onPointerDown: pointerMoveDir(function (e, dir) {
+              if (dir == 'x') {
+                return mp2.pointerDown(e, bs, direction => {
+                  const m = dateFromYearMonthDay(date.get())
+                  m.setTime(m.getTime() + direction * DAYMILLSECONDS)
+                  if (direction) {
+                    date.set(YearMonthDayVirtualView.fromDate(m))
+                  }
+                })
+              }
+            }),
             children() {
               fdom.div({
-                s_position: 'relative',
+                className: 'relative',
                 s_transform() {
-                  return `translateX(${transX.get()}px)`
+                  return `translateX(${-bodyScrollX.get()}px)`
                 },
                 children() {
-                  //前一部分
-                  renderIf(showWeek, () => {
-                    renderWeek(() => week().beforeWeek(), 0)
-                  }, () => {
-                    //显示月份
-                    renderCalendarView(
-                      () => yearMonth().lastMonth(),
-                      0)
-                  })
-
-                  //中间部分
-
-                  renderCalendarView(
-                    yearMonth,
-                    1)
-
-                  //后面部分
-                  //前一部分
-                  renderIf(showWeek, () => {
-                    renderWeek(() => week().nextWeek(), 2)
-                  }, () => {
-                    //显示月份
-                    renderCalendarView(
-                      () => yearMonth().nextMonth(),
-                      2)
+                  renderArray(memoArray(() => {
+                    const d = date.get()
+                    return [d.beforeDay(), d, d.nextDay()]
+                  }, simpleEqualsEqual), function (w, getIndex) {
+                    mdom.div({
+                      attrs(v) {
+                        const i = getIndex()
+                        if (i != 1) {
+                          v.s_position = 'absolute'
+                          v.s_inset = 0
+                          v.s_transform = `translateX(${(i - 1) * 100}%)`
+                        }
+                      },
+                      children() {
+                        demoList(faker.number.int({
+                          max: 17,
+                          min: 15
+                        }))
+                      }
+                    })
                   })
                 }
               })
@@ -407,131 +366,166 @@ function calendar(fullWidth: number, fullScreen?: boolean) {
       })
     }
   })
-
   function renderCalendarView(
-    yearMonth: GetValue<YearMonthVirtualView>,
-    i: number
+    yearMonth: YearMonthVirtualView,
+    getIndex: GetValue<number>
   ) {
     function selectCurrent() {
       const d = date.get()
-      const ym = yearMonth()
+      const ym = yearMonth
       return d.year == ym.year && d.month == ym.month
     }
-    const arg: FDomAttributes<"div"> = {}
-    if (i == 1) {
-      const interpolateY = memo(() => {
-        const perHeight = perSize()
-        const moveHeight = perHeight * 5
-        const weekOfMonth = getWeekOfMonth(dateFromYearMonthDay(date.get())) - 1
-        return getInterpolate({
-          0: 0,
-          [-moveHeight]: -perHeight * weekOfMonth
-        }, extrapolationClamp)
-      })
-      arg.s_transform = () => {
-        const y = transY.get()
-        return ` translateY(${interpolateY()(y)}px)`
-      }
-    } else {
-      arg.s_position = 'absolute'
-      arg.s_inset = 0
-      arg.s_transform = `translateX(${(i - 1) * 100}%)`
-    }
-    arg.children = () => {
-      for (let y = 0; y < 6; y++) {
+    return mdom.div({
+      attrs(v) {
+        const i = getIndex()
+        if (i == 1) {
+          const y = scrollY.get()
+          v.s_transform = ` translateY(${interpolateY(y)}px)`
+        } else {
+          v.s_position = 'absolute'
+          v.s_inset = 0
+          v.s_transform = `translateX(${(i - 1) * 100}%)`
+        }
+      },
+      children() {
+        renderWeekHeader(() => {
+          const y = scrollY.get()
+          const ty = - interpolateY(y)
+          return `translateY(${ty}px)`
+        })
         fdom.div({
-          s_display: 'flex',
-          s_alignItems: 'center',
-          s_justifyContent: 'center',
           children() {
-            for (let x = 0; x < 7; x++) {
 
-              const fullday = memo(() => yearMonth().fullDayOf(x, y))
-              const lunarDay = memo(() => {
-                let c = yearMonth()
-                const fd = fullday()
-                if (fd.type == 'last') {
-                  c = yearMonth().lastMonth()
-                } else if (fd.type == 'next') {
-                  c = yearMonth().nextMonth()
-                }
-                const sd = SolarDay.fromYmd(c.year, c.month, fd.day)
-                return sd.getLunarDay()
-              })
-              const selected = memo(() => {
-                return fullday().type == 'this' && selectCurrent() && date.get().day == fullday().day
-              })
+            for (let y = 0; y < 6; y++) {
+              fdom.div({
+                className: 'flex items-center justify-center relative',
+                children() {
 
-              renderCell({
-                day() {
-                  return fullday().day
-                },
-                onClick() {
-                  setCalenderData(fullday())
-                },
-                lunarDay,
-                selected,
-                hide() {
-                  if (showWeek()) {
-                    return false
+                  for (let x = 0; x < 7; x++) {
+                    const fullday = yearMonth.fullDayOf(x, y)
+                    let c = yearMonth
+                    if (fullday.type == 'last') {
+                      c = yearMonth.lastMonth()
+                    } else if (fullday.type == 'next') {
+                      c = yearMonth.nextMonth()
+                    }
+
+                    renderFirstDayWeek(x, {
+                      year: c.year,
+                      month: c.month,
+                      day: fullday.day
+                    })
+
+                    const sd = SolarDay.fromYmd(c.year, c.month, fullday.day)
+                    const lunarDay = sd.getLunarDay()
+                    const selected = memo(() => {
+                      return fullday.type == 'this' && selectCurrent() && date.get().day == fullday.day
+                    })
+
+                    renderCell({
+                      day: fullday.day,
+                      onClick() {
+                        date.set(
+                          YearMonthDayVirtualView.from(c.year, c.month, fullday.day)
+                        )
+                      },
+                      lunarDay,
+                      selected,
+                      hide() {
+                        if (showWeek()) {
+                          return false
+                        }
+                        return fullday.type != 'this'
+                      }
+                    })
                   }
-                  return fullday().type != 'this'
                 }
               })
             }
           }
         })
       }
-    }
-    return fdom.div(arg)
+    })
   }
 
-  function renderWeek(
-    week: GetValue<WeekVirtualView>,
-    i: number
-  ) {
-
-    const arg: FDomAttributes<"div"> = {
+  function renderWeekHeader(transform?: GetValue<string>) {
+    //星期
+    fdom.div({
+      className: "bg-base-300 relative z-10",
       s_display: 'flex',
       s_alignItems: 'center',
       s_justifyContent: 'space-between',
-      s_alignSelf: 'flex-start'
-    }
-    if (i != 1) {
-      arg.s_position = 'absolute'
-      arg.s_inset = 0
-      arg.s_transform = `translateX(${(i - 1) * 100}%)`
-    }
-    arg.children = () => {
+      s_transform: transform,
+      children() {
+        for (let i = 0; i < 7; i++) {
+          fdom.div({
+            className: 'flex-1 aspect-square flex items-center justify-center',
+            childrenType: "text",
+            children() {
+              return WEEKS[yearMonth().weekDay(i)]
+            }
+          })
+        }
+      }
+    })
+  }
+  function renderWeek(
+    week: WeekVirtualView,
+    getIndex: GetValue<number>
+  ) {
+    mdom.div({
+      attrs(v) {
+        v.className = 'self-start'
+        const i = getIndex()
+        if (i != 1) {
+          v.s_position = 'absolute'
+          v.s_inset = 0
+          v.s_transform = `translateX(${(getIndex() - 1) * 100}%)`
+        }
+      },
+      children() {
+        renderWeekHeader()
+        fdom.div({
+          className: 'flex items-center justify-center relative',
+          children() {
+            for (let x = 0; x < 7; x++) {
+              const md = week.cells[x]
+              renderFirstDayWeek(x, md)
 
-      for (let x = 0; x < 7; x++) {
-        const md = memo(() => week().cells[x])
-        const lunarDay = memo(() => {
-          const sd = SolarDay.fromYmd(md().year, md().month, md().day)
-          return sd.getLunarDay()
-        })
-        renderCell({
-          hide() {
-            return false;
-          },
-          day() {
-            return md().day
-          },
-          lunarDay,
-          selected() {
-            return yearMonthDayEqual(md(), date.get())
-          },
-          onClick() {
-
-          },
+              const sd = SolarDay.fromYmd(md.year, md.month, md.day)
+              const lunarDay = sd.getLunarDay()
+              renderCell({
+                hide() {
+                  return false;
+                },
+                day: md.day,
+                lunarDay,
+                selected() {
+                  return yearMonthDayEqual(md, date.get())
+                },
+                onClick() {
+                  date.set(md)
+                },
+              })
+            }
+          }
         })
       }
-    }
-    fdom.div(arg)
+    })
   }
 }
 
-
+function renderFirstDayWeek(x: number, ym: YearMonthDay) {
+  if (x == 0) {
+    fdom.div({
+      className: 'absolute left-0 text-label-small',
+      childrenType: 'text',
+      children() {
+        return getWeekOfYear(dateFromYearMonthDay(ym), firstDayOfWeekIndex.get())
+      }
+    })
+  }
+}
 
 function renderCell({
   day,
@@ -540,9 +534,9 @@ function renderCell({
   selected,
   onClick
 }: {
-  day: ValueOrGet<number>
+  day: number
   hide: GetValue<boolean>
-  lunarDay: GetValue<LunarDay>,
+  lunarDay: LunarDay,
   selected: GetValue<boolean>
   onClick(): void
 }) {
@@ -593,10 +587,10 @@ function renderCell({
         s_fontSize: '10px',
         childrenType: 'text',
         className: 'text-neutral-500',
-        children() {
-          return lunarDay().getName()
-        }
+        children: lunarDay.getName()
       })
     }
   })
 }
+
+

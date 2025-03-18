@@ -1,5 +1,5 @@
 import { addEffect, createSignal, emptyArray } from "wy-helper";
-import { hookDrawRect, simpleFlex, hookDrawText, CanvasRectNode } from "mve-dom-helper/canvasRender";
+import { hookDrawRect, simpleFlex, hookDrawText, CanvasRectNode, hookDrawTextWrap } from "mve-dom-helper/canvasRender";
 import { renderArray } from "mve-helper";
 import { dom, renderPortal } from "mve-dom";
 import { hookAlterStateHolder, hookCurrentStateHolder } from "mve-core";
@@ -22,14 +22,13 @@ export default function () {
       renderArray(list.get, function (row, getIndex) {
         console.log("list", row)
         const n: CanvasRectNode = hookDrawText({
-          width: 100,
+          height: 100,
           config() {
             return {
-              config: {
-                font: "bold 18px serif"
-              },
+              fontFamily: 'serif',
+              fontSize: '20px',
+              textBaseline: "top",
               text: `${n.target.index()},${a.get()}:${row}--${getIndex()}`,
-              lineHeight: 30,
             }
           },
           onClick(e) {
@@ -47,15 +46,18 @@ export default function () {
         })
       })
       hookDrawText({
-        width: 40,
+        height: 60,
         config() {
           return {
-            config: {
-              font: "bold 18px serif"
-            },
+            fontSize: '60px',
+            fontWeight: 'bold',
+            fontFamily: "serif",
             text: "点击",
-            lineHeight: 30,
           }
+        },
+        drawInfo(arg) {
+          console.log("dd", arg)
+          return {}
         },
         onClick() {
           a.set(a.get() + 1)

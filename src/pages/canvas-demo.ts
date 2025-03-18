@@ -33,8 +33,8 @@ export default function () {
     // demo2()
     // demo3()
     // demo4()
-    // demo5()
-    demo6()
+    demo5()
+    // demo6()
   }, {
 
     beforeDraw(ctx: CanvasRenderingContext2D) {
