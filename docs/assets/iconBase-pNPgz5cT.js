@@ -1,1 +1,0 @@
-import{ag as a}from"./index-DKe6Phur.js";function r(n,t){n.forEach(function(o){t(o.tag,o.attr,()=>{r(o.child,t)})})}function i(n,t,o){var{renderItem:e,renderRoot:c}=a.consume();(t||c)(n.attr,()=>{r(n.child,e)},o)}export{i as G};

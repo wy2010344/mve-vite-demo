@@ -1,6 +1,6 @@
 import { addEffect, createSignal, flexDisplayUtil, memo } from "wy-helper";
 import data from "./data";
-import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage } from "mve-dom-helper/canvasRender";
+import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap } from "mve-dom-helper/canvasRender";
 
 import Scroller from 'scroller';
 import { hookTrackSignal } from "mve-helper";
@@ -105,7 +105,7 @@ export default function () {
                 })
               },
             })
-            hookDrawText({
+            hookDrawTextWrap({
               ext: {
                 grow: 1
               },

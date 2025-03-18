@@ -12,6 +12,8 @@ export function renderSizeSvg(
   return fsvg.svg({
     ...attrs,
     fill: "currentColor",
+    stroke: 'currentColor',
+    strokeWidth: 0,
     width: size,
     height: size,
     children
