@@ -1,5 +1,24 @@
 import { fdom, fsvg, renderText } from "mve-dom"
 import themes from "daisyui/functions/themeOrder"
+import { createSignal } from "wy-helper"
+import { faker } from "@faker-js/faker";
+const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+
+export const themeSignal = createSignal(isDarkMode.matches ? 'dark' : 'light')
+isDarkMode.addEventListener(
+  'change',
+  e => {
+    themeSignal.set(e.matches ? 'dark' : 'light')
+  }
+)
+
+
+export function randomTheme() {
+  return themes[faker.number.int({
+    max: themes.length - 1
+  })]
+}
+
 export default function () {
   fdom.div({
     className: 'daisy-dropdown',
@@ -34,6 +53,9 @@ export default function () {
               for (const theme of themes) {
                 fdom.li({
                   className: 'relative flex items-center',
+                  onClick() {
+                    themeSignal.set(theme)
+                  },
                   children() {
                     fdom.div({
                       data_theme: theme,

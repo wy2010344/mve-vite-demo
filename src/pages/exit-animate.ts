@@ -4,7 +4,7 @@ import { hookAddResult, render } from "mve-core";
 import { fdom, renderText } from "mve-dom";
 import { renderExitArrayClone } from "mve-dom-helper";
 import { ExitModel, getExitAnimateArray, hookTrackSignal, renderArray, renderIf } from "mve-helper";
-import { createSignal, emptyArray, GetValue } from "wy-helper";
+import { createSignal, emptyArray, emptyFun, GetValue } from "wy-helper";
 import explain from "../explain";
 import markdown from "../markdown";
 
@@ -14,13 +14,14 @@ import markdown from "../markdown";
  * 退出的时候,克隆元素
  */
 export default function () {
-  const list = createSignal<{
-    time: number
-  }[]>([
+  const initList = [
     {
       time: Date.now()
     }
-  ])
+  ]
+  const list = createSignal<{
+    time: number
+  }[]>(initList)
 
   explain(function () {
     markdown`
@@ -32,6 +33,9 @@ export default function () {
     * normal: 同时进出
     * in-out: 选进后出
     * out-in: 先出后进
+    
+其它:
+  可以控制忽略动画,比如初始化页面不动画    
     `
   })
 
@@ -107,7 +111,10 @@ export default function () {
       }
       const getList = getExitAnimateArray(list.get, {
         mode,
-        wait
+        wait,
+        enterIgnore() {
+          return initList == list.get()
+        }
       })
 
 
@@ -147,6 +154,9 @@ export default function () {
           renderArray(getList, (row, getIndex) => {
             const div = renderRow(row, getIndex)
             hookTrackSignal(row.step, function (value) {
+              if (!row.promise()) {
+                return
+              }
               if (value == 'enter') {
                 animate(div, {
                   x: ['100%', 0]
@@ -165,15 +175,20 @@ export default function () {
           `
           renderExitArrayClone(getList, (row, getIndex) => {
             const div = renderRow(row, getIndex)
-            animate(div, {
-              x: ['100%', 0]
-            }).finished.then(row.resolve)
+            if (row.promise()) {
+              animate(div, {
+                x: ['100%', 0]
+              }).finished.then(row.resolve)
+            }
             return {
               node: div,
               applyAnimate(node) {
-                animate(node as HTMLDivElement, {
-                  x: [0, '100%']
-                }).finished.then(row.resolve)
+                if (row.promise()) {
+
+                  animate(node as HTMLDivElement, {
+                    x: [0, '100%']
+                  }).finished.then(row.resolve)
+                }
               },
             }
           })

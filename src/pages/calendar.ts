@@ -2,15 +2,15 @@ import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, destinationWithMarginTrans, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, MomentumIScroll, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, } from "wy-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, destinationWithMarginTrans, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, getSpringBaseAnimationConfig, FrictionalFactory, } from "wy-helper";
 import explain from "../explain";
 import { renderMobileView } from "../onlyMobile";
-import hookTrackLayout from "../dailycost/hookTrackLayout";
-import { movePage } from "../dailycost/movePage";
-import firstDayOfWeek, { firstDayOfWeekIndex, WEEKS, WEEKTIMES } from "../dailycost/firstDayOfWeek";
+import hookTrackLayout from "../daily-record/hookTrackLayout";
+import { movePage } from "../daily-record/movePage";
+import firstDayOfWeek, { firstDayOfWeekIndex, WEEKS, WEEKTIMES } from "../daily-record/firstDayOfWeek";
 import fixRightTop from "../fixRightTop";
 import themeDropdown from "../themeDropdown";
-import demoList from "../dailycost/demoList";
+import demoList from "../daily-record/demoList";
 import { faker } from "@faker-js/faker";
 
 
@@ -45,7 +45,7 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
 
   const scrollY = signalAnimateFrame(0)
   let content: HTMLElement
-  const bs = MomentumIScroll.get()
+  const bs = FrictionalFactory.get()
   function perSize() {
     return getFullWidth() / 7
   }
@@ -62,16 +62,35 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
     }, extrapolationClamp)
   })
 
+  const bodyScrollX = signalAnimateFrame(0)
 
 
-  hookTrackSignal(date.get, function () {
-    addEffect(() => {
-      if (showWeek()) {
-        scrollY.changeTo(perSize() * 5)
-      } else {
-        scrollY.changeTo(0)
+  let lastDate = date.get()
+  hookTrackSignal(() => bodyScrollX.getAnimateConfig(), function (c) {
+    if (!c) {
+      if (!lastDate.equals(date.get())) {
+        addEffect(() => {
+          if (showWeek()) {
+            scrollY.animateTo(perSize() * 5, getSpringBaseAnimationConfig({
+              config: {
+                zta: 0.7,
+                omega0: 20,
+              }
+            }))
+          } else {
+            scrollY.animateTo(0, getSpringBaseAnimationConfig({
+              config: {
+                zta: 0.7,
+                omega0: 20,
+              }
+            }))
+          }
+          // setTimeout(() => {
+          // }, 200)
+        })
       }
-    })
+      lastDate = date.get()
+    }
   })
   hookTrackSignal(memo<YearMonthVirtualView>(oldMonth => {
     const ym = yearMonth()
@@ -118,7 +137,7 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
     onPointerDown: pointerMoveDir(function (e, dir) {
       if (dir == 'y') {
         //上下滑动
-        const m = ScrollFromPage.from(e, {
+        return ScrollFromPage.from(e, {
           getPage: eventGetPageY,
           scrollDelta(delta) {
             const y = scrollY.get()
@@ -128,7 +147,7 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
             )
           },
           onFinish(velocity) {
-            const out = bs.destinationWithMargin({
+            const out = bs.destinationWithMarginIscroll({
               velocity,
               current: scrollY.get(),
               containerSize: container.clientHeight,
@@ -136,9 +155,9 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
             })
             const snap = dragSnapWithList([
               {
-                beforeForce: 1,
+                beforeForce: 0.005,
                 size: perSize() * 5,
-                afterForce: 1
+                afterForce: 0.005
               }
             ])
             destinationWithMarginTrans(out, scrollY, {
@@ -146,14 +165,6 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
             })
           }
         })
-        return {
-          onPointerMove(e) {
-            m.move(e)
-          },
-          onPointerUp(e) {
-            m.end(e)
-          },
-        }
       }
     }),
     children() {
@@ -305,7 +316,6 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
             }
             return d
           }))
-          const bodyScrollX = signalAnimateFrame(0)
           const mp2 = movePage(bodyScrollX, getContainerWidth)
           fdom.div({
             className: ' flex-1',
@@ -343,7 +353,7 @@ function calendar(getFullWidth: GetValue<number>, mock?: boolean) {
                       children() {
                         demoList(faker.number.int({
                           max: 17,
-                          min: 1
+                          min: 15
                         }))
                       }
                     })

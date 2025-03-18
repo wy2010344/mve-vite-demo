@@ -14,11 +14,11 @@ import scrollDemo1 from './scroller-demo/demo1'
 import scrollDemo1p from './scroller-demo/demo1p'
 import pagingx from './scroller-demo/pagingx'
 import snapDemo from './scroller-demo/snapDemo'
-import scrollerDemo1 from './demos/scrollerDemo1'
+import scrollerDemo1 from './pages/demos/scrollerDemo1'
 import reorderDemo from './pages/reorder-demo'
-import demo2 from './demos/demo2'
+import demo2 from './pages/demos/demo2'
 import calendar from './pages/calendar'
-import dailycost from './dailycost'
+import dailycost from './daily-record'
 import { history, historyState } from './history'
 import { hookDestroy, hookPromiseSignal, promiseSignal, renderArray, renderIf, renderOne } from 'mve-helper'
 import route from './route'
@@ -35,7 +35,9 @@ const destroy = createRoot(app, () => {
     renderRoot(attrs, children) {
       svg.svg({
         ...attrs,
-        fill: "currentColor"
+        fill: "currentColor",
+        stroke: 'currentColor',
+        strokeWidth: '0'
       }).render(children)
     }
   })
