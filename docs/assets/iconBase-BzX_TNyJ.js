@@ -1,0 +1,1 @@
+import{aL as a}from"./index-DvMfoO23.js";function r(n,t){n.forEach(function(o){t(o.tag,o.attr,()=>{r(o.child,t)})})}function i(n,t,o){var{renderItem:e,renderRoot:c}=a.consume();(t||c)(n.attr,()=>{r(n.child,e)},o)}export{i as G};

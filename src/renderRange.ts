@@ -70,7 +70,7 @@ export function renderNumberRange(label: string, range: NumberRange) {
   fdom.div({
     children() {
       dom.label({
-        className: "align-middle text-right block",
+        className: "block",
       }).renderText`${label}: `
 
       fdom.div({

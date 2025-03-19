@@ -1,7 +1,7 @@
 import { fdom } from "mve-dom"
 import { hookDraw, renderCanvas } from "mve-dom-helper/canvasRender";
 import { hookDestroy, renderArray } from "mve-helper";
-import { subscribeMove, subscribeRequestAnimationFrame } from "wy-dom-helper";
+import { pointerMove, subscribeMove, subscribeRequestAnimationFrame } from "wy-dom-helper";
 import { asLazy, batchSignalEnd, createSignal, emptyArray, memo, run, toProxySignal } from "wy-helper";
 import { createSignalForceDir, emptySignalForceDir, forceLink, ForceLink, forceManybody, ForceNode, initForceConfig, initToNode, mergeNodesAndLinks, SignalForceDir, tickForce } from "wy-helper/forceLayout";
 
@@ -94,24 +94,6 @@ export default function () {
     didTick()
     batchSignalEnd()
   }))
-
-  hookDestroy(subscribeMove(function (p, e) {
-    // console.log("ss", p?.clientX, p?.clientY)
-    const c = currentNode.get()
-    if (c) {
-      if (e) {
-        config.alphaTarget = 0
-        c.x.f = undefined
-        c.y.f = undefined
-        currentNode.set(undefined)
-      } else {
-        c.x.f = p.offsetX - width / 2
-        c.y.f = p.offsetY - height / 2
-      }
-    }
-  }, "pointer", {
-    element: canvas
-  }))
   renderCanvas(canvas, function () {
     renderArray(() => getNodesAndLinks().links, link => {
       hookDraw({
@@ -143,9 +125,18 @@ export default function () {
         onPointerDown(e) {
           config.alphaTarget = 0.3
           currentNode.set(node)
-
-          // node.x.f = e.original.clientX - width / 2
-          // node.y.f = e.original.clientY - height / 2
+          pointerMove({
+            onMove(p) {
+              node.x.f = p.offsetX - width / 2
+              node.y.f = p.offsetY - height / 2
+            },
+            onEnd(e) {
+              config.alphaTarget = 0
+              node.x.f = undefined
+              node.y.f = undefined
+              currentNode.set(undefined)
+            },
+          }, canvas)
         },
         withPath: true,
         draw(ctx, path) {
