@@ -1,10 +1,14 @@
-import { dom, fdom } from "mve-dom";
-import { createSignal, springBaseAnimationConfig, StoreRef, WeightMeasure, FrictionalFactory, EaseType } from "wy-helper";
+import { dom, fdom, renderText } from "mve-dom";
+import { createSignal, springBaseAnimationConfig, StoreRef, WeightMeasure, FrictionalFactory, EaseType, easeFns } from "wy-helper";
 import { NumberRange, renderNumberRange } from "../renderRange";
 import fixRightTop from "../fixRightTop";
 import themeDropdown from "../themeDropdown";
 
-import drawCanvasCurve from "../draw-canvas-curve";
+import drawCanvasCurve from "../animation-view/draw-canvas-curve";
+import bezierCanvasView from "../animation-view/bezier-canvas-view";
+import { easePoly, easeCirc, easeSine, easeExpo, easeBonuceOut, easeBack, easeElastic } from "../animation-view/tween-view";
+import drawUnknownEndView from "../animation-view/draw-unknown-end-view";
+import { renderControl, renderEase } from "../animation-view/util";
 
 export default function () {
 
@@ -16,19 +20,24 @@ export default function () {
   fdom.div({
     className: 'w-full h-full overflow-y-auto flex flex-col items-center pt-1 pb-1 ',
     children() {
-
       fdom.div({
-        className: "grid items-center [grid-template-columns:auto_1fr]",
+        className: "grid items-center [grid-template-columns:1fr_auto]",
         children() {
           renderSpring()
+          bezierCanvasView()
           renderFrc()
+          easePoly()
+          easeSine()
+          easeCirc()
+          easeExpo()
+          easeBack()
+          easeElastic()
+          easeBonuceOut()
           renderWeight()
         }
       })
     }
   })
-
-
 }
 
 function renderSpring() {
@@ -53,20 +62,7 @@ function renderSpring() {
     min: 0.1,
     max: 80
   })
-  fdom.div({
-    className: 'flex flex-col items-end space-y-1',
-    children() {
-      dom.h1({
-        className: "text-2xl"
-      }).renderText`Spring动画`
-      renderNumberRange('initVelocity', initialVelocity)
-      renderNumberRange('displacementThreshold', displacementThreshold)
-      renderNumberRange('velocityThreshold', velocityThreshold)
-      renderNumberRange('zta', zta)
-      renderNumberRange('omega0', omega0)
-    }
-  })
-  drawCanvasCurve({
+  drawUnknownEndView({
     getAnimationFun(height) {
       return springBaseAnimationConfig(height, {
         config: {
@@ -81,7 +77,21 @@ function renderSpring() {
         velocityThreshold: velocityThreshold.value.get(),
         // ease: "out"
       })
-    },
+    }
+  })
+
+  fdom.div({
+    className: 'flex flex-col items-start space-y-1',
+    children() {
+      dom.h1({
+        className: "text-2xl"
+      }).renderText`Spring动画`
+      renderNumberRange('initVelocity', initialVelocity)
+      renderNumberRange('displacementThreshold', displacementThreshold)
+      renderNumberRange('velocityThreshold', velocityThreshold)
+      renderNumberRange('zta', zta)
+      renderNumberRange('omega0', omega0)
+    }
   })
 }
 function renderFrc() {
@@ -91,9 +101,13 @@ function renderFrc() {
   })
 
   const ease = createSignal<EaseType>('in')
-
+  drawUnknownEndView({
+    getAnimationFun(height) {
+      return FrictionalFactory.get(deceleration.value.get()).getFromDistance(height).animationConfig(ease.get())
+    }
+  })
   fdom.div({
-    className: 'flex flex-col items-end space-y-1',
+    className: 'flex flex-col items-start space-y-1',
     children() {
       dom.h1({
         className: "text-2xl"
@@ -101,11 +115,6 @@ function renderFrc() {
       renderNumberRange('deceleration', deceleration)
       renderEase(ease)
     }
-  })
-  drawCanvasCurve({
-    getAnimationFun(height) {
-      return FrictionalFactory.get(deceleration.value.get()).getFromDistance(height).animationConfig(ease.get())
-    },
   })
 }
 
@@ -122,53 +131,16 @@ function renderWeight() {
 
 
   const ease = createSignal<EaseType>('in')
-  fdom.div({
-    className: 'flex flex-col items-end space-y-1',
-    children() {
-      dom.h1({
-        className: "text-2xl"
-      }).renderText`重力加速度动画`
-      renderNumberRange('initialVelocity', initialVelocity)
-      renderNumberRange('acceleration', acceleration)
-      renderEase(ease)
-    }
-  })
-  drawCanvasCurve({
+
+  drawUnknownEndView({
     getAnimationFun(height) {
       return new WeightMeasure(height, initialVelocity.value.get(), acceleration.value.get()).animationConfig(ease.get())
-    },
-  })
-}
-
-
-function renderEase(ease: StoreRef<EaseType>) {
-
-  fdom.div({
-    children() {
-      dom.label({
-        className: 'block text-right'
-      }).renderText`ease:`
-      const s = fdom.select({
-        value: ease.get,
-        onInput(e) {
-          ease.set(s.value as any)
-        },
-        className: 'daisy-select',
-        children() {
-          fdom.option({
-            childrenType: 'text',
-            children: `in`,
-          })
-          fdom.option({
-            childrenType: 'text',
-            children: `out`,
-          })
-          fdom.option({
-            childrenType: 'text',
-            children: `in-out`,
-          })
-        }
-      })
     }
   })
+  renderControl('重力加速度动画', function () {
+    renderNumberRange('initialVelocity', initialVelocity)
+    renderNumberRange('acceleration', acceleration)
+    renderEase(ease)
+  })
 }
+
