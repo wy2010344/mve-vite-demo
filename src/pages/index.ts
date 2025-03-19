@@ -130,6 +130,11 @@ function renderCard() {
         description: `一些动画曲线的查看`
       })
       card({
+        href: '/canvas-demo',
+        title: `canvas上绘制的列表`,
+        description: `受react-canvas启发,基于mve`
+      })
+      card({
         href: '/magnified-dock',
         title: `magnified-dock`,
         description: `一个类似mac上的dock的实现`
