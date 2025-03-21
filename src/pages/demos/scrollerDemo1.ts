@@ -1,8 +1,10 @@
 import { fdom } from "mve-dom";
 import { renderArray } from "mve-helper";
-import { cssMap, pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
-import { arrayCountCreateWith, destinationWithMarginTrans, eventGetPageY, FrictionalFactory, overScrollSlow, quote, ScrollFromPage } from "wy-helper";
+import { animateSignal, cssMap, pointerMoveDir, } from "wy-dom-helper";
+import { arrayCountCreateWith, defaultSpringAnimationConfig, eventGetPageY, FrictionalFactory, overScrollSlow, quote, scrollEdgeIteration, ScrollFromPage, scrollInfinityIteration, spring } from "wy-helper";
 
+const fr = FrictionalFactory.get()//0.0006
+const fr2 = FrictionalFactory.get(0.08)
 export default function () {
 
   fdom.div({
@@ -11,7 +13,7 @@ export default function () {
     children: "iScroll"
   })
 
-  const transY = signalAnimateFrame(0)
+  const scrollY = animateSignal(0)
   let content: HTMLElement
   const bs = FrictionalFactory.get()
   const container = fdom.div({
@@ -23,20 +25,50 @@ export default function () {
       return ScrollFromPage.from(e, {
         getPage: eventGetPageY,
         scrollDelta(delta, velocity) {
-          const y = transY.get()
-          transY.changeTo(
+          const y = scrollY.get()
+          scrollY.set(
             y +
             overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
           )
         },
         onFinish(velocity) {
-          const out = bs.destinationWithMarginIscroll({
+
+          //使用惯性
+          // return fr.destinationWithMarginIscroll({
+          //   scroll: scrollY,
+          //   velocity,
+          //   containerSize: container.clientHeight,
+          //   contentSize: content.offsetHeight,
+          //   edgeConfig(velocity) {
+          //     return scrollInfinityIteration(velocity, {
+          //       nextVelocity(n) {
+          //         return n * 0.95
+          //       },
+          //     })
+          //     // return fr2.getFromVelocity(velocity).animationConfig('in')
+          //   },
+          //   edgeBackConfig: defaultSpringAnimationConfig,
+          // })
+
+          let backTarget = 0, backVelocity = 0, then = false
+          //使用纯迭代
+          scrollY.change(scrollEdgeIteration({
             velocity,
-            current: transY.get(),
             containerSize: container.clientHeight,
-            contentSize: content.offsetHeight
+            contentSize: content.offsetHeight,
+            onBack(target, velocity) {
+              then = true
+              backTarget = target
+              backVelocity = velocity
+            },
+          })).then((value) => {
+            console.log('🆚', value)
+            if (value && then) {
+              scrollY.changeTo(backTarget, spring({
+                initialVelocity: backVelocity
+              }))
+            }
           })
-          destinationWithMarginTrans(out, transY)
         }
       })
     }),
@@ -44,7 +76,7 @@ export default function () {
       content = fdom.div({
         className: cs.content,
         s_transform() {
-          return `translateY(${-transY.get()}px)`
+          return `translateY(${-scrollY.get()}px)`
         },
         children() {
           renderArray(() => arrayCountCreateWith(100, quote), (row, getIndex) => {

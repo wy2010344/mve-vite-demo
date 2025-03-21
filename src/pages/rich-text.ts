@@ -1,13 +1,16 @@
 import { faker } from "@faker-js/faker";
-import { dom, fdom, renderTextContent } from "mve-dom";
+import { dom, fdom, renderPortal, renderTextContent } from "mve-dom";
 import { renderCode } from "mve-dom-helper";
-import { hookTrackSignal } from "mve-helper";
+import { hookDestroy, hookTrackSignal } from "mve-helper";
 import { contentEditableText, initContentEditableModel } from "wy-dom-helper/contentEditable";
-import { createSignal } from "wy-helper";
+import { addEffect, batchSignalEnd, createSignal, tw } from "wy-helper";
 import explain from "../explain";
 import markdown from "../markdown";
 import fixRightTop from "../fixRightTop";
 import themeDropdown from "../themeDropdown";
+import { arrow, autoPlacement, autoUpdate, computePosition, hide, offset } from '@floating-ui/dom';
+import { hookAddDestroy } from "mve-core";
+import { cns } from "wy-dom-helper";
 
 export default function () {
   fixRightTop(function () {
@@ -22,6 +25,14 @@ export default function () {
   })
   const storeKey = 'rich-text-demo'
   const storeValue = localStorage.getItem(storeKey)
+
+  const map = {} as Record<string, string>
+  function images(name: string) {
+    if (!map[name]) {
+      map[name] = faker.image.avatar()
+    }
+    return map[name]
+  }
   const model = createSignal(storeValue ? {
     currentIndex: 0,
     history: [
@@ -35,6 +46,7 @@ export default function () {
   })
   const readonly = createSignal(false)
   fdom.div({
+    className: 'overflow-auto',
     children() {
       fdom.button({
         className: 'daisy-btn',
@@ -47,10 +59,11 @@ export default function () {
         }
       })
       renderContentEditable({
+
         render(value, a) {
           return fdom.pre({
             ...a,
-            className: 'prose daisy-prose',
+            className: 'prose daisy-prose whitespace-pre-wrap ',
             contentEditable() {
               return readonly.get() ? false : contentEditableText
             },
@@ -61,39 +74,100 @@ export default function () {
                 if (typeof item == 'string') {
                   renderTextContent(item)
                 } else if (item.type == 'at') {
-                  fdom.span({
-                    className: 'daisy-tooltip text-primary ',
+                  const hover = createSignal(false)
+                  const atSpan = fdom.span({
+                    //@todo 这里文本一定要渲染到外面去!!
+                    className: 'text-primary ',
+                    onPointerEnter(e) {
+                      hover.set(true)
+                    },
+                    onPointerLeave(e) {
+                      hover.set(false)
+                    },
                     children() {
-                      fdom.div({
-                        className: 'daisy-tooltip-content not-prose',
-                        children() {
-                          fdom.div({
-                            className: 'daisy-card',
-                            children() {
-                              fdom.div({
-                                className: 'daisy-avatar',
-                                children() {
-                                  fdom.div({
-                                    className: 'ring-primary ring-offset-base-100 w-24 rounded-full ring ring-offset-2',
-                                    children() {
-                                      fdom.img({
-                                        src: faker.image.avatar(),
-                                      })
-                                    }
-                                  })
-                                }
-                              })
-                            }
-                          })
-                          fdom.div({
-                            className: 'animate-bounce text-orange-400 -rotate-10 text-2xl font-black',
-                            childrenType: 'text',
-                            children: `Wow!`,
-                          })
-                        }
-                      })
                       renderTextContent(item.value)
                     }
+                  })
+                  renderPortal(document.body, () => {
+                    const loc = createSignal(1)
+                    const tooltip = fdom.div({
+                      className: 'fixed',
+                      s_opacity() {
+                        return hover.get() ? 1 : 0
+                      },
+                      s_pointerEvents() {
+                        return hover.get() ? 'all' : 'none'
+                      },
+                      children() {
+                        const anchor = fdom.div({
+                          className() {
+                            const l = loc.get()
+                            return cns('absolute w-4 h-4 border-8 border-transparent',
+                              l == 1 && tw`border-b-base-100 top-0 translate-y-[-100%]`,
+                              l == 2 && tw`border-t-base-100 bottom-0 translate-y-[100%] `,
+                            )
+                          }
+                        })
+
+                        const addDestroy = hookAddDestroy()
+                        addEffect(() => {
+                          addDestroy(autoUpdate(atSpan, tooltip, function () {
+                            computePosition(atSpan, tooltip, {
+                              middleware: [
+                                autoPlacement({
+                                  allowedPlacements: ['top', 'bottom']
+                                }),
+                                arrow({ element: anchor }),
+                                offset(10),
+                                hide()
+                              ]
+                            }).then(({ x, y, middlewareData }) => {
+                              tooltip.style.left = x + 'px'
+                              tooltip.style.top = y + 'px'
+                              const index = middlewareData.autoPlacement?.index
+                              if (index && index != loc.get()) {
+                                loc.set(index)
+                                batchSignalEnd()
+                              }
+
+                              const arrow = middlewareData.arrow;
+                              if (arrow) {
+                                anchor.style.left = arrow.x + 'px'
+                                anchor.style.top = arrow.y + 'px'
+                              }
+                              tooltip.style.display = middlewareData.hide?.referenceHidden ? 'none' : ''
+                            })
+                          }))
+                        })
+
+                        fdom.div({
+                          className: 'flex items-center gap-1 flex-col justify-center p-1 shadow-xl bg-base-100',
+                          s_boxShadow: `0px 0px 20px 0px rebeccapurple`,
+                          children() {
+                            fdom.div({
+                              className: 'daisy-avatar w-24 rounded-full overflow-hidden',
+                              children() {
+                                fdom.img({
+                                  src: images(item.value),
+                                  alt: 'name',
+                                })
+                              }
+                            })
+                            fdom.h2({
+                              className: 'daisy-card-title text-lg font-bold',
+                              childrenType: 'text',
+                              children: item.value,
+                            })
+                          }
+                        })
+                        fdom.div({
+                          className: 'absolute top-0 animate-bounce text-orange-400 -rotate-10 text-2xl font-black',
+                          childrenType: 'text',
+                          children: `Wow!`,
+                        })
+                      }
+                    })
+                    // hookDestroy()
                   })
                 } else if (item.type == 'url') {
                   fdom.a({

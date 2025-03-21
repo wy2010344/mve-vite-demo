@@ -1,5 +1,5 @@
-import { createSignal, EaseFn, easeFns, EaseType, getTweenAnimationConfig, GetValue, memoFun, Quote } from "wy-helper"
-import { dom, fdom, renderText } from "mve-dom";
+import { createSignal, easeFns, EaseType, memoFun, Quote } from "wy-helper"
+import { fdom, renderText } from "mve-dom";
 import drawCanvasCurve from "./draw-canvas-curve";
 import { NumberRange, renderNumberRange } from "../renderRange";
 import { renderControl, renderEase } from "./util";

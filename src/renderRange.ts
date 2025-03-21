@@ -1,9 +1,8 @@
-import { dom, fdom, renderTextContent } from "mve-dom";
-import { createSignal, emptyObject, GetValue, SetValue, springBaseAnimationConfig, StoreRef, memo, easeFns } from "wy-helper";
+import { dom, fdom } from "mve-dom";
+import { createSignal, emptyObject, GetValue, SetValue, StoreRef } from "wy-helper";
 import { renderContentEditable, renderInput } from "mve-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
 import { cns, DomElementType } from "wy-dom-helper";
-import { renderCanvas, hookDraw, hookDrawText, hookDrawTextWrap } from "mve-dom-helper/canvasRender";
 
 export class NumberRange {
   readonly value: StoreRef<number>

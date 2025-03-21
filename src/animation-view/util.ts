@@ -1,10 +1,9 @@
 
 import { dom, fdom, renderText } from "mve-dom";
-import { hookDraw, hookDrawText, renderCanvas } from "mve-dom-helper/canvasRender";
-import { AnimationConfig, createSignal, EaseType, EmptyFun, GetValue, memo, memoFun, ScrollFromPage, StoreRef } from "wy-helper";
+import { EaseType, EmptyFun, memoFun, StoreRef } from "wy-helper";
 import { themeSignal } from "../themeDropdown";
-import { oklch, rgb, formatHex } from "culori";
-import { pointerMove, pointerMoveDir } from "wy-dom-helper";
+import { rgb, formatHex } from "culori";
+import { pointerMove } from "wy-dom-helper";
 import { renderContentEditable } from "mve-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
 

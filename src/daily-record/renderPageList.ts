@@ -1,7 +1,7 @@
 import { fdom } from "mve-dom";
 import { dateFromYearMonthDay, DAYMILLSECONDS, memo, simpleEqualsEqual, YearMonthDayVirtualView, StoreRef, GetValue, FrictionalFactory } from "wy-helper";
 import { hookTrackSignal, memoArray, renderArray } from "mve-helper";
-import { pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
+import { animateSignal, pointerMoveDir, } from "wy-dom-helper";
 import { movePage } from "./movePage";
 import renderPage from "./renderPage";
 
@@ -13,7 +13,7 @@ export default function (
   function getContainerWidth() {
     return container.clientWidth
   }
-  const bodyScrollX = signalAnimateFrame(0)
+  const bodyScrollX = animateSignal(0)
   const mp2 = movePage(bodyScrollX, getContainerWidth)
   hookTrackSignal(memo<YearMonthDayVirtualView>((lastDate) => {
     const d = date.get()
@@ -67,7 +67,7 @@ export default function (
             // ]
           }, simpleEqualsEqual), function (w, getIndex) {
             renderPage(getIndex, () => {
-              return bodyScrollX.getAnimateConfig()
+              return bodyScrollX.onAnimation()
             })
           })
         }

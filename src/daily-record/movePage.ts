@@ -1,5 +1,5 @@
 import { MoveEnd } from "wy-dom-helper"
-import { AbsAnimateFrameValue, addEffect, AnimateFrameEvent, batchSignalEnd, cacheVelocity, EmptyFun, eventGetPageX, FrictionalFactory, getSpringBaseAnimationConfig, GetValue, ScrollFromPage, WeightMeasure } from "wy-helper"
+import { addEffect, AnimateSignal, batchSignalEnd, eventGetPageX, FrictionalFactory, GetValue, ScrollFromPage, spring, WeightMeasure } from "wy-helper"
 
 
 
@@ -9,7 +9,7 @@ import { AbsAnimateFrameValue, addEffect, AnimateFrameEvent, batchSignalEnd, cac
 const fc = FrictionalFactory.get(0.01)
 export function getPageSnap(velocity: number) {
   //使用弹性
-  return getSpringBaseAnimationConfig({
+  return spring({
     initialVelocity: velocity
   })
   //使用重力惯性
@@ -23,10 +23,9 @@ export function getPageSnap(velocity: number) {
 }
 
 export function movePage(
-  scrollX: AbsAnimateFrameValue,
+  scrollX: AnimateSignal,
   // fc: FrictionalFactory,
   getWidth: GetValue<number>,
-  event?: AnimateFrameEvent,
 ) {
   //翻页时的全局速度
   let globalDirectionVelocity = 0
@@ -61,7 +60,7 @@ export function movePage(
               // getSpringBaseAnimationConfig({
               //   initialVelocity: velocity
               // }),
-              event)
+            )
           } else {
             const direction = targetDis > 0 ? 1 : -1
             globalDirectionVelocity = velocity
@@ -83,9 +82,9 @@ export function movePage(
           //   initialVelocity: globalDirectionVelocity
           // }),
           getPageSnap(globalDirectionVelocity),
-          event)
+        )
         globalDirectionVelocity = 0
-        scrollX.slientDiff(-diffWidth)
+        scrollX.silentDiff(-diffWidth)
         batchSignalEnd()
       })
     }
@@ -98,7 +97,7 @@ export function movePage(
  * @param maxScrllHeight 最大滚动距离
  * @returns 
  */
-export function transSticky(trans: AbsAnimateFrameValue, maxScrllHeight = 0) {
+export function transSticky(trans: AnimateSignal, maxScrllHeight = 0) {
   let ty = Math.max(trans.get(), 0)
   if (maxScrllHeight) {
     ty = Math.min(ty, maxScrllHeight)

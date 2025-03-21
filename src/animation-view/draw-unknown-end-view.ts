@@ -1,4 +1,4 @@
-import { AnimationConfig, createSignal } from "wy-helper";
+import { createSignal, DeltaXSignalAnimationConfig, SetValue } from "wy-helper";
 import drawCanvasCurve from "./draw-canvas-curve";
 import { fdom } from "mve-dom";
 import { pointerMove } from "wy-dom-helper";
@@ -6,26 +6,50 @@ import { renderContentEditable } from "mve-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
 
 
+function fakeSubscribeRequestAnimateFrame(
+  callback: (time: number) => any,
+  onFinish?: SetValue<boolean>): () => void {
+  let canceled = false
+  function cancel() {
+    onFinish?.(false)
+    canceled = true
+  }
+  let i = 0
+  while (true) {
+    const nexti = i + 16
+    const b = callback(nexti)
+    i = nexti
+    if (b) {
+      break
+    }
+  }
+  onFinish?.(true)
+  return cancel
+}
 
 export default function ({
   getAnimationFun
 }: {
-  getAnimationFun(height: number): AnimationConfig
+  getAnimationFun(): DeltaXSignalAnimationConfig
 }) {
   const toNegative = createSignal(false)
   drawCanvasCurve({
     getDotList(height) {
       const dir = toNegative.get() ? -1 : 1
-      const fun = getAnimationFun(dir * (height))
       const list: number[] = []
-      let time = 0
-      while (true) {
-        const out = fun(time)
-        list.push(dir * out[0])
-        time = time + 16
-        if (out[1]) {
-          break
-        }
+      let value = 0
+      const fun = getAnimationFun()(dir * height)
+      const out = fun({
+        get() {
+          return value
+        },
+        set(v) {
+          list.push(dir * v)
+          value = v
+        },
+      })
+      if (out) {
+        fakeSubscribeRequestAnimateFrame(out.callback)
       }
       return list
     },
