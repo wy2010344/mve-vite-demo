@@ -1,6 +1,6 @@
 import { renderIf } from "mve-helper";
 import { fdom, mdom } from "mve-dom";
-import { dateFromYearMonthDay, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, getWeekOfYear, memo, memoFun, SignalAnimateFrameValue, StoreRef, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
+import { AnimateSignal, dateFromYearMonthDay, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, getWeekOfYear, memo, memoFun, StoreRef, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
 import { cns } from "wy-dom-helper";
 import { SolarDay } from "tyme4ts";
 import { firstDayOfWeekIndex, WEEKS } from "./firstDayOfWeek";
@@ -8,7 +8,7 @@ export const selectShadowCell = 'select-cell'
 export default function (
   yearMonth: YearMonthVirtualView,
   getIndex: GetValue<number>,
-  calendarScrollY: SignalAnimateFrameValue,
+  calendarScrollY: AnimateSignal,
   date: StoreRef<YearMonthDayVirtualView>,
   fullWidth: GetValue<number>
 ) {

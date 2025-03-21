@@ -1,5 +1,5 @@
 import { dom, fdom, renderText } from "mve-dom";
-import { createSignal, springBaseAnimationConfig, StoreRef, WeightMeasure, FrictionalFactory, EaseType, easeFns } from "wy-helper";
+import { createSignal, StoreRef, WeightMeasure, FrictionalFactory, EaseType, easeFns, spring } from "wy-helper";
 import { NumberRange, renderNumberRange } from "../renderRange";
 import fixRightTop from "../fixRightTop";
 import themeDropdown from "../themeDropdown";
@@ -18,7 +18,7 @@ export default function () {
   })
 
   fdom.div({
-    className: 'w-full h-full overflow-y-auto flex flex-col items-center pt-1 pb-1 ',
+    className: 'w-full h-full overflow-y-auto flex flex-col items-center pt-1 pb-1 touch-none',
     children() {
       fdom.div({
         className: "grid items-center [grid-template-columns:1fr_auto]",
@@ -33,7 +33,7 @@ export default function () {
           easeBack()
           easeElastic()
           easeBonuceOut()
-          renderWeight()
+          // renderWeight()
         }
       })
     }
@@ -63,8 +63,8 @@ function renderSpring() {
     max: 80
   })
   drawUnknownEndView({
-    getAnimationFun(height) {
-      return springBaseAnimationConfig(height, {
+    getAnimationFun() {
+      return spring({
         config: {
           zta: zta.value.get(),
           omega0: omega0.value.get()
@@ -102,8 +102,10 @@ function renderFrc() {
 
   const ease = createSignal<EaseType>('in')
   drawUnknownEndView({
-    getAnimationFun(height) {
-      return FrictionalFactory.get(deceleration.value.get()).getFromDistance(height).animationConfig(ease.get())
+    getAnimationFun() {
+      return function (height) {
+        return FrictionalFactory.get(deceleration.value.get()).getFromDistance(height).animationConfig(ease.get())
+      }
     }
   })
   fdom.div({
@@ -132,11 +134,13 @@ function renderWeight() {
 
   const ease = createSignal<EaseType>('in')
 
-  drawUnknownEndView({
-    getAnimationFun(height) {
-      return new WeightMeasure(height, initialVelocity.value.get(), acceleration.value.get()).animationConfig(ease.get())
-    }
-  })
+  // drawUnknownEndView({
+  //   getAnimationFun(height) {
+  //     return new WeightMeasure(height, initialVelocity.value.get(),
+  //      acceleration.value.get()).animationConfig(ease.get()
+  //     )
+  //   }
+  // })
   renderControl('重力加速度动画', function () {
     renderNumberRange('initialVelocity', initialVelocity)
     renderNumberRange('acceleration', acceleration)

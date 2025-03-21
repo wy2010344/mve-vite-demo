@@ -1,11 +1,11 @@
 import { createContext } from "mve-core";
-import { SignalAnimateFrameValue, YearMonthDayVirtualView } from "wy-helper";
+import { AnimateSignal, YearMonthDayVirtualView } from "wy-helper";
 
 export const topContext = createContext<{
   today(): YearMonthDayVirtualView
-  yearMonthScrollY: SignalAnimateFrameValue,
+  yearMonthScrollY: AnimateSignal,
   scrollYearMonthOpenHeight(): number
-  calendarScrollY: SignalAnimateFrameValue
+  calendarScrollY: AnimateSignal
   showCalendar(): boolean
   calendarOpenHeight(): number
   calendarScroll(delta: number, velocity: number): void

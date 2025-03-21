@@ -1,7 +1,7 @@
 import { fdom } from "mve-dom";
 import { memo, numberIntFillWithN0, simpleEqualsEqual, tw, YearMonthDayVirtualView, YearMonthVirtualView, WeekVirtualView, StoreRef, GetValue, dateFromYearMonthDay, ScrollFromPage, eventGetPageY, FrictionalFactory, emptyArray, emptyObject } from "wy-helper";
 import { getExitAnimateArray, hookTrackSignal, memoArray, renderArray } from "mve-helper";
-import { cns, pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
+import { animateSignal, cns, pointerMoveDir } from "wy-dom-helper";
 import hookTrackLayout from "./hookTrackLayout";
 import { movePage } from "./movePage";
 import { firstDayOfWeekIndex, WEEKTIMES } from "./firstDayOfWeek";
@@ -62,7 +62,7 @@ export default function (
     }),
     children() {
       //星期与天都需要滚动
-      const scrollX = signalAnimateFrame(0)
+      const scrollX = animateSignal(0)
       hookTrackSignal(memo<YearMonthVirtualView>(oldMonth => {
         const ym = yearMonth()
         if (oldMonth && showCalendar()) {
@@ -203,7 +203,7 @@ export default function (
                     'text-2xl text-base-content font-bold',
                     tn.equals(dn) ? 'text-2xl' : tn.year == dn.year ? 'text-xl' : 'text-lg',
 
-                    calendarScrollY.getAnimateConfig() ? tw`cursor-not-allowed` : tw`cursor-pointer`
+                    calendarScrollY.onAnimation() ? tw`cursor-not-allowed` : tw`cursor-pointer`
                   )
                 },
                 childrenType: 'text',
@@ -215,14 +215,14 @@ export default function (
                   return `${numberIntFillWithN0(d.month, 2)}-${numberIntFillWithN0(d.day, 2)}`
                 },
                 onClick() {
-                  if (calendarScrollY.getAnimateConfig()) {
+                  if (calendarScrollY.onAnimation()) {
                     return
                   }
                   if (showCalendar()) {
                     //为了使越界触发
                     calendarClose()
                   } else {
-                    calendarScrollY.animateTo(0)
+                    calendarScrollY.changeTo(0)
                   }
                 }
               })

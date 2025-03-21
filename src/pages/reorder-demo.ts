@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker"
 import { fdom } from "mve-dom"
 import { renderArrayToArray } from "mve-helper"
-import { moveEdgeScroll, signalAnimateFrame, subscribeEventListener, subscribeScroller } from "wy-dom-helper"
-import { AbsAnimateFrameValue, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, getTweenAnimationConfig, reorderCheckTarget, SignalAnimateFrameValue, StoreRef } from "wy-helper"
+import { animateSignal, moveEdgeScroll, subscribeEventListener, subscribeScroller } from "wy-dom-helper"
+import { AnimateSignal, AnimationTime, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, reorderCheckTarget, storeRef, StoreRef, tween } from "wy-helper"
 import themeDropdown, { randomTheme } from "../themeDropdown"
 import fixRightTop from "../fixRightTop"
 
@@ -15,7 +15,7 @@ export const dataList = Array(30).fill(1).map((_, i) => {
 })
 
 type Row = typeof dataList[0]
-const ease1 = getTweenAnimationConfig(600, easeFns.out(easeFns.circ))
+const ease1 = tween(600, easeFns.out(easeFns.circ))
 export default function () {
   fixRightTop(function () {
     themeDropdown()
@@ -42,7 +42,7 @@ export default function () {
         children() {
           const outArray = renderArrayToArray(orderList.get, (v, getIndex) => {
             const h = Math.floor(Math.random() * 100 + 50)
-            const transY = signalAnimateFrame(0)
+            const transY = animateSignal(0)
             const marginTop = 10//Math.floor(Math.random() * 10 + 5)
             const div = fdom.div({
               className: 'daisy-row daisy-card flex-row',
@@ -65,7 +65,7 @@ export default function () {
                   return
                 }
                 const destroyScroll = subscribeScroller(container, 'y', e => {
-                  transY.changeTo(transY.get() + e)
+                  transY.set(transY.get() + e)
                   return true
                 })
                 onDrag.set(v)
@@ -80,10 +80,10 @@ export default function () {
                 })
                 const endMove = subscribeEventListener(document, 'pointermove', e => {
                   mes.changePoint(e.pageY)
-                  transY.changeTo(transY.get() + e.pageY - lastPageY)
+                  transY.set(transY.get() + e.pageY - lastPageY)
                   lastPageY = e.pageY
                   const outList = outArray()
-                  didMove(orderList, transY, div, getIndex(), outList, marginTop)
+                  didMove(orderList, out, outList, marginTop)
                   // didMoveMarginTop(orderList, transY, div, getIndex(), outList, marginTop)
                   batchSignalEnd()
                 })
@@ -92,10 +92,8 @@ export default function () {
                   endUp()
                   destroyScroll()
                   mes.destroy()
-                  transY.changeTo(0, ease1, {
-                    onFinish(v) {
-                      onDrag.set(undefined)
-                    },
+                  transY.changeTo(0, ease1).then(() => {
+                    onDrag.set(undefined)
                   })
                   batchSignalEnd()
                 })
@@ -117,11 +115,12 @@ export default function () {
               }
             })
 
-            return {
+            const out = {
               div,
               transY,
               getIndex
             }
+            return out
           })
         }
       })
@@ -134,68 +133,54 @@ function getOffset(v: {
   div: {
     offsetHeight: number
   };
-  transY: AbsAnimateFrameValue;
+  transY: AnimateSignal;
 }) {
   return v.div.offsetHeight
 }
 
+type MoveItem = {
+  div: HTMLElement;
+  getIndex(): number
+  transY: AnimateSignal
+}
+
 function didMove<T>(
   orderList: StoreRef<T[]>,
-  transY: SignalAnimateFrameValue,
-  div: {
-    offsetHeight: number
-  },
-  index: number,
-  outList: {
-    div: {
-      offsetHeight: number
-    };
-    transY: AbsAnimateFrameValue;
-  }[],
+  item: MoveItem,
+  outList: MoveItem[],
   gap: number = 0
 ) {
 
   const n = reorderCheckTarget(
     outList,
-    index,
+    item.getIndex(),
     getOffset,
-    transY.get(),
+    item.transY.get(),
     gap
   )
   if (n) {
     const [fromIndex, toIndex] = n
     const diff = beforeMoveOperate(fromIndex, toIndex, outList, getOffset, gap, (row, from) => {
-      row.transY.changeTo(0, ease1, {
-        /**
-         * 如果依margin,则元素应该有margin?
-         * 如果元素在位置1,则无margin与gap
-         * 如果不在位置1,则有margin与gap
-         */
-        from
-      })
+      /**
+       * 如果依margin,则元素应该有margin?
+       * 如果元素在位置1,则无margin与gap
+       * 如果不在位置1,则有margin与gap
+       */
+      row.transY.set(from)
+      row.transY.changeTo(0, ease1)
     })
     orderList.set(arrayMove(orderList.get(), fromIndex, toIndex, true))
-    transY.slientDiff(diff)
+    item.transY.silentDiff(diff)
   }
 }
 
 function didMoveMarginTop<T>(
   orderList: StoreRef<T[]>,
-  transY: SignalAnimateFrameValue,
-  div: {
-    offsetTop: number
-    offsetHeight: number
-  },
-  index: number,
-  outList: {
-    div: {
-      offsetTop: number
-      offsetHeight: number
-    };
-    transY: AbsAnimateFrameValue;
-  }[],
+  { div, transY, getIndex }: MoveItem,
+  outList: MoveItem[],
   marginTop: number = 0
 ) {
+  const index = getIndex()
 
   const didCenterOffsetTop = div.offsetTop + transY.get() + (div.offsetHeight / 2)
   // console.log("dd", transY.get())
@@ -215,18 +200,17 @@ function didMoveMarginTop<T>(
       for (let i = justIndex; i < index; i++) {
         const row = outList[i]
         // row.transY.changeTo(-div.offsetHeight - marginTop)
-        row.transY.changeTo(0, ease1, {
-          /**
-           * 如果依margin,则元素应该有margin?
-           * 如果元素在位置1,则无margin与gap
-           * 如果不在位置1,则有margin与gap
-           */
-          from: -div.offsetHeight - marginTop
-        })
+        row.transY.set(-div.offsetHeight - marginTop)
+        /**
+         * 如果依margin,则元素应该有margin?
+         * 如果元素在位置1,则无margin与gap
+         * 如果不在位置1,则有margin与gap
+         */
+        row.transY.changeTo(0, ease1)
       }
       console.log("aa", index, justIndex, diff, transY.get(), diff + transY.get())
       orderList.set(arrayMove(orderList.get(), index, justIndex, true))
-      transY.slientDiff(diff)
+      transY.silentDiff(diff)
     }
   } else {
     //向下
@@ -246,13 +230,17 @@ function didMoveMarginTop<T>(
         //受影响的表演一次animation动画
         const row = outList[i]
         // row.transY.changeTo(div.offsetHeight + marginTop)
-        row.transY.changeTo(0, ease1, {
-          from: div.offsetHeight + marginTop
-        })
+        row.transY.set(div.offsetHeight + marginTop)
+        /**
+         * 如果依margin,则元素应该有margin?
+         * 如果元素在位置1,则无margin与gap
+         * 如果不在位置1,则有margin与gap
+         */
+        row.transY.changeTo(0, ease1)
       }
       console.log("bb", index, justIndex)
       orderList.set(arrayMove(orderList.get(), index, justIndex, true))
-      transY.slientDiff(diff)
+      transY.silentDiff(diff)
     }
   }
 }
