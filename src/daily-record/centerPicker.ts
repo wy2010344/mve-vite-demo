@@ -12,7 +12,8 @@ export default function ({
   renderCell,
   value,
   realTimeValue = createSignal(value.get()),
-  format = quote
+  format = quote,
+  getNearNestDiff = quote
 }: {
   height: GetValue<number>
   cellHeight: number
@@ -20,6 +21,7 @@ export default function ({
   value: StoreRef<number>
   realTimeValue?: StoreRef<number>,
   format?: Quote<number>
+  getNearNestDiff?(n: number): number
 }) {
   const scrollY = animateSignal(0)
   function addValue(needAdd: number) {
@@ -34,8 +36,11 @@ export default function ({
     }
   }
   hookTrackSignal(value.get, function (v) {
-    const diff = v - realTimeValue.get()
+    const diff = getNearNestDiff(v - realTimeValue.get())
     if (diff) {
+      /**
+       * 这个对于周期的循环并不友好
+       */
       addEffect(() => {
         const snapTarget = diff * cellHeight
         scrollY.changeTo(snapTarget,

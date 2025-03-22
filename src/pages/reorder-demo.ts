@@ -5,6 +5,7 @@ import { animateSignal, moveEdgeScroll, subscribeEventListener, subscribeScrolle
 import { AnimateSignal, AnimationTime, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, reorderCheckTarget, storeRef, StoreRef, tween } from "wy-helper"
 import themeDropdown, { randomTheme } from "../themeDropdown"
 import fixRightTop from "../fixRightTop"
+import { renderMobileView } from "../onlyMobile"
 
 export const dataList = Array(30).fill(1).map((_, i) => {
   return {
@@ -22,109 +23,104 @@ export default function () {
   })
   const orderList = createSignal(dataList)
   const onDrag = createSignal<Row | undefined>(undefined)
-  fdom.div({
-    s_overflow: 'hidden',
-    s_height: '100vh',
-    onTouchMove(e) {
-      e.preventDefault()
-    },
-    children() {
-      const container = fdom.div({
-        s_width: '300px',
-        s_height: '100%',
-        s_overflow: 'auto',
-        s_marginInline: 'auto',
-        s_position: 'relative',
-        className: 'daisy-list',
-        s_userSelect() {
-          return onDrag.get() ? 'none' : 'auto'
-        },
-        children() {
-          const outArray = renderArrayToArray(orderList.get, (v, getIndex) => {
-            const h = Math.floor(Math.random() * 100 + 50)
-            const transY = animateSignal(0)
-            const marginTop = 10//Math.floor(Math.random() * 10 + 5)
-            const div = fdom.div({
-              className: 'daisy-row daisy-card flex-row',
-              data_theme: randomTheme(),
-              s_display: 'flex',
-              s_alignItems: 'center',
-              s_marginTop() {
-                return getIndex() ? marginTop + 'px' : '0px'
-              },
-              s_position: 'relative',
-              s_minHeight: h + 'px',
-              s_zIndex() {
-                return onDrag.get() == v ? '1' : '0'
-              },
-              s_transform() {
-                return `translateY(${transY.get()}px)`
-              },
-              onPointerDown(e) {
-                if (onDrag.get()) {
-                  return
+  return renderMobileView(function ({ width, height }, mock) {
+
+    const container = fdom.div({
+
+      s_width: '100%',
+      s_height: '100%',
+      s_overflow: 'auto',
+      s_marginInline: 'auto',
+      s_position: 'relative',
+      className: 'daisy-list touch-none pl-1 pr-1',
+      s_userSelect() {
+        return onDrag.get() ? 'none' : 'auto'
+      },
+      children() {
+        const outArray = renderArrayToArray(orderList.get, (v, getIndex) => {
+          const h = Math.floor(Math.random() * 100 + 50)
+          const transY = animateSignal(0)
+          const marginTop = 10//Math.floor(Math.random() * 10 + 5)
+          const div = fdom.div({
+            className: 'daisy-row daisy-card flex-row gap-1 pl-1 pr-1',
+            data_theme: randomTheme(),
+            s_display: 'flex',
+            s_alignItems: 'center',
+            s_marginTop() {
+              return getIndex() ? marginTop + 'px' : '0px'
+            },
+            s_position: 'relative',
+            s_minHeight: h + 'px',
+            s_zIndex() {
+              return onDrag.get() == v ? '1' : '0'
+            },
+            s_transform() {
+              return `translateY(${transY.get()}px)`
+            },
+            onPointerDown(e) {
+              if (onDrag.get()) {
+                return
+              }
+              const destroyScroll = subscribeScroller(container, 'y', e => {
+                transY.set(transY.get() + e)
+                return true
+              })
+              onDrag.set(v)
+              let lastPageY = e.pageY
+              const mes = moveEdgeScroll(e.pageY, {
+                direction: "y",
+                container,
+                config: {
+                  padding: 10,
+                  config: true
                 }
-                const destroyScroll = subscribeScroller(container, 'y', e => {
-                  transY.set(transY.get() + e)
-                  return true
-                })
-                onDrag.set(v)
-                let lastPageY = e.pageY
-                const mes = moveEdgeScroll(e.pageY, {
-                  direction: "y",
-                  container,
-                  config: {
-                    padding: 10,
-                    config: true
-                  }
-                })
-                const endMove = subscribeEventListener(document, 'pointermove', e => {
-                  mes.changePoint(e.pageY)
-                  transY.set(transY.get() + e.pageY - lastPageY)
-                  lastPageY = e.pageY
-                  const outList = outArray()
-                  didMove(orderList, out, outList, marginTop)
-                  // didMoveMarginTop(orderList, transY, div, getIndex(), outList, marginTop)
-                  batchSignalEnd()
-                })
-                const endUp = subscribeEventListener(document, 'pointerup', e => {
-                  endMove()
-                  endUp()
-                  destroyScroll()
-                  mes.destroy()
-                  transY.changeTo(0, ease1).then(() => {
-                    onDrag.set(undefined)
-                  })
-                  batchSignalEnd()
+              })
+              const endMove = subscribeEventListener(document, 'pointermove', e => {
+                mes.changePoint(e.pageY)
+                transY.set(transY.get() + e.pageY - lastPageY)
+                lastPageY = e.pageY
+                const outList = outArray()
+                didMove(orderList, out, outList, marginTop)
+                // didMoveMarginTop(orderList, transY, div, getIndex(), outList, marginTop)
+                batchSignalEnd()
+              })
+              const endUp = subscribeEventListener(document, 'pointerup', e => {
+                endMove()
+                endUp()
+                destroyScroll()
+                mes.destroy()
+                transY.changeTo(0, ease1).then(() => {
+                  onDrag.set(undefined)
                 })
                 batchSignalEnd()
-              },
-              children() {
-                fdom.img({
-                  src: v.avatar,
-                  s_width: '50px',
-                  s_height: '50px'
-                })
-                fdom.span({
-                  childrenType: "text",
-                  children: v.name
-                })
-                fdom.hr({
-                  s_flex: 1
-                })
-              }
-            })
-
-            const out = {
-              div,
-              transY,
-              getIndex
+              })
+              batchSignalEnd()
+            },
+            children() {
+              fdom.img({
+                src: v.avatar,
+                s_width: '50px',
+                s_height: '50px'
+              })
+              fdom.span({
+                childrenType: "text",
+                children: v.name
+              })
+              fdom.hr({
+                s_flex: 1
+              })
             }
-            return out
           })
-        }
-      })
-    }
+
+          const out = {
+            div,
+            transY,
+            getIndex
+          }
+          return out
+        })
+      }
+    })
   })
 
 }

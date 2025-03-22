@@ -9,6 +9,9 @@ import bezierCanvasView from "../animation-view/bezier-canvas-view";
 import { easePoly, easeCirc, easeSine, easeExpo, easeBonuceOut, easeBack, easeElastic } from "../animation-view/tween-view";
 import drawUnknownEndView from "../animation-view/draw-unknown-end-view";
 import { renderControl, renderEase } from "../animation-view/util";
+import { renderFullScreen, renderMobileView } from "../onlyMobile";
+import { cns } from "wy-dom-helper";
+import { renderIf } from "mve-helper";
 
 export default function () {
 
@@ -17,27 +20,40 @@ export default function () {
     themeDropdown()
   })
 
-  fdom.div({
-    className: 'w-full h-full overflow-y-auto flex flex-col items-center pt-1 pb-1 touch-none',
-    children() {
+  renderFullScreen(function ({ width, height }) {
+
+    renderIf(() => width() < 1000, function () {
       fdom.div({
-        className: "grid items-center [grid-template-columns:1fr_auto]",
+        className: "w-full h-full flex items-center justify-center",
+        childrenType: 'text',
+        children: '宽度大于1000才可正常查看'
+      })
+    }, function () {
+
+      fdom.div({
+        className: 'w-full h-full overflow-y-auto flex flex-col items-center pt-1 pb-1 touch-none',
         children() {
-          renderSpring()
-          bezierCanvasView()
-          renderFrc()
-          easePoly()
-          easeSine()
-          easeCirc()
-          easeExpo()
-          easeBack()
-          easeElastic()
-          easeBonuceOut()
-          // renderWeight()
+          fdom.div({
+            className: "grid items-center [grid-template-columns:1fr_auto]",
+            children() {
+              renderSpring()
+              bezierCanvasView()
+              renderFrc()
+              easePoly()
+              easeSine()
+              easeCirc()
+              easeExpo()
+              easeBack()
+              easeElastic()
+              easeBonuceOut()
+              // renderWeight()
+            }
+          })
         }
       })
-    }
+    })
   })
+
 }
 
 function renderSpring() {

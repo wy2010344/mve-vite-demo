@@ -67,6 +67,7 @@ export function renderMobileView(
   const isMobile = onlyMobile()
   renderOne(isMobile, function (showType) {
     if (showType == 'mobile') {
+      renderFullScreen(renderDisplay)
     } else if (showType == 'fake-and-mobile' || showType == 'also-mobile') {
       fdom.div({
         className: 'daisy-mockup-phone',
