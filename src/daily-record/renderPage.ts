@@ -1,6 +1,6 @@
 import { fdom, mdom } from "mve-dom"
-import { pointerMoveDir, signalAnimateFrame } from "wy-dom-helper"
-import { addEffect, destinationWithMarginTrans, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, ScrollFromPage } from "wy-helper"
+import { animateSignal, pointerMoveDir } from "wy-dom-helper"
+import { addEffect, defaultSpringAnimationConfig, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
 import demoList from "./demoList"
 import { faker } from "@faker-js/faker"
 import { hookTrackSignal } from "mve-helper"
@@ -17,12 +17,12 @@ export default function (
   onScrollX: GetValue<any>
 ) {
   const { showCalendar, calendarFinish, calendarScroll } = topContext.consume()
-  const scrollY = signalAnimateFrame(0)
+  const scrollY = animateSignal(0)
   hookTrackSignal(onScrollX, function (v) {
     if (!v && getIndex() != 1) {
       //滚动出去后,归位
       addEffect(() => {
-        scrollY.changeTo(0)
+        scrollY.set(0)
       })
     }
   })
@@ -49,7 +49,7 @@ export default function (
               calendarScroll(delta, velocity)
             } else {
               const y = scrollY.get()
-              scrollY.changeTo(
+              scrollY.set(
                 y +
                 overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
               )
@@ -63,13 +63,19 @@ export default function (
                 //创建
                 console.log("新建")
               }
-              const out = bs.destinationWithMarginIscroll({
-                velocity,
-                current: scrollY.get(),
+              bs.destinationWithMarginIscroll({
+                velocity, scroll: scrollY,
                 containerSize: container.clientHeight,
-                contentSize: content.offsetHeight
+                contentSize: content.offsetHeight,
+                edgeBackConfig: defaultSpringAnimationConfig,
+                edgeConfig(velocity) {
+                  return scrollInfinityIteration(velocity, {
+                    nextVelocity(n) {
+                      return n * 0.9
+                    },
+                  })
+                },
               })
-              destinationWithMarginTrans(out, scrollY)
             }
           }
         })
@@ -104,7 +110,7 @@ export default function (
         children() {
           demoList(faker.number.int({
             min: 1,
-            max: 18
+            max: 58
           }))
         }
       })

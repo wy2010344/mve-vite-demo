@@ -44,6 +44,9 @@ export default {
   'magnified-dock'() {
     return import('./pages/magnified-dock');
   },
+  'mve-canvas'() {
+    return import('./pages/mve-canvas');
+  },
   'reorder-demo'() {
     return import('./pages/reorder-demo');
   },

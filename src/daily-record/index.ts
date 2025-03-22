@@ -7,7 +7,7 @@ import firstDayOfWeek from "./firstDayOfWeek";
 import renderHeader from "./renderHeader";
 import renderPageList from "./renderPageList";
 import { topContext } from "./context";
-import { signalAnimateFrame } from "wy-dom-helper";
+import { animateSignal } from "wy-dom-helper";
 import renderScrollYear from "./renderYearMonthChoose";
 import { getPageSnap } from "./movePage";
 import { hookDestroy } from "mve-helper";
@@ -16,7 +16,9 @@ import { hookDestroy } from "mve-helper";
 const bs = FrictionalFactory.get()
 export default function () {
 
-  renderMobileView(function (getFullWidth, mock) {
+  renderMobileView(function ({
+    width: getFullWidth
+  }, mock) {
     if (mock) {
       fixRightTop(function () {
         firstDayOfWeek()
@@ -45,8 +47,8 @@ export default function () {
       // return 3 * getFullWidth() / 7
     }
     //日历滚动,只用这个表达开关
-    const calendarScrollY = signalAnimateFrame(calendarOpenHeight())
-    const yearMonthScrollY = signalAnimateFrame(scrollYearMonthOpenHeight())
+    const calendarScrollY = animateSignal(calendarOpenHeight())
+    const yearMonthScrollY = animateSignal(scrollYearMonthOpenHeight())
 
     function showYearMonth() {
       return yearMonthScrollY.get() != scrollYearMonthOpenHeight()
@@ -62,10 +64,10 @@ export default function () {
       },
       async calendarClose() {
         if (showYearMonth()) {
-          yearMonthScrollY.animateTo(scrollYearMonthOpenHeight())
-          calendarScrollY.animateTo(calendarOpenHeight())
+          yearMonthScrollY.changeTo(scrollYearMonthOpenHeight())
+          calendarScrollY.changeTo(calendarOpenHeight())
         } else {
-          calendarScrollY.animateTo(calendarOpenHeight())
+          calendarScrollY.changeTo(calendarOpenHeight())
         }
       },
       calendarScroll(delta, velocity) {
@@ -74,29 +76,29 @@ export default function () {
           const wValue = yearMonthScrollY.get() + delta
           if (wValue >= scrollYearMonthOpenHeight()) {
             //回到顶问她
-            yearMonthScrollY.changeTo(scrollYearMonthOpenHeight())
+            yearMonthScrollY.set(scrollYearMonthOpenHeight())
             batchSignalEnd()
           } else if (wValue <= 0) {
             //有惯性
-            yearMonthScrollY.changeTo(yearMonthScrollY.get() + delta / 3)
+            yearMonthScrollY.set(yearMonthScrollY.get() + delta / 3)
           } else {
-            yearMonthScrollY.changeTo(wValue)
+            yearMonthScrollY.set(wValue)
           }
         } else {
           const wValue = calendarScrollY.get() + delta
           if (wValue >= calendarOpenHeight()) {
             //回到顶部
             // showCalendar.set(false)
-            calendarScrollY.changeTo(calendarOpenHeight())
+            calendarScrollY.set(calendarOpenHeight())
             batchSignalEnd()
           } else if (wValue <= 0) {
             //向下拉,可能带动更上一层的滚动
             //自身清零
-            calendarScrollY.changeTo(0)
+            calendarScrollY.set(0)
             //将偏移量给上位
             yearMonthScrollY.changeDiff(wValue)
           } else {
-            calendarScrollY.changeTo(wValue)
+            calendarScrollY.set(wValue)
           }
         }
       },
@@ -112,7 +114,7 @@ export default function () {
               getPageSnap(velocity))
           }
         } else {
-          const dis = bs.getFromDistance(velocity)
+          const dis = bs.getFromVelocity(velocity)
           const targetDis = dis.distance + calendarScrollY.get()
           if (targetDis > calendarOpenHeight() / 2) {
             calendarScrollY.changeTo(calendarOpenHeight(),

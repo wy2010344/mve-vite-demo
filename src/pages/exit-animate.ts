@@ -1,10 +1,9 @@
 import { faker } from "@faker-js/faker";
 import { animate } from "motion";
-import { hookAddResult, render } from "mve-core";
-import { fdom, renderText } from "mve-dom";
+import { fdom } from "mve-dom";
 import { renderExitArrayClone } from "mve-dom-helper";
-import { ExitModel, getExitAnimateArray, hookTrackSignal, renderArray, renderIf } from "mve-helper";
-import { createSignal, emptyArray, emptyFun, GetValue } from "wy-helper";
+import { ExitModel, getExitAnimateArray, hookTrackSignal, renderArray } from "mve-helper";
+import { createSignal, GetValue } from "wy-helper";
 import explain from "../explain";
 import markdown from "../markdown";
 
@@ -85,6 +84,8 @@ export default function () {
     return div
   }
   fdom.div({
+    s_overflowY: 'auto',
+    s_overflowX: 'hidden',
     s_display: 'flex',
     s_flexDirection: 'column',
     s_alignItems: 'center',

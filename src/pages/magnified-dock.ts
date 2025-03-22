@@ -1,11 +1,9 @@
-import { dom, fdom, renderText } from "mve-dom"
-import { animateSignal } from "mve-dom-helper";
-import { animateFrame, cns, requestBatchAnimationFrame, signalAnimateFrame } from "wy-dom-helper";
-import { batchSignalEnd, createSignal, cubicBezier, extrapolationClamp, getInterpolate, getSpringBaseAnimationConfig, getTweenAnimationConfig, getZtaAndOmega0From, memo } from "wy-helper";
+import { dom, fdom } from "mve-dom"
+import { animateSignal, requestBatchAnimationFrame } from "wy-dom-helper";
+import { batchSignalEnd, createSignal, cubicBezier, extrapolationClamp, getInterpolate, getZtaAndOmega0From, memo, spring, tween } from "wy-helper";
 import explain from "../explain";
-import { tw } from 'wy-helper'
-import { onlyMobile } from "../onlyMobile";
 import markdown from "../markdown";
+import { hookAnimateSignal } from "mve-dom-helper";
 const APPS = [
   'Safari',
   'Mail',
@@ -17,7 +15,7 @@ const APPS = [
   'Music',
 ];
 
-const sp = getSpringBaseAnimationConfig({
+const sp = spring({
   config: getZtaAndOmega0From(170, 12, 0.1)
 })
 const SPRING = {
@@ -52,10 +50,10 @@ export default () => {
   const mouseRight = createSignal(-Infinity)
 
 
-  const left = animateSignal(() => {
+  const left = hookAnimateSignal(() => {
     return gp(mouseLeft.get())
   })
-  const right = animateSignal(() => {
+  const right = hookAnimateSignal(() => {
     return gp(mouseRight.get())
   })
   fdom.div({
@@ -104,8 +102,8 @@ export default () => {
       const scaleBase = memo(() => {
         return scaleMap(distance())
       })
-      const scale = animateSignal(scaleBase)
-      const x = animateSignal(() => {
+      const scale = hookAnimateSignal(scaleBase)
+      const x = hookAnimateSignal(() => {
         const d = distance();
         if (d === -Infinity) {
           return 0;
@@ -118,7 +116,7 @@ export default () => {
         config: sp
       })
 
-      const y = signalAnimateFrame(0, requestBatchAnimationFrame)
+      const y = animateSignal(0)
       const btn = dom.button({
         className: "aspect-square block w-10 rounded-full bg-white shadow origin-bottom relative group/abc",
         style: {
@@ -129,8 +127,8 @@ export default () => {
         },
         async onClick() {
           async function fun() {
-            await y.animateTo(-40, getTweenAnimationConfig(0.7 / 2 * 1000, cubicBezier(0, 0, 0.2, 1)))
-            await y.animateTo(0, getTweenAnimationConfig(0.7 / 2 * 1000, cubicBezier(0.8, 0, 1, 1)))
+            await y.changeTo(-40, tween(0.7 / 2 * 1000, cubicBezier(0, 0, 0.2, 1)))
+            await y.changeTo(0, tween(0.7 / 2 * 1000, cubicBezier(0.8, 0, 1, 1)))
           }
           await fun()
           await fun()

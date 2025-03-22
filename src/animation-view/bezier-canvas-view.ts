@@ -35,12 +35,6 @@ export default function () {
     },
     children() {
       render偏移(transY)
-      const canvas = fdom.canvas({
-        className: 'rotate-x-180',
-        width: getOuterWidth,
-        height: getOuterHeight
-      })
-
       const dotList = memo(() => {
         const get = cubicBezier(x1.get(), y1.get(), x2.get(), y2.get())
         const max = size.get()
@@ -52,7 +46,11 @@ export default function () {
         return list
       })
 
-      renderCanvas(canvas, () => {
+      renderCanvas({
+        className: 'rotate-x-180',
+        width: getOuterWidth,
+        height: getOuterHeight
+      }, () => {
         hookDraw({
           y() {
             return 5 + beforeHeight.get()

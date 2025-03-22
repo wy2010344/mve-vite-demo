@@ -2,12 +2,12 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "20be44fde58167b426f1e082ca220523",
+      "signature": "fb1c42fb989dddee5318d97da710d4c3",
       "file": true,
       "replaced": "^0.1.12"
     },
     "wy-dom-helper": {
-      "signature": "92d627d7427e0f7c5f175762893420eb",
+      "signature": "424ededdb73c76e51309a3252f61e977",
       "file": true,
       "replaced": "^0.1.10"
     },
@@ -27,7 +27,7 @@
       "replaced": "^2.0.0"
     },
     "mve-dom-helper": {
-      "signature": "6bf3fa51cb558ad2a4c2ba2ad7cd7663",
+      "signature": "427653b61b56a15da03854ddfc0b6558",
       "file": true,
       "replaced": "^2.0.1"
     },

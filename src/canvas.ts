@@ -14,11 +14,6 @@ export default function () {
     className: "w-full h-[100vh] flex flex-col items-center justify-center"
   }).render(() => {
 
-    const canvas = dom.canvas({
-      width: 500,
-      height: 500,
-      className: "border-solid border-[1px] border-red-300"
-    }).render()
     const list = createSignal<number[]>([])
     const count = createSignal(0)
     dom.button({
@@ -55,7 +50,11 @@ export default function () {
         return rs
       }
     }
-    renderCanvas(canvas, () => {
+    renderCanvas({
+      width: 500,
+      height: 500,
+      className: "border-solid border-[1px] border-red-300"
+    }, () => {
 
       hookDraw({
         x: 100,

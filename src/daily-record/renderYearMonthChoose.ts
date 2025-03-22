@@ -82,15 +82,28 @@ export default function (date: StoreRef<YearMonthDayVirtualView>) {
                     },
                   },
                   format(n) {
-                    n = n - 1
                     n = n % 12
-                    return (n + 12) % 12 + 1
+                    if (n == 0) {
+                      return 12
+                    } else if (n > 0) {
+                      return n
+                    } else {
+                      return 12 + n
+                    }
+                  },
+                  getNearNestDiff(n) {
+                    if (n < -6) {
+                      return 12 + n
+                    } else if (n > 6) {
+                      return n - 12
+                    }
+                    return n
                   },
                   renderCell(i) {
                     fdom.div({
                       className: 'h-11 text-center flex items-center justify-center',
                       childrenType: "text",
-                      children: numberIntFillWithN0(i, 2)
+                      children: numberIntFillWithN0((i - 1 + 12) % 12 + 1, 2)
                     })
                   },
                 })

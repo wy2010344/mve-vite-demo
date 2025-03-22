@@ -2,7 +2,6 @@ import { hookAddDestroy } from "mve-core";
 import { createSignal, flexDisplayUtil } from "wy-helper";
 import demo3 from "../canvas-demo/demo3";
 import { hookDestroy } from "mve-helper";
-import demo4 from "../canvas-demo/demo4";
 import demo5 from "../canvas-demo/demo5";
 import demo6 from "../canvas-demo/demo6";
 import demo1 from "../canvas-demo/demo1";
@@ -21,13 +20,11 @@ export default function () {
   hookDestroy(() => {
     window.removeEventListener("resize", resize)
   })
-
-  const canvas = fdom.canvas({
+  renderCanvas({
     className: 'touch-none',
     width: w.get,
-    height: h.get
-  })
-  renderCanvas(canvas, () => {
+    height: h.get,
+  }, () => {
     hookDrawRect({
       width: w.get,
       height: h.get,
@@ -53,7 +50,7 @@ export default function () {
         // demo1()
         // demo2()
         // demo3()
-        demo4()
+        // demo4()
         // demo5()
         // demo6()
       }

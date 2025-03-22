@@ -130,7 +130,7 @@ function renderCard() {
         description: `一些动画曲线的查看`
       })
       card({
-        href: '/canvas-demo',
+        href: '/mve-canvas',
         title: `canvas上绘制的列表`,
         description: `受react-canvas启发,基于mve`
       })
