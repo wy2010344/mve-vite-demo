@@ -2,7 +2,7 @@ import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, pointerMoveDir, animateSignal } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, FrictionalFactory, spring, defaultSpringAnimationConfig, } from "wy-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, FrictionalFactory, spring, defaultSpringAnimationConfig, scrollInfinityIteration, } from "wy-helper";
 import explain from "../explain";
 import { renderMobileView } from "../onlyMobile";
 import hookTrackLayout from "../daily-record/hookTrackLayout";
@@ -48,7 +48,6 @@ export default function () {
     const scrollY = animateSignal(0)
     let content: HTMLElement
     const bs = FrictionalFactory.get()
-    const bs2 = FrictionalFactory.get(0.05)
     function perSize() {
       return getFullWidth() / 7
     }
@@ -165,7 +164,11 @@ export default function () {
                 targetSnap: snap,
                 edgeBackConfig: defaultSpringAnimationConfig,
                 edgeConfig(velocity) {
-                  return bs2.getFromVelocity(velocity).animationConfig('in')
+                  return scrollInfinityIteration(velocity, {
+                    nextVelocity(n) {
+                      return n * 0.9
+                    },
+                  })
                 },
               })
             }

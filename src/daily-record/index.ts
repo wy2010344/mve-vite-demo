@@ -114,7 +114,7 @@ export default function () {
               getPageSnap(velocity))
           }
         } else {
-          const dis = bs.getFromDistance(velocity)
+          const dis = bs.getFromVelocity(velocity)
           const targetDis = dis.distance + calendarScrollY.get()
           if (targetDis > calendarOpenHeight() / 2) {
             calendarScrollY.changeTo(calendarOpenHeight(),

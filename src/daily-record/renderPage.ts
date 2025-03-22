@@ -1,6 +1,6 @@
 import { fdom, mdom } from "mve-dom"
 import { animateSignal, pointerMoveDir } from "wy-dom-helper"
-import { addEffect, defaultSpringAnimationConfig, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, ScrollFromPage } from "wy-helper"
+import { addEffect, defaultSpringAnimationConfig, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
 import demoList from "./demoList"
 import { faker } from "@faker-js/faker"
 import { hookTrackSignal } from "mve-helper"
@@ -9,7 +9,6 @@ import { topContext } from "./context"
 const CREATE_SCROLLY = -50
 
 const bs = FrictionalFactory.get()
-const bs2 = FrictionalFactory.get(0.005)
 /**
  * 每一天的页面
  */
@@ -70,7 +69,11 @@ export default function (
                 contentSize: content.offsetHeight,
                 edgeBackConfig: defaultSpringAnimationConfig,
                 edgeConfig(velocity) {
-                  return bs2.getFromVelocity(velocity).animationConfig('in')
+                  return scrollInfinityIteration(velocity, {
+                    nextVelocity(n) {
+                      return n * 0.9
+                    },
+                  })
                 },
               })
             }
@@ -107,7 +110,7 @@ export default function (
         children() {
           demoList(faker.number.int({
             min: 1,
-            max: 18
+            max: 58
           }))
         }
       })
