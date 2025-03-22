@@ -40,23 +40,34 @@ export function onlyMobile() {
   return showMobile.get
 }
 
-
+export function renderFullScreen(renderDisplay: (arg: DisplayArg) => void) {
+  const width = createSignal(window.innerWidth)
+  const height = createSignal(window.innerHeight)
+  hookDestroy(subscribeEventListener(window, 'resize', e => {
+    width.set(window.innerWidth)
+    height.set(window.innerHeight)
+  }))
+  fdom.div({
+    className: 'w-full h-full',
+    children() {
+      renderDisplay({
+        width: width.get,
+        height: height.get
+      })
+    }
+  })
+}
+type DisplayArg = {
+  width: GetValue<number>,
+  height: GetValue<number>
+}
 export function renderMobileView(
-  renderDisplay: (width: GetValue<number>, mock?: boolean) => void,
+  renderDisplay: (arg: DisplayArg, mock?: boolean) => void,
 ) {
   const isMobile = onlyMobile()
   renderOne(isMobile, function (showType) {
     if (showType == 'mobile') {
-      const width = createSignal(window.innerWidth)
-      hookDestroy(subscribeEventListener(window, 'resize', e => {
-        width.set(window.innerWidth)
-      }))
-      fdom.div({
-        className: 'w-full h-full',
-        children() {
-          renderDisplay(width.get)
-        }
-      })
+      renderFullScreen(renderDisplay)
     } else if (showType == 'fake-and-mobile' || showType == 'also-mobile') {
       fdom.div({
         className: 'daisy-mockup-phone',
@@ -73,7 +84,14 @@ export function renderMobileView(
               fdom.div({
                 className: 'flex-1 min-h-0 relative',
                 children() {
-                  renderDisplay(() => 390, true)
+                  renderDisplay({
+                    width() {
+                      return 390
+                    },
+                    height() {
+                      return 805
+                    }
+                  }, true)
                 }
               })
             }

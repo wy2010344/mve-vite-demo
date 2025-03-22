@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { fdom } from "mve-dom";
-import { pointerMoveDir, signalAnimateFrame } from "wy-dom-helper";
-import { destinationWithMarginTrans, eventGetPageX, FrictionalFactory, overScrollSlow, ScrollFromPage } from "wy-helper";
+import { animateSignal, pointerMoveDir, } from "wy-dom-helper";
+import { eventGetPageX, FrictionalFactory, overScrollSlow, ScrollFromPage } from "wy-helper";
 
 export default function () {
 
@@ -16,7 +16,7 @@ export default function () {
       e.preventDefault()
     },
     children() {
-      const scrollX = signalAnimateFrame(0)
+      const scrollX = animateSignal(0)
       const bs = FrictionalFactory.get()
       let content: HTMLElement
       const container = fdom.div({
@@ -29,19 +29,19 @@ export default function () {
             getPage: eventGetPageX,
             scrollDelta(delta, velocity) {
               const y = scrollX.get()
-              scrollX.changeTo(
+              scrollX.set(
                 y +
                 overScrollSlow(y, delta, container.clientWidth, content.offsetWidth)
               )
             },
             onFinish(velocity) {
-              const out = bs.destinationWithMarginIscroll({
-                velocity,
-                current: scrollX.get(),
-                containerSize: container.clientWidth,
-                contentSize: content.offsetWidth
-              })
-              destinationWithMarginTrans(out, scrollX)
+              // const out = bs.destinationWithMarginIscroll({
+              //   velocity,
+              //   current: scrollX.get(),
+              //   containerSize: container.clientWidth,
+              //   contentSize: content.offsetWidth
+              // })
+              // destinationWithMarginTrans(out, scrollX)
             }
           })
         }),

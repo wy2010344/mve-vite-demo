@@ -1,8 +1,8 @@
 import { renderForEach } from "mve-core"
 import { fdom } from "mve-dom"
-import { hookTrackSignal, memoArray, renderArray } from "mve-helper"
-import { pointerMoveDir, signalAnimateFrame } from "wy-dom-helper"
-import { addEffect, batchSignalEnd, createSignal, eventGetPageY, FrictionalFactory, getSpringBaseAnimationConfig, GetValue, quote, Quote, ScrollFromPage, SetValue, springBaseAnimationConfig, storeRef, StoreRef } from "wy-helper"
+import { hookTrackSignal } from "mve-helper"
+import { animateSignal, pointerMoveDir } from "wy-dom-helper"
+import { addEffect, batchSignalEnd, createSignal, defaultSpringAnimationConfig, eventGetPageY, FrictionalFactory, GetValue, quote, Quote, ScrollFromPage, spring, StoreRef } from "wy-helper"
 
 
 const fc = FrictionalFactory.get(0.007)
@@ -12,7 +12,8 @@ export default function ({
   renderCell,
   value,
   realTimeValue = createSignal(value.get()),
-  format = quote
+  format = quote,
+  getNearNestDiff = quote
 }: {
   height: GetValue<number>
   cellHeight: number
@@ -20,33 +21,34 @@ export default function ({
   value: StoreRef<number>
   realTimeValue?: StoreRef<number>,
   format?: Quote<number>
+  getNearNestDiff?(n: number): number
 }) {
-  const scrollY = signalAnimateFrame(0)
+  const scrollY = animateSignal(0)
   function addValue(needAdd: number) {
     realTimeValue.set(format(realTimeValue.get() + needAdd))
   }
   function didChange() {
     const needAdd = Math.floor(scrollY.get() / cellHeight)
     if (needAdd) {
-      scrollY.slientDiff(-needAdd * cellHeight)
+      scrollY.silentDiff(-needAdd * cellHeight)
       addValue(needAdd)
       batchSignalEnd()
     }
   }
   hookTrackSignal(value.get, function (v) {
-    const diff = v - realTimeValue.get()
+    const diff = getNearNestDiff(v - realTimeValue.get())
     if (diff) {
+      /**
+       * 这个对于周期的循环并不友好
+       */
       addEffect(() => {
         const snapTarget = diff * cellHeight
         scrollY.changeTo(snapTarget,
-          getSpringBaseAnimationConfig(),
+          defaultSpringAnimationConfig,
           //    (delta) => {
           //   return fc.getFromDistance(delta).animationConfig()
           // },
-          {
-            onProcess: didChange,
-            onFinish: didChange
-          })
+          didChange)
       })
     }
   })
@@ -65,16 +67,13 @@ export default function ({
             addValue(Math.round(targetDis / cellHeight))
             const snapTarget = Math.round(targetDis / cellHeight) * cellHeight
             scrollY.changeTo(snapTarget,
-              getSpringBaseAnimationConfig(),
+              defaultSpringAnimationConfig,
               //    (delta) => {
               //   return fc.getFromDistance(delta).animationConfig()
               // },
-              {
-                onProcess: didChange,
-                onFinish() {
-                  didChange()
-                  value.set(realTimeValue.get())
-                }
+              didChange).then(() => {
+                didChange()
+                value.set(realTimeValue.get())
               })
           }
         })
@@ -101,6 +100,4 @@ export default function ({
       })
     }
   }
-
-
 }

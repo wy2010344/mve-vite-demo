@@ -1,11 +1,6 @@
-import { fdom, renderText } from "mve-dom";
-import { hookDraw, hookDrawText, renderCanvas } from "mve-dom-helper/canvasRender";
-import { AnimationConfig, createSignal, emptyFun, EmptyFun, GetValue, memo, memoFun, ScrollFromPage, StoreRef } from "wy-helper";
-import { themeSignal } from "../themeDropdown";
-import { oklch, rgb, formatHex } from "culori";
-import { pointerMove, pointerMoveDir } from "wy-dom-helper";
-import { renderContentEditable } from "mve-dom-helper";
-import { contentEditableText } from "wy-dom-helper/contentEditable";
+import { fdom } from "mve-dom";
+import { hookDraw, renderCanvas } from "mve-dom-helper/canvasRender";
+import { createSignal, emptyFun, GetValue, memo, StoreRef } from "wy-helper";
 import { getBaseContentColor, render偏移 } from "./util";
 
 export default function drawCanvasCurve({
@@ -45,12 +40,11 @@ export default function drawCanvasCurve({
     },
     children() {
       render偏移(transY)
-      const canvas = fdom.canvas({
+      renderCanvas({
         className: "rotate-x-180",
         width: getOuterSize,
         height: getOutterHeight
-      })
-      renderCanvas(canvas, () => {
+      }, () => {
         hookDraw({
           x: 5,
           y() {
