@@ -3,6 +3,7 @@ import { topContext } from "./context";
 import demoList from "./demoList";
 import { arrayCountCreateWith, createSignal, extrapolationClamp, getInterpolate, getYearMonthDays, mapInterpolateRange, memoFun, mixNumber, numberIntFillWithN0, StoreRef, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
 import centerPicker from "./centerPicker";
+import { circleFindNearst, circleFormat } from "./movePage";
 
 export default function (date: StoreRef<YearMonthDayVirtualView>) {
   const { yearMonthScrollY, scrollYearMonthOpenHeight } = topContext.consume()
@@ -81,29 +82,15 @@ export default function (date: StoreRef<YearMonthDayVirtualView>) {
                       }
                     },
                   },
-                  format(n) {
-                    n = n % 12
-                    if (n == 0) {
-                      return 12
-                    } else if (n > 0) {
-                      return n
-                    } else {
-                      return 12 + n
-                    }
-                  },
-                  getNearNestDiff(n) {
-                    if (n < -6) {
-                      return 12 + n
-                    } else if (n > 6) {
-                      return n - 12
-                    }
-                    return n
+                  circle: {
+                    baseIndex: 1,
+                    count: 12
                   },
                   renderCell(i) {
                     fdom.div({
                       className: 'h-11 text-center flex items-center justify-center',
                       childrenType: "text",
-                      children: numberIntFillWithN0((i - 1 + 12) % 12 + 1, 2)
+                      children: numberIntFillWithN0(i, 2)
                     })
                   },
                 })

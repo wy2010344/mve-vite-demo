@@ -1,10 +1,10 @@
 
 import { dom, fdom, renderText } from "mve-dom";
-import { EaseType, EmptyFun, memoFun, StoreRef } from "wy-helper";
+import { EaseType, EmptyFun, memoFun, numberStoreTranfrom, StoreRef } from "wy-helper";
 import { themeSignal } from "../themeDropdown";
 import { rgb, formatHex } from "culori";
 import { pointerMove } from "wy-dom-helper";
-import { renderContentEditable } from "mve-dom-helper";
+import { renderContentEditable, renderContentEditableTrans } from "mve-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
 
 export const getBaseContentColor = function () {
@@ -43,17 +43,9 @@ export function render偏移(transY: StoreRef<number>) {
         }
       })
       renderText`偏移:`
-      renderContentEditable("div", {
-        contentEditable: contentEditableText,
-        value: transY.get,
-        onValueChange(v: string) {
-          let n = Number(v)
-          if (isNaN(n)) {
-            return
-          }
-          transY.set(n)
-        },
-      })
+      renderContentEditableTrans(numberStoreTranfrom, transY.get, transY.set, fdom.div({
+        contentEditable: contentEditableText
+      }))
     }
   })
 }

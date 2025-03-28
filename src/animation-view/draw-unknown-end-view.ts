@@ -1,8 +1,8 @@
-import { createSignal, DeltaXSignalAnimationConfig, SetValue } from "wy-helper";
+import { createSignal, DeltaXSignalAnimationConfig, numberStoreTranfrom, SetValue, SilentDiff } from "wy-helper";
 import drawCanvasCurve from "./draw-canvas-curve";
 import { fdom } from "mve-dom";
 import { pointerMove } from "wy-dom-helper";
-import { renderContentEditable } from "mve-dom-helper";
+import { renderContentEditable, renderContentEditableTrans } from "mve-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
 
 
@@ -39,7 +39,7 @@ export default function ({
       const list: number[] = []
       let value = 0
       const fun = getAnimationFun()(dir * height)
-      const out = fun({
+      const callback = fun(new SilentDiff({
         get() {
           return value
         },
@@ -47,9 +47,9 @@ export default function ({
           list.push(dir * v)
           value = v
         },
-      })
-      if (out) {
-        fakeSubscribeRequestAnimateFrame(out.callback)
+      }))
+      if (callback) {
+        fakeSubscribeRequestAnimateFrame(callback)
       }
       return list
     },
@@ -83,22 +83,15 @@ export default function ({
               toNegative.set(!toNegative.get())
             }
           })
-          renderContentEditable("div", {
+          renderContentEditableTrans(numberStoreTranfrom, size.get, function (n) {
+
+            n = Math.round(n)
+            if (n > 0) {
+              size.set(n)
+            }
+          }, fdom.div({
             contentEditable: contentEditableText,
-            value() {
-              return size.get()
-            },
-            onValueChange(v: string) {
-              let n = Number(v)
-              if (isNaN(n)) {
-                return
-              }
-              n = Math.round(n)
-              if (n > 0) {
-                size.set(n)
-              }
-            },
-          })
+          }))
           fdom.div({
             childrenType: "text",
             children() {
