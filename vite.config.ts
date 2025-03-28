@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
-import myRoute from './src/vite-plugin-my-route'
+import viteImportMap from 'wy-helper/viteImportmap'
+import path from 'path'
 export default defineConfig({
 	server: {
 		watch: {
@@ -17,7 +18,10 @@ export default defineConfig({
 		}
 	},
 	plugins: [
-		myRoute(),
+		// viteImportMap({
+		// 	watchFolder: path.resolve(__dirname, './src/pages'),
+		// 	outputFile: path.resolve(__dirname, './src/route.ts')
+		// }),
 		tailwindcss(),
 	],
 })
