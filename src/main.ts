@@ -21,12 +21,12 @@ import calendar from './pages/calendar'
 import dailycost from './daily-record'
 import { history, historyState } from './history'
 import { hookDestroy, hookPromiseSignal, promiseSignal, renderArray, renderIf, renderOne } from 'mve-helper'
-import route from './route'
 import themes from "daisyui/functions/themeOrder"
 import { getToasts } from './toast'
 import { IconContext } from "mve-icons";
 import { emptyFun } from 'wy-helper'
 const app = document.querySelector<HTMLDivElement>('#app')!
+const pages = import.meta.glob('./pages/**')
 const destroy = createRoot(app, () => {
   IconContext.provide({
     renderItem(tag, attrs, children) {
@@ -48,7 +48,9 @@ const destroy = createRoot(app, () => {
     if (pathname.startsWith('/')) {
       pathname = pathname.slice(1)
     }
-    const load = (route as any)[pathname || 'index'];
+    // const load = (route as any)[pathname || 'index'];
+    console.log("pages", pathname, pages)
+    const load = pages[`./pages/${pathname || 'index'}.ts`]
     return load
   })
   renderIf(loading, () => {

@@ -1,9 +1,11 @@
 import { renderIf } from "mve-helper";
 import { fdom, mdom } from "mve-dom";
-import { AnimateSignal, dateFromYearMonthDay, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, getWeekOfYear, memo, memoFun, StoreRef, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
+import { AnimateSignal, dateFromYearMonthDay, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, getWeekOfYear, memo, memoFun, StoreRef, WeekVirtualView, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
 import { cns } from "wy-dom-helper";
 import { SolarDay } from "tyme4ts";
 import { firstDayOfWeekIndex, WEEKS } from "./firstDayOfWeek";
+import { topContext } from "./context";
+import { renderCell, renderFirstDayWeek, renderWeekHeader } from "./renderWeekday";
 export const selectShadowCell = 'select-cell'
 export default function (
   yearMonth: YearMonthVirtualView,
@@ -16,7 +18,7 @@ export default function (
   function perSize() {
     return fullWidth() / 7
   }
-
+  const { showCalendar } = topContext.consume()
 
   function selectCurrent() {
     const d = date.get()
@@ -35,28 +37,10 @@ export default function (
       }
     },
     children() {
-      //周这个需要snap
-      fdom.div({
-        className: 'flex bg-base-100 z-10 relative',
-        // s_transform() {
-        //   let minScrollHeight = 0
-        //   // if (content && container) {
-        //   //   minScrollHeight = container.clientHeight - content.offsetHeight
-        //   // }
-        //   return `translateY(${transSticky(currentScrollY(), minScrollHeight)}px)`
-        // },
-        children() {
-          for (let i = 0; i < 7; i++) {
-            fdom.div({
-              className: 'flex-1 aspect-square flex items-center justify-center text-base-content',
-              childrenType: "text",
-              children() {
-                return WEEKS[yearMonth.weekDay(i)]
-              }
-            })
-          }
-        }
+      renderWeekHeader(function (i) {
+        return WEEKS[yearMonth.weekDay(i)]
       })
+      //周这个需要snap
       const interpolateY = memoFun(() => {
         const perHeight = perSize()
         const moveHeight = perHeight * 5
@@ -75,7 +59,7 @@ export default function (
         //展示月份
         const moveHeight = perSize() * 5
         return getInterpolate({
-          0: perSize() * 5,
+          0: perSize() * 6,
           [moveHeight]: perSize()
         }, extrapolationClamp)
       })
@@ -87,89 +71,61 @@ export default function (
         },
         children() {
 
-          fdom.div({
-            s_height() {
-              return perSize() * 6 + 'px'
-            },
-            s_transform() {
-              const ty = Math.max(calendarScrollY.get(), 0)
-              return `translateY(${-interpolateY(ty)}px)`
-            },
-            children() {
-              for (let y = 0; y < 6; y++) {
-                fdom.div({
-                  className: 'flex items-center justify-center relative',
-                  children() {
-                    for (let x = 0; x < 7; x++) {
-                      const fd = yearMonth.fullDayOf(x, y)
-                      let c = yearMonth
-                      if (fd.type == 'last') {
-                        c = yearMonth.lastMonth()
-                      } else if (fd.type == 'next') {
-                        c = yearMonth.nextMonth()
-                      }
-                      if (x == 0) {
-                        fdom.div({
-                          className: 'absolute left-0 text-label-small',
-                          childrenType: 'text',
-                          children() {
-                            return getWeekOfYear(dateFromYearMonthDay({
-                              year: c.year,
-                              month: c.month,
-                              day: fd.day
-                            }), firstDayOfWeekIndex.get())
+          renderIf(showCalendar, function () {
+            fdom.div({
+              s_height() {
+                return perSize() * 7 + 'px'
+              },
+              s_transform() {
+                const ty = Math.max(calendarScrollY.get(), 0)
+                return `translateY(${-interpolateY(ty)}px)`
+              },
+              children() {
+                for (let y = 0; y < 6; y++) {
+                  fdom.div({
+                    className: 'flex items-center justify-center relative',
+                    children() {
+                      for (let x = 0; x < 7; x++) {
+                        const fullday = yearMonth.fullDayOf(x, y)
+                        let c = yearMonth
+                        if (fullday.type == 'last') {
+                          c = yearMonth.lastMonth()
+                        } else if (fullday.type == 'next') {
+                          c = yearMonth.nextMonth()
+                        }
+                        renderFirstDayWeek(x, {
+                          year: c.year,
+                          month: c.month,
+                          day: fullday.day
+                        })
+                        const sd = SolarDay.fromYmd(c.year, c.month, fullday.day)
+                        const lunarDay = sd.getLunarDay()
+                        const selected = memo(() => {
+                          return fullday.type == 'this' && selectCurrent() && date.get().day == fullday.day
+                        })
+
+                        renderCell({
+                          day: fullday.day,
+                          onClick() {
+                            date.set(
+                              YearMonthDayVirtualView.from(c.year, c.month, fullday.day)
+                            )
+                          },
+                          lunarDay,
+                          selected,
+                          hide() {
+                            if (showCalendar()) {
+                              return fullday.type != 'this'
+                            }
+                            return false
                           }
                         })
                       }
-                      const sd = SolarDay.fromYmd(c.year, c.month, fd.day)
-                      const lunarDay = sd.getLunarDay()
-                      const selected = memo(() => {
-                        return fd.type == 'this' && selectCurrent() && date.get().day == fd.day
-                      })
-                      fdom.div({
-                        className() {
-                          return cns(
-                            `flex-1 aspect-square cursor-pointer
-                        flex flex-col items-center justify-center gap-1 `,
-                            fd.type != 'this' && 'opacity-30'
-                          )
-                        },
-                        onClick() {
-                          date.set(YearMonthDayVirtualView.from(c.year, c.month, fd.day))
-                        },
-                        children() {
-                          fdom.div({
-                            className: 'flex items-center justify-center relative aspect-square p-1',
-                            children() {
-                              renderIf(selected, () => {
-                                fdom.div({
-                                  id: selectShadowCell,
-                                  className() {
-                                    return cns(
-                                      `absolute inset-0 ring-1 rounded-full ring-accent`
-                                    )
-                                  }
-                                })
-                              })
-                              fdom.span({
-                                className: 'relative text-base-content/80  text-label-large',
-                                childrenType: 'text',
-                                children: fd.day
-                              })
-                            }
-                          })
-                          fdom.div({
-                            className: 'text-label-small  text-base-content/60',
-                            childrenType: "text",
-                            children: lunarDay.getName()
-                          })
-                        }
-                      })
                     }
-                  }
-                })
+                  })
+                }
               }
-            }
+            })
           })
         }
       })

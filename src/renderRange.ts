@@ -1,6 +1,6 @@
 import { dom, fdom } from "mve-dom";
-import { createSignal, emptyObject, GetValue, SetValue, StoreRef } from "wy-helper";
-import { renderContentEditable, renderInput } from "mve-dom-helper";
+import { createSignal, emptyObject, GetValue, numberStoreTranfrom, SetValue, StoreRef } from "wy-helper";
+import { renderContentEditable, renderContentEditableTrans, renderInput, renderInputTrans } from "mve-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
 import { cns, DomElementType } from "wy-dom-helper";
 
@@ -49,20 +49,15 @@ export function renderDivNumber({
   //     setValue(n)
   //   },
   // })
-  renderContentEditable(type, {
+  renderContentEditableTrans(
+    numberStoreTranfrom,
     value,
-    className: cns("flex-0 daisy-input", className),
-    contentEditable: contentEditableText,
-    onValueChange(v: string) {
-      const n = Number(v)
-      if (isNaN(n)) {
-        return
-      }
-      setValue(n)
-    },
-  })
+    setValue,
+    fdom.div({
+      className: cns("flex-0 daisy-input", className),
+      contentEditable: contentEditableText,
+    }))
 }
-
 
 export function renderNumberRange(label: string, range: NumberRange) {
 
@@ -85,7 +80,7 @@ export function renderNumberRange(label: string, range: NumberRange) {
           })
           fdom.div({
             children() {
-              renderInput("input", {
+              renderInputTrans(numberStoreTranfrom, range.value.get, range.value.set, fdom.input({
                 type: "range",
                 className: "daisy-range range-xs",
                 min: range.min.get,
@@ -93,11 +88,7 @@ export function renderNumberRange(label: string, range: NumberRange) {
                 step() {
                   return (range.max.get() - range.min.get()) / range.step.get()
                 },
-                value: range.value.get,
-                onValueChange(v) {
-                  range.value.set(Number(v))
-                }
-              })
+              }))
 
               fdom.div({
                 className: "flex-1 flex items-center justify-between relative",

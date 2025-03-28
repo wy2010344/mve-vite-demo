@@ -1,9 +1,9 @@
 import { dom, fdom } from "mve-dom";
 import { hookDraw, renderCanvas } from "mve-dom-helper/canvasRender";
-import { createSignal, StoreRef, cubicBezier, memo, EmptyFun } from "wy-helper";
+import { createSignal, StoreRef, cubicBezier, memo, EmptyFun, numberStoreTranfrom } from "wy-helper";
 import { NumberRange, } from "../renderRange";
 import { pointerMove } from "wy-dom-helper";
-import { renderContentEditable } from "mve-dom-helper";
+import { renderContentEditable, renderContentEditableTrans } from "mve-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
 import { getBaseContentColor, getCssVariableColor, render偏移 } from "./util";
 
@@ -172,18 +172,10 @@ function renderInput(label: string, value: StoreRef<number>) {
       dom.label({
         className: 'block'
       }).renderText`${label}:`
-      renderContentEditable("div", {
+      renderContentEditableTrans(numberStoreTranfrom, value.get, value.set, fdom.div({
         className: "daisy-input",
         contentEditable: contentEditableText,
-        value: value.get,
-        onValueChange(v: string) {
-          let n = Number(v)
-          if (isNaN(n)) {
-            return
-          }
-          value.set(n)
-        },
-      })
+      }))
     }
   })
 }

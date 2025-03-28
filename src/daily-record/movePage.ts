@@ -2,15 +2,37 @@ import { MoveEnd } from "wy-dom-helper"
 import { addEffect, AnimateSignal, batchSignalEnd, eventGetPageX, FrictionalFactory, GetValue, ScrollFromPage, spring, WeightMeasure } from "wy-helper"
 
 
+export function circleFindNearst(diff: number, max: number) {
+  if (diff < -max / 2) {
+    return max + diff
+  } else if (diff > max / 2) {
+    return diff - max
+  }
+  return diff
+}
 
 /**
- * 使用0.01可以在300ms内完成
+ * 
+ * @param n 0~max-1,加上一个值
+ * @param max 总数量 
+ * @returns 0~max-1
  */
-const fc = FrictionalFactory.get(0.01)
+export function circleFormat(n: number, max: number) {
+  n = n % max
+  if (n < 0) {
+    return max + n
+  }
+  return n
+}
+
+
 export function getPageSnap(velocity: number) {
   //使用弹性
   return spring({
-    initialVelocity: velocity
+    initialVelocity: velocity,
+    config: {
+      zta: 0.5
+    }
   })
   //使用重力惯性
   // return function (delta: number) {
@@ -24,7 +46,6 @@ export function getPageSnap(velocity: number) {
 
 export function movePage(
   scrollX: AnimateSignal,
-  // fc: FrictionalFactory,
   getWidth: GetValue<number>,
 ) {
   //翻页时的全局速度
@@ -38,13 +59,10 @@ export function movePage(
 
       return ScrollFromPage.from(initE, {
         getPage: eventGetPageX,
-        scrollDelta(delta, velocity) {
+        scrollDelta(delta) {
           scrollX.changeDiff(delta)
         },
         onFinish(velocity) {
-          // const dis = bc.getFromVelocity(velocity)
-          // const targetDis = dis.maxDistance + scrollX.get()
-          // console.log("targetDis", velocity, dis.maxDistance, scrollX.get(), getWidth() / 2)
           const dis = bs.getFromVelocity(velocity)
           const targetDis = dis.distance + scrollX.get()
           const absTargetDis = Math.abs(targetDis)
@@ -52,14 +70,8 @@ export function movePage(
             //恢复原状
             scrollX.changeTo(
               0,
-              // (deltax) => {
-              //   return fc.getFromDistance(deltax).animationConfig()
-              // },
               //效果不太好,有速度就变化
               getPageSnap(velocity),
-              // getSpringBaseAnimationConfig({
-              //   initialVelocity: velocity
-              // }),
             )
           } else {
             const direction = targetDis > 0 ? 1 : -1
@@ -75,12 +87,6 @@ export function movePage(
         const diffWidth = direction * getWidth()
         scrollX.changeTo(
           diffWidth,
-          // deltax => {
-          //   return fc.getFromDistance(deltax).animationConfig()
-          // },
-          // getSpringBaseAnimationConfig({
-          //   initialVelocity: globalDirectionVelocity
-          // }),
           getPageSnap(globalDirectionVelocity),
         )
         globalDirectionVelocity = 0

@@ -89,7 +89,7 @@ export default function () {
                 endUp()
                 destroyScroll()
                 mes.destroy()
-                transY.changeTo(0, ease1).then(() => {
+                transY.animateTo(0, ease1).then(() => {
                   onDrag.set(undefined)
                 })
                 batchSignalEnd()

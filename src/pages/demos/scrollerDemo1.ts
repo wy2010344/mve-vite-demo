@@ -1,74 +1,129 @@
-import { fdom } from "mve-dom";
+import { fdom, renderText } from "mve-dom";
+import { renderContentEditable, renderContentEditableTrans } from "mve-dom-helper";
 import { renderArray } from "mve-helper";
-import { animateSignal, cssMap, pointerMoveDir, } from "wy-dom-helper";
-import { arrayCountCreateWith, defaultSpringAnimationConfig, eventGetPageY, FrictionalFactory, overScrollSlow, quote, scrollEdgeIteration, ScrollFromPage, scrollInfinityIteration, spring } from "wy-helper";
+import { animateSignal, cns, cssMap, pointerMoveDir, } from "wy-dom-helper";
+import { contentEditableText } from "wy-dom-helper/contentEditable";
+import { arrayCountCreateWith, createSignal, defaultSpringAnimationConfig, eventGetPageY, FrictionalFactory, numberStoreTranfrom, overScrollSlow, quote, scrollEdgeIteration, ScrollFromPage, scrollInfinityIteration, spring, tw } from "wy-helper";
 
-const fr = FrictionalFactory.get()//0.0006
+//保持有限的位移
+const fr = FrictionalFactory.get(0.004)//0.0006
 const fr2 = FrictionalFactory.get(0.08)
+
+
+/**
+ * 原生一次滚动200 * 44 左右
+ */
 export default function () {
 
+  const maxCount = createSignal(1000)
+  const version = createSignal(0)
+  function scrollType() {
+    const i = version.get() % 2
+    if (i == 0) {
+      return '原生'
+    } else {
+      return '惯性'
+    }
+  }
+  const initV = createSignal(0)
   fdom.div({
     className: cs.title,
-    childrenType: "text",
-    children: "iScroll"
+    children() {
+      renderText`iScroll`
+      fdom.button({
+        childrenType: 'text',
+        onClick() {
+          container.scrollTop = 0
+          scrollY.set(0)
+          version.set(version.get() + 1)
+        },
+        children() {
+          return scrollType()
+        }
+      })
+      renderContentEditableTrans(numberStoreTranfrom, maxCount.get, v => {
+        if (v < 0) {
+          return
+        }
+        maxCount.set(Math.round(v))
+      }, fdom.span({
+        contentEditable: contentEditableText,
+        className: 'min-w-1'
+      }))
+      fdom.span({
+        childrenType: 'text',
+        children: '--'
+      })
+      fdom.span({
+        childrenType: 'text',
+        children() {
+          return initV.get().toFixed(2)
+        }
+      })
+    }
   })
 
   const scrollY = animateSignal(0)
   let content: HTMLElement
-  const bs = FrictionalFactory.get()
   const container = fdom.div({
-    className: cs.container,
-    onTouchMove(e) {
-      e.preventDefault()
+    className() {
+      return cns(cs.container,
+        scrollType() == '原生' ? tw`overflow-auto` : tw`touch-none overflow-hidden`
+      )
     },
     onPointerDown: pointerMoveDir(function (e, dir) {
+      if (scrollType() == '原生') {
+        return
+      }
       return ScrollFromPage.from(e, {
         getPage: eventGetPageY,
         scrollDelta(delta, velocity) {
-          const y = scrollY.get()
+          const y = scrollY.getTarget()
+          console.log("v", y, scrollY.get())
+          // const y = scrollY.get()
           scrollY.set(
             y +
             overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
           )
         },
         onFinish(velocity) {
-
+          initV.set(velocity)
           //使用惯性
-          // return fr.destinationWithMarginIscroll({
-          //   scroll: scrollY,
-          //   velocity,
-          //   containerSize: container.clientHeight,
-          //   contentSize: content.offsetHeight,
-          //   edgeConfig(velocity) {
-          //     return scrollInfinityIteration(velocity, {
-          //       nextVelocity(n) {
-          //         return n * 0.95
-          //       },
-          //     })
-          //     // return fr2.getFromVelocity(velocity).animationConfig('in')
-          //   },
-          //   edgeBackConfig: defaultSpringAnimationConfig,
-          // })
+          return fr.destinationWithMarginIscroll({
+            scroll: scrollY,
+            velocity,
+            // multiple: 2,
+            containerSize: container.clientHeight,
+            contentSize: content.offsetHeight,
+            edgeConfig(velocity) {
+              return scrollInfinityIteration(velocity, {
+                nextVelocity(v) {
+                  return v * 0.93
+                }
+              })
+              // return fr2.getFromVelocity(velocity).animationConfig('in')
+            },
+            edgeBackConfig: defaultSpringAnimationConfig,
+          })
 
-          let backTarget = 0, backVelocity = 0, then = false
-          //使用纯迭代
-          scrollY.change(scrollEdgeIteration({
+          scrollEdgeIteration(scrollY, {
             velocity,
             containerSize: container.clientHeight,
             contentSize: content.offsetHeight,
-            onBack(target, velocity) {
-              then = true
-              backTarget = target
-              backVelocity = velocity
-            },
-          })).then((value) => {
-            console.log('🆚', value)
-            if (value && then) {
-              scrollY.changeTo(backTarget, spring({
-                initialVelocity: backVelocity
+            // nextVelocity(n) {
+            //   return n * 0.9978
+            // },
+            // edgeNextVelocity(n) {
+            //   return n * 0.93
+            // }
+          }).then(value => {
+            if (value) {
+              scrollY.changeTo(value.target, spring({
+                initialVelocity: value.velocity
               }))
             }
           })
+
         }
       })
     }),
@@ -79,7 +134,7 @@ export default function () {
           return `translateY(${-scrollY.get()}px)`
         },
         children() {
-          renderArray(() => arrayCountCreateWith(100, quote), (row, getIndex) => {
+          renderArray(() => arrayCountCreateWith(maxCount.get(), quote), (row, getIndex) => {
             fdom.div({
               className: cs.row,
               childrenType: "text",
@@ -122,7 +177,6 @@ const cs = cssMap({
 		left: 0;
 		width: 100%;
 		background: #ccc;
-		overflow: hidden;
     `,
   content: `
       	position: absolute;
