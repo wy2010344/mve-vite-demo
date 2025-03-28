@@ -1,8 +1,8 @@
-import { emptyArray, createSignal, trackSignal, memo, StoreRef, addEffect } from "wy-helper"
+import { emptyArray, createSignal, trackSignal, memo, StoreRef, addEffect, numberStoreTranfrom } from "wy-helper"
 import { dom, fdom, fsvg, svg } from 'mve-dom'
 import { renderArray } from 'mve-helper'
 import { hookAddDestroy } from "mve-core"
-import { renderContentEditable, renderInput, renderInputBool } from "mve-dom-helper"
+import { renderContentEditable, renderContentEditableTrans, renderInput, renderInputBool, renderInputTrans } from "mve-dom-helper"
 import { contentEditableText } from "wy-dom-helper/contentEditable"
 
 export default () => {
@@ -135,42 +135,22 @@ export default () => {
     }
   })
 
-  const value = createSignal('')
-  renderInput("input", {
+  const value = createSignal(0)
+  renderInputTrans(numberStoreTranfrom, value.get, value.set, fdom.input({
     className: "border-solid border-[black] border-spacing-1 border-[1px]",
-    value: value.get,
-    onValueChange(v) {
-      if (isNaN(Number(v))) {
-        return
-      }
-      value.set(v)
-    },
-    onInput(e) {
-      console.log("dd", e)
-    }
-  })
+  }))
 
-  const text = createSignal('1')
-  renderContentEditable("pre", {
-    value: text.get,
+  const text = createSignal(1)
+  renderContentEditableTrans(numberStoreTranfrom, text.get, text.set, fdom.pre({
+
     className: "min-w-1",
     contentEditable: contentEditableText,
-    onValueChange(v: string) {
-      if (isNaN(Number(v))) {
-        return
-      }
-      // text.set(v)
-    },
-  })
+  }))
 
   const checked = createSignal(false)
-  renderInputBool({
-    type: "checkbox",
-    checked: checked.get,
-    onInput(e) {
-      checked.set(e.currentTarget.checked)
-    }
-  })
+  renderInputBool(checked.get, checked.set, fdom.input({
+    type: "checkbox"
+  }))
 
   getOnClick()
 }

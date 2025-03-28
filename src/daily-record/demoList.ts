@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { fdom, fsvg } from "mve-dom"
+import { numberIntFillWithN0 } from "wy-helper"
 
 export default function (time: number) {
   fdom.ul({
@@ -18,7 +19,7 @@ export default function (time: number) {
             fdom.div({
               className: 'text-4xl font-thin opacity-30 tabular-nums',
               childrenType: 'text',
-              children: `0${i + 1}`,
+              children: numberIntFillWithN0(i + 1, 2),
             })
             fdom.div({
               children() {

@@ -1,6 +1,6 @@
 import { fdom } from "mve-dom";
 import { memo, numberIntFillWithN0, simpleEqualsEqual, tw, YearMonthDayVirtualView, YearMonthVirtualView, WeekVirtualView, StoreRef, GetValue, dateFromYearMonthDay, ScrollFromPage, eventGetPageY, FrictionalFactory, emptyArray, emptyObject } from "wy-helper";
-import { getExitAnimateArray, hookTrackSignal, memoArray, renderArray } from "mve-helper";
+import { getExitAnimateArray, hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { animateSignal, cns, pointerMoveDir } from "wy-dom-helper";
 import hookTrackLayout from "./hookTrackLayout";
 import { movePage } from "./movePage";
@@ -11,6 +11,7 @@ import { topContext } from "./context";
 import { IoReturnUpBackOutline } from "mve-icons/io5";
 import { renderExitArrayClone } from "mve-dom-helper";
 import { animate } from "motion";
+import renderWeekday from "./renderWeekday";
 
 const bs = FrictionalFactory.get()
 export default function (
@@ -42,23 +43,6 @@ export default function (
           }
         })
       }
-      // if (showCalendar()) {
-      //   if (dir == 'y') {
-      //     return ScrollFromPage.from(e, {
-      //       getPage: eventGetPageY,
-      //       scrollDelta(delta, velocity) {
-      //         if (showCalendar()) {
-      //           calendarScroll(delta, velocity)
-      //         }
-      //       },
-      //       onFinish(velocity) {
-      //         if (showCalendar()) {
-      //           calendarFinish(velocity)
-      //         }
-      //       }
-      //     })
-      //   }
-      // }
     }),
     children() {
       //星期与天都需要滚动
@@ -122,16 +106,26 @@ export default function (
               return `translateX(${-scrollX.get()}px)`
             },
             children() {
-              renderArray(memoArray(() => {
-                const ym = yearMonth()
-                return [ym.lastMonth(), ym, ym.nextMonth()]
-              }, simpleEqualsEqual), function (yearMonth, getIndex) {
-                renderCalendar(
-                  yearMonth,
-                  getIndex,
-                  calendarScrollY,
-                  date,
-                  getFullWidth)
+              renderIf(showCalendar, function () {
+
+                renderArray(memoArray(() => {
+                  const ym = yearMonth()
+                  return [ym.lastMonth(), ym, ym.nextMonth()]
+                }, simpleEqualsEqual), function (yearMonth, getIndex) {
+                  renderCalendar(
+                    yearMonth,
+                    getIndex,
+                    calendarScrollY,
+                    date,
+                    getFullWidth)
+                })
+              }, function () {
+                renderArray(memoArray(() => {
+                  const wk = week()
+                  return [wk.beforeWeek(), wk, wk.nextWeek()]
+                }, simpleEqualsEqual), function (week, getIndex) {
+                  renderWeekday(week, getIndex, date)
+                })
               })
             }
           })
