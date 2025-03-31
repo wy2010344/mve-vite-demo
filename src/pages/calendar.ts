@@ -2,16 +2,16 @@ import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, pointerMoveDir, animateSignal } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, FrictionalFactory, spring, defaultSpringAnimationConfig, scrollInfinityIteration, } from "wy-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, FrictionalFactory, spring, defaultSpringAnimationConfig, scrollInfinityIteration, destinationWithMargin, ClampingScrollFactory, eventGetPageX, } from "wy-helper";
 import explain from "../explain";
 import { renderMobileView } from "../onlyMobile";
 import hookTrackLayout from "../daily-record/hookTrackLayout";
-import { movePage } from "../daily-record/movePage";
 import firstDayOfWeek, { firstDayOfWeekIndex, WEEKS, WEEKTIMES } from "../daily-record/firstDayOfWeek";
 import fixRightTop from "../fixRightTop";
 import themeDropdown from "../themeDropdown";
 import demoList from "../daily-record/demoList";
 import { faker } from "@faker-js/faker";
+import { movePage } from 'mve-dom-helper'
 import { fchmod } from "fs";
 
 
@@ -155,19 +155,16 @@ export default function () {
                   afterForce: 0.005
                 }
               ])
-              bs.destinationWithMarginIscroll({
+              destinationWithMargin({
+
                 scroll: scrollY,
-                velocity,
+                frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
                 containerSize: container.clientHeight,
                 contentSize: content.offsetHeight,
                 targetSnap: snap,
                 edgeBackConfig: defaultSpringAnimationConfig,
                 edgeConfig(velocity) {
-                  return scrollInfinityIteration(velocity, {
-                    nextVelocity(n) {
-                      return n * 0.9
-                    },
-                  })
+                  return ClampingScrollFactory.get(100).getFromVelocity(velocity).animationConfig()
                 },
               })
             }
@@ -254,23 +251,27 @@ export default function () {
                   },
                   onPointerDown: pointerMoveDir(function (e, dir) {
                     if (dir == 'x') {
-                      return mp.pointerDown(e, bs, (direction) => {
-                        if (showWeek()) {
-                          //星期
-                          const m = dateFromYearMonthDay(date.get())
-                          m.setTime(m.getTime() + direction * WEEKTIMES)
-                          if (direction) {
-                            date.set(YearMonthDayVirtualView.fromDate(m))
-                          }
-                        } else {
-                          //月份
-                          const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
-                          if (date.get().day > c.days) {
-                            date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
+                      return mp.pointerDown(e, {
+                        getPage: eventGetPageX,
+                        callback(direction, velocity) {
+                          if (showWeek()) {
+                            //星期
+                            const m = dateFromYearMonthDay(date.get())
+                            m.setTime(m.getTime() + direction * WEEKTIMES)
+                            if (direction) {
+                              date.set(YearMonthDayVirtualView.fromDate(m))
+                            }
                           } else {
-                            date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
+                            //月份
+                            const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
+                            if (date.get().day > c.days) {
+                              date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
+                            } else {
+                              date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
+                            }
                           }
-                        }
+
+                        },
                       })
                     }
                   }),
@@ -328,12 +329,15 @@ export default function () {
               className: ' flex-1',
               onPointerDown: pointerMoveDir(function (e, dir) {
                 if (dir == 'x') {
-                  return mp2.pointerDown(e, bs, direction => {
-                    const m = dateFromYearMonthDay(date.get())
-                    m.setTime(m.getTime() + direction * DAYMILLSECONDS)
-                    if (direction) {
-                      date.set(YearMonthDayVirtualView.fromDate(m))
-                    }
+                  return mp2.pointerDown(e, {
+                    getPage: eventGetPageX,
+                    callback(direction, velocity) {
+                      const m = dateFromYearMonthDay(date.get())
+                      m.setTime(m.getTime() + direction * DAYMILLSECONDS)
+                      if (direction) {
+                        date.set(YearMonthDayVirtualView.fromDate(m))
+                      }
+                    },
                   })
                 }
               }),

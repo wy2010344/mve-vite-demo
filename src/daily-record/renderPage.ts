@@ -1,6 +1,6 @@
 import { fdom, mdom } from "mve-dom"
 import { animateSignal, pointerMoveDir } from "wy-dom-helper"
-import { addEffect, defaultSpringAnimationConfig, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
+import { addEffect, ClampingScrollFactory, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
 import demoList from "./demoList"
 import { faker } from "@faker-js/faker"
 import { hookTrackSignal } from "mve-helper"
@@ -63,17 +63,19 @@ export default function (
                 //创建
                 console.log("新建")
               }
-              bs.destinationWithMarginIscroll({
-                velocity, scroll: scrollY,
+              destinationWithMargin({
+                frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
+                scroll: scrollY,
                 containerSize: container.clientHeight,
                 contentSize: content.offsetHeight,
                 edgeBackConfig: defaultSpringAnimationConfig,
                 edgeConfig(velocity) {
-                  return scrollInfinityIteration(velocity, {
-                    nextVelocity(n) {
-                      return n * 0.9
-                    },
-                  })
+                  return ClampingScrollFactory.get(100).getFromVelocity(velocity).animationConfig()
+                  // return scrollInfinityIteration(velocity, {
+                  //   nextVelocity(n) {
+                  //     return n * 0.9
+                  //   },
+                  // })
                 },
               })
             }

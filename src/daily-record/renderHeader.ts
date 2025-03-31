@@ -3,13 +3,12 @@ import { memo, numberIntFillWithN0, simpleEqualsEqual, tw, YearMonthDayVirtualVi
 import { getExitAnimateArray, hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { animateSignal, cns, pointerMoveDir } from "wy-dom-helper";
 import hookTrackLayout from "./hookTrackLayout";
-import { movePage } from "./movePage";
 import { firstDayOfWeekIndex, WEEKTIMES } from "./firstDayOfWeek";
 import { selectShadowCell } from "./renderCalendar";
 import renderCalendar from "./renderCalendar";
 import { topContext } from "./context";
 import { IoReturnUpBackOutline } from "mve-icons/io5";
-import { renderExitArrayClone } from "mve-dom-helper";
+import { movePage, renderExitArrayClone } from "mve-dom-helper";
 import { animate } from "motion";
 import renderWeekday from "./renderWeekday";
 
@@ -78,23 +77,26 @@ export default function (
         className: 'overflow-hidden  bg-base-300 touch-none',
         onPointerDown: pointerMoveDir(function (e, dir) {
           if (dir == 'x') {
-            return mp.pointerDown(e, bs, (direction) => {
-              if (showCalendar()) {
-                //切换月份
-                const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
-                if (date.get().day > c.days) {
-                  date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
+            return mp.pointerDown(e, {
+              callback(direction, velocity) {
+
+                if (showCalendar()) {
+                  //切换月份
+                  const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
+                  if (date.get().day > c.days) {
+                    date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
+                  } else {
+                    date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
+                  }
                 } else {
-                  date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
+                  //切换周
+                  const m = dateFromYearMonthDay(date.get())
+                  m.setTime(m.getTime() + direction * WEEKTIMES)
+                  if (direction) {
+                    date.set(YearMonthDayVirtualView.fromDate(m))
+                  }
                 }
-              } else {
-                //切换周
-                const m = dateFromYearMonthDay(date.get())
-                m.setTime(m.getTime() + direction * WEEKTIMES)
-                if (direction) {
-                  date.set(YearMonthDayVirtualView.fromDate(m))
-                }
-              }
+              },
             })
           }
         }),
@@ -180,12 +182,12 @@ export default function (
                     animate(div, {
                       rotateY: dir > 0 ? [90, 0] : [90, 180],
                       // scaleY: [0, 1]
-                    }).finished.then(m.resolve)
+                    }).then(m.resolve)
                   } else if (step == 'exiting') {
                     animate(div, {
                       rotateY: dir > 0 ? [0, 90] : [180, 90],
                       // scaleY: [1, 0]
-                    }).finished.then(m.resolve)
+                    }).then(m.resolve)
                   }
                 })
               })
