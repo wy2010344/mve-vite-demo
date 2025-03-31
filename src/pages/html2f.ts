@@ -1,5 +1,5 @@
 import { fdom, renderText, renderTextContent } from "mve-dom";
-import { toastError } from "../toast";
+import { toastError } from "../pop";
 import { AllXmlNode, manyMatch, matchCharNotIn, orRuleGet, Que, ruleGet, ruleGetString, ruleStrBetweenGet, toXmlNodes, whiteList, whiteSpaceMatch } from "wy-helper/tokenParser";
 import { createSignal, } from "wy-helper";
 import { generateParseXml } from 'wy-helper/tokenParser'
