@@ -161,11 +161,11 @@ export default function () {
               if (value == 'enter') {
                 animate(div, {
                   x: ['100%', 0]
-                }).finished.then(row.resolve)
+                }).then(row.resolve)
               } else if (value == 'exiting') {
                 animate(div, {
                   x: [0, '100%']
-                }).finished.then(row.resolve)
+                }).then(row.resolve)
               }
             })
           })
@@ -179,7 +179,7 @@ export default function () {
             if (row.promise()) {
               animate(div, {
                 x: ['100%', 0]
-              }).finished.then(row.resolve)
+              }).then(row.resolve)
             }
             return {
               node: div,
@@ -188,7 +188,7 @@ export default function () {
 
                   animate(node as HTMLDivElement, {
                     x: [0, '100%']
-                  }).finished.then(row.resolve)
+                  }).then(row.resolve)
                 }
               },
             }

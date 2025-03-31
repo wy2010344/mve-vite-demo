@@ -1,15 +1,16 @@
 import { fdom, renderText } from "mve-dom";
-import { renderContentEditable, renderContentEditableTrans } from "mve-dom-helper";
+import { renderContentEditableTrans } from "mve-dom-helper";
 import { renderArray } from "mve-helper";
 import { animateSignal, cns, cssMap, pointerMoveDir, } from "wy-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
-import { arrayCountCreateWith, createSignal, defaultSpringAnimationConfig, eventGetPageY, FrictionalFactory, numberStoreTranfrom, overScrollSlow, quote, scrollEdgeIteration, ScrollFromPage, scrollInfinityIteration, spring, tw } from "wy-helper";
+import { arrayCountCreateWith, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, FrictionalFactory, numberStoreTranfrom, overScrollSlow, quote, scrollEdgeIteration, ScrollFromPage, scrollInfinityIteration, spring, tw } from "wy-helper";
 
 //保持有限的位移
-const fr = FrictionalFactory.get(0.004)//0.0006
+// const fr = FrictionalFactory.get(0.004)//0.0006
 const fr2 = FrictionalFactory.get(0.08)
 
-
+const fr = ClampingScrollFactory.get()
+const fb2 = ClampingScrollFactory.get(100)
 /**
  * 原生一次滚动200 * 44 左右
  */
@@ -79,7 +80,6 @@ export default function () {
         getPage: eventGetPageY,
         scrollDelta(delta, velocity) {
           const y = scrollY.getTarget()
-          console.log("v", y, scrollY.get())
           // const y = scrollY.get()
           scrollY.set(
             y +
@@ -88,14 +88,17 @@ export default function () {
         },
         onFinish(velocity) {
           initV.set(velocity)
+          console.log("v1", velocity)
           //使用惯性
-          return fr.destinationWithMarginIscroll({
+          return destinationWithMargin({
             scroll: scrollY,
-            velocity,
+            frictional: fr.getFromVelocity(velocity),
             // multiple: 2,
             containerSize: container.clientHeight,
             contentSize: content.offsetHeight,
             edgeConfig(velocity) {
+              console.log("v", velocity)
+              return fb2.getFromVelocity(velocity).animationConfig()
               return scrollInfinityIteration(velocity, {
                 nextVelocity(v) {
                   return v * 0.93

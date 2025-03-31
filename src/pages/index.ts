@@ -62,6 +62,11 @@ function renderCard() {
         title: '退出动画',
         description: '入场动画、离场动画'
       })
+      card({
+        href: '/virtual-list-3',
+        title: '虚拟列表,与自定义滚动',
+        description: '虚拟列表,与自定义滚动'
+      })
       fdom.div({
 
         data_theme: randomTheme(),

@@ -1,10 +1,14 @@
 import { renderMobileView } from "../onlyMobile";
-import { addEffect, arrayCountCreateWith, createSignal, flexDisplayUtil, memo } from "wy-helper";
+import { addEffect, arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, flexDisplayUtil, memo, ScrollFromPage } from "wy-helper";
 import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap, renderCanvas } from "mve-dom-helper/canvasRender";
 
 import Scroller from 'scroller';
 import { hookTrackSignal } from "mve-helper";
 import { faker } from "@faker-js/faker";
+import { animateSignal, pointerMove } from "wy-dom-helper";
+
+const fr = ClampingScrollFactory.get()
+const edgeFr = ClampingScrollFactory.get(100)
 export default function () {
   renderMobileView(function ({
     width,
@@ -17,45 +21,53 @@ export default function () {
       height,
     }, () => {
 
-      let moveLastPoint: PointerEvent | undefined
-      const scrollTop = createSignal(0)
-      const data = arrayCountCreateWith(30, (i) => {
+      // let moveLastPoint: PointerEvent | undefined
+      const scrollY = animateSignal(0)
+      const data = arrayCountCreateWith(50, (i) => {
         return i
       })
-      const scroller = new Scroller((left: number, top: number) => {
-        scrollTop.set(top)
-      }, {
-        scrollingX: false,
-        scrollingY: true,
-        decelerationRate: 0.95,
-        penetrationAcceleration: 0.08,
-      })
-      window.addEventListener("pointermove", e => {
-        if (moveLastPoint) {
-          moveLastPoint = e
-          scroller.doTouchMove([moveLastPoint], moveLastPoint.timeStamp);
-        }
-      })
+      // const scroller = new Scroller((left: number, top: number) => {
+      //   scrollTop.set(top)
+      // }, {
+      //   scrollingX: false,
+      //   scrollingY: true,
+      //   decelerationRate: 0.95,
+      //   penetrationAcceleration: 0.08,
+      // })
+      // window.addEventListener("pointermove", e => {
+      //   if (moveLastPoint) {
+      //     moveLastPoint = e
+      //     scroller.doTouchMove([moveLastPoint], moveLastPoint.timeStamp);
+      //   }
+      // })
 
-      function end(e: PointerEvent) {
-        if (moveLastPoint) {
-          moveLastPoint = undefined
-          scroller.doTouchEnd(e.timeStamp);
-        }
-      }
-      window.addEventListener("pointerup", end)
-      window.addEventListener("pointercancel", end)
+      // function end(e: PointerEvent) {
+      //   if (moveLastPoint) {
+      //     moveLastPoint = undefined
+      //     scroller.doTouchEnd(e.timeStamp);
+      //   }
+      // }
+      // window.addEventListener("pointerup", end)
+      // window.addEventListener("pointercancel", end)
 
-      hookTrackSignal(() => {
-        addEffect(() => {
-          scroller.setDimensions(420, 700, 420, (80 + 30) * data.length - 30);
+      // hookTrackSignal(() => {
+      //   addEffect(() => {
+      //     scroller.setDimensions(420, 700, 420, (80 + 30) * data.length - 30);
+      //   })
+      // })
+
+      const totalHeight = memo(() => {
+        let totalHeight = 0
+        container.children().forEach(child => {
+          totalHeight += 4 + child.height()
         })
+        return totalHeight
       })
-      hookDrawRect({
+      const container = hookDrawRect({
         width,
         height,
         paddingTop() {
-          return -scrollTop.get()
+          return -scrollY.get()
         },
         layout() {
           return simpleFlex({
@@ -76,8 +88,27 @@ export default function () {
           }
         },
         onPointerDown(e) {
-          moveLastPoint = e.original
-          scroller.doTouchStart([moveLastPoint], moveLastPoint.timeStamp);
+          // moveLastPoint = e.original
+          pointerMove(ScrollFromPage.from(e.original, {
+            getPage: eventGetPageY,
+            scrollDelta(delta, velocity) {
+              scrollY.set(scrollY.getTarget() + delta)
+              batchSignalEnd()
+            },
+            onFinish(velocity) {
+              return destinationWithMargin({
+                scroll: scrollY,
+                frictional: fr.getFromVelocity(velocity),
+                containerSize: container.height(),
+                contentSize: totalHeight(),
+                edgeConfig(velocity) {
+                  return edgeFr.getFromVelocity(velocity).animationConfig()
+                },
+                edgeBackConfig: defaultSpringAnimationConfig,
+              })
+            }
+          }))
+          // scroller.doTouchStart([moveLastPoint], moveLastPoint.timeStamp);
         },
         paddingRight: 4,
         children() {

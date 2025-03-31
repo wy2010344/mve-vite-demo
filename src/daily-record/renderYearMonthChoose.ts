@@ -2,8 +2,8 @@ import { fdom } from "mve-dom";
 import { topContext } from "./context";
 import demoList from "./demoList";
 import { arrayCountCreateWith, createSignal, extrapolationClamp, getInterpolate, getYearMonthDays, mapInterpolateRange, memoFun, mixNumber, numberIntFillWithN0, StoreRef, YearMonthDayVirtualView, YearMonthVirtualView } from "wy-helper";
-import centerPicker from "./centerPicker";
-import { circleFindNearst, circleFormat } from "./movePage";
+import { centerPicker } from "mve-dom-helper";
+
 
 export default function (date: StoreRef<YearMonthDayVirtualView>) {
   const { yearMonthScrollY, scrollYearMonthOpenHeight } = topContext.consume()

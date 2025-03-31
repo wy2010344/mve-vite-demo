@@ -27,24 +27,37 @@ function fakeSubscribeRequestAnimateFrame(
   return cancel
 }
 
+
 export default function ({
   getAnimationFun
 }: {
-  getAnimationFun(): DeltaXSignalAnimationConfig
+  getAnimationFun(absHeight: number): {
+    rewriteHeight?: number
+    callback: DeltaXSignalAnimationConfig
+  }
 }) {
   const toNegative = createSignal(false)
   drawCanvasCurve({
     getDotList(height) {
+
       const dir = toNegative.get() ? -1 : 1
       const list: number[] = []
       let value = 0
-      const fun = getAnimationFun()(dir * height)
+      const animationFun = getAnimationFun(height)
+
+      let realHeight = height
+      let pc = 1
+      if (animationFun.rewriteHeight) {
+        pc = height / animationFun.rewriteHeight
+        realHeight = animationFun.rewriteHeight
+      }
+      const fun = animationFun.callback(dir * realHeight)
       const callback = fun(new SilentDiff({
         get() {
           return value
         },
         set(v) {
-          list.push(dir * v)
+          list.push(dir * v * pc)
           value = v
         },
       }))

@@ -12,6 +12,7 @@ import { renderControl, renderEase } from "../animation-view/util";
 import { renderFullScreen, renderMobileView } from "../onlyMobile";
 import { cns } from "wy-dom-helper";
 import { renderIf } from "mve-helper";
+import renderClamping from "../animation-view/clamping-scroll";
 
 export default function () {
 
@@ -39,6 +40,7 @@ export default function () {
               renderSpring()
               bezierCanvasView()
               renderFrc()
+              renderClamping()
               easePoly()
               easeSine()
               easeCirc()
@@ -80,19 +82,21 @@ function renderSpring() {
   })
   drawUnknownEndView({
     getAnimationFun() {
-      return spring({
-        config: {
-          zta: zta.value.get(),
-          omega0: omega0.value.get()
-        },
-        /**默认0 */
-        initialVelocity: initialVelocity.value.get(),
-        /**默认0.01 */
-        displacementThreshold: displacementThreshold.value.get(),
-        /**默认2 */
-        velocityThreshold: velocityThreshold.value.get(),
-        // ease: "out"
-      })
+      return {
+        callback: spring({
+          config: {
+            zta: zta.value.get(),
+            omega0: omega0.value.get()
+          },
+          /**默认0 */
+          initialVelocity: initialVelocity.value.get(),
+          /**默认0.01 */
+          displacementThreshold: displacementThreshold.value.get(),
+          /**默认2 */
+          velocityThreshold: velocityThreshold.value.get(),
+          // ease: "out"
+        })
+      }
     }
   })
 
@@ -116,11 +120,13 @@ function renderFrc() {
     max: 0.001
   })
 
-  const ease = createSignal<EaseType>('in')
+  // const ease = createSignal<EaseType>('in')
   drawUnknownEndView({
     getAnimationFun() {
-      return function (height) {
-        return FrictionalFactory.get(deceleration.value.get()).getFromDistance(height).animationConfig(ease.get())
+      return {
+        callback(height) {
+          return FrictionalFactory.get(deceleration.value.get()).getFromDistance(height).animationConfig()
+        }
       }
     }
   })
@@ -131,7 +137,7 @@ function renderFrc() {
         className: "text-2xl"
       }).renderText`摩擦减速动画`
       renderNumberRange('deceleration', deceleration)
-      renderEase(ease)
+      // renderEase(ease)
     }
   })
 }

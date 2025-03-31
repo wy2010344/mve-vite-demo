@@ -9,8 +9,8 @@ import renderPageList from "./renderPageList";
 import { topContext } from "./context";
 import { animateSignal } from "wy-dom-helper";
 import renderScrollYear from "./renderYearMonthChoose";
-import { getPageSnap } from "./movePage";
 import { hookDestroy } from "mve-helper";
+import { defaultGetPageSnap } from "mve-dom-helper";
 
 // const fc = new FrictionalFactory()
 const bs = FrictionalFactory.get()
@@ -108,20 +108,20 @@ export default function () {
           const targetDis = dis.distance + yearMonthScrollY.get()
           if (targetDis > scrollYearMonthOpenHeight() / 2) {
             yearMonthScrollY.changeTo(scrollYearMonthOpenHeight(),
-              getPageSnap(velocity))
+              defaultGetPageSnap(velocity))
           } else {
             yearMonthScrollY.changeTo(0,
-              getPageSnap(velocity))
+              defaultGetPageSnap(velocity))
           }
         } else {
           const dis = bs.getFromVelocity(velocity)
           const targetDis = dis.distance + calendarScrollY.get()
           if (targetDis > calendarOpenHeight() / 2) {
             calendarScrollY.changeTo(calendarOpenHeight(),
-              getPageSnap(velocity))
+              defaultGetPageSnap(velocity))
           } else {
             calendarScrollY.changeTo(0,
-              getPageSnap(velocity),
+              defaultGetPageSnap(velocity),
             )
           }
         }

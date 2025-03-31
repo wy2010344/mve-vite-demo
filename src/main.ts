@@ -6,7 +6,7 @@ import canvas from './canvas'
 import changePortal from './changePortal'
 import clipDemo from './clipDemo'
 import tree from './pages/tree'
-import absoluteDemo from './absoluteDemo'
+import absoluteDemo from './pages/absoluteDemo'
 import canvas2 from './pages/canvas-demo'
 import typeContain from './typeContain'
 import three from './three'
@@ -22,9 +22,9 @@ import dailycost from './daily-record'
 import { history, historyState } from './history'
 import { hookDestroy, hookPromiseSignal, promiseSignal, renderArray, renderIf, renderOne } from 'mve-helper'
 import themes from "daisyui/functions/themeOrder"
-import { getToasts } from './toast'
 import { IconContext } from "mve-icons";
-import { emptyFun } from 'wy-helper'
+import { emptyFun, run } from 'wy-helper'
+import { renderPop } from 'mve-dom-helper'
 const app = document.querySelector<HTMLDivElement>('#app')!
 const pages = import.meta.glob('./pages/**')
 const destroy = createRoot(app, () => {
@@ -58,14 +58,7 @@ const destroy = createRoot(app, () => {
       className: 'absolute left-1 top-1 daisy-loading daisy-loading-spinner daisy-loading-xl',
     })
   })
-  fdom.div({
-    className: "daisy-toast daisy-toast-top daisy-toast-center",
-    children() {
-      renderArray(getToasts, function (row) {
-        row.render()
-      })
-    }
-  })
+  renderPop()
 
   renderOne(get, function (result) {
     if (result) {
