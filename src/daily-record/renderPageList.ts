@@ -1,11 +1,10 @@
 import { fdom } from "mve-dom";
-import { dateFromYearMonthDay, DAYMILLSECONDS, memo, simpleEqualsEqual, YearMonthDayVirtualView, StoreRef, GetValue, FrictionalFactory, eventGetPageX } from "wy-helper";
+import { dateFromYearMonthDay, DAYMILLSECONDS, memo, simpleEqualsEqual, YearMonthDayVirtualView, StoreRef, FrictionalFactory, eventGetPageX, ClampingScrollFactory } from "wy-helper";
 import { hookTrackSignal, memoArray, renderArray } from "mve-helper";
 import { animateSignal, pointerMoveDir, } from "wy-dom-helper";
 import renderPage from "./renderPage";
 import { movePage } from "mve-dom-helper";
 
-const bs = FrictionalFactory.get()
 export default function (
   date: StoreRef<YearMonthDayVirtualView>,
   // getFullWidth: GetValue<number>
@@ -35,18 +34,22 @@ export default function (
   }))
   const container = fdom.div({
     className: 'flex-1 overflow-hidden',
-    onPointerDown: pointerMoveDir(function (e, dir) {
-      if (dir == 'x') {
-        return mp2.pointerDown(e, {
-          getPage: eventGetPageX,
-          callback(direction, velocity) {
-            const m = dateFromYearMonthDay(date.get())
-            m.setTime(m.getTime() + direction * DAYMILLSECONDS)
-            if (direction) {
-              date.set(YearMonthDayVirtualView.fromDate(m))
-            }
-          },
-        })
+    onPointerDown: pointerMoveDir(function () {
+      return {
+        onMove(e, dir) {
+          if (dir == 'x') {
+            return mp2.pointerDown(e, {
+              getPage: eventGetPageX,
+              callback(direction, velocity) {
+                const m = dateFromYearMonthDay(date.get())
+                m.setTime(m.getTime() + direction * DAYMILLSECONDS)
+                if (direction) {
+                  date.set(YearMonthDayVirtualView.fromDate(m))
+                }
+              },
+            })
+          }
+        }
       }
     }),
     children() {
@@ -63,11 +66,6 @@ export default function (
               d,
               d.nextDay()
             ]
-            // return [
-            //   new DayWithExt(d.beforeDay()),
-            //   new DayWithExt(d),
-            //   new DayWithExt(d.nextDay())
-            // ]
           }, simpleEqualsEqual), function (w, getIndex) {
             renderPage(getIndex, () => {
               return bodyScrollX.onAnimation()

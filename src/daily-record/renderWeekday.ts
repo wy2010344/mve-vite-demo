@@ -1,10 +1,8 @@
 import { fdom, mdom } from "mve-dom"
-import { dateFromYearMonthDay, GetValue, getWeekOfYear, StoreRef, tw, WeekVirtualView, YearMonthDay, yearMonthDayEqual, YearMonthDayVirtualView } from "wy-helper"
+import { dateFromYearMonthDay, GetValue, getWeekOfYear, StoreRef, WeekVirtualView, YearMonthDay, yearMonthDayEqual, YearMonthDayVirtualView } from "wy-helper"
 import { firstDayOfWeekIndex, WEEKS } from "./firstDayOfWeek"
-import { LunarDay, SolarDay } from "tyme4ts"
-import { selectShadowCell } from "./renderCalendar"
-import { renderIf } from "mve-helper"
-import { cns } from "wy-dom-helper"
+import { SolarDay } from "tyme4ts"
+import renderCell from "./renderCell"
 
 
 export function renderWeekHeader(renderCell: (i: number) => string) {
@@ -35,61 +33,6 @@ export function renderFirstDayWeek(x: number, ym: YearMonthDay) {
       }
     })
   }
-}
-
-export function renderCell({
-  day,
-  lunarDay,
-  hide,
-  selected,
-  onClick
-}: {
-  day: number
-  hide: GetValue<boolean>
-  lunarDay: LunarDay,
-  selected: GetValue<boolean>
-  onClick(): void
-}) {
-
-  fdom.div({
-    className() {
-      return cns(
-        `flex-1 aspect-square cursor-pointer
-                        flex flex-col items-center justify-center gap-1 `,
-        hide() && 'opacity-30'
-      )
-    },
-    onClick,
-    children() {
-      fdom.div({
-        className: 'flex items-center justify-center relative aspect-square p-1',
-        children() {
-          renderIf(selected, () => {
-            fdom.div({
-              id: selectShadowCell,
-              className() {
-                return cns(
-                  `absolute inset-0 ring-1 rounded-full ring-accent`
-                )
-              }
-            })
-          })
-          fdom.span({
-            className: 'relative text-base-content/80  text-label-large',
-            childrenType: 'text',
-            children: day
-          })
-        }
-      })
-      fdom.div({
-        className: 'text-label-small  text-base-content/60',
-        childrenType: "text",
-        children: lunarDay.getName()
-      })
-    }
-  })
-
-
 }
 
 

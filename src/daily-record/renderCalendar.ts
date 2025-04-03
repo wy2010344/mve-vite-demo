@@ -5,8 +5,8 @@ import { cns } from "wy-dom-helper";
 import { SolarDay } from "tyme4ts";
 import { firstDayOfWeekIndex, WEEKS } from "./firstDayOfWeek";
 import { topContext } from "./context";
-import { renderCell, renderFirstDayWeek, renderWeekHeader } from "./renderWeekday";
-export const selectShadowCell = 'select-cell'
+import { renderFirstDayWeek, renderWeekHeader } from "./renderWeekday";
+import renderCell from "./renderCell";
 export default function (
   yearMonth: YearMonthVirtualView,
   getIndex: GetValue<number>,

@@ -1,6 +1,6 @@
 import { fdom } from "mve-dom";
 import { renderMobileView } from "../onlyMobile";
-import { createSignal, simpleEqualsNotEqual, YearMonthDayVirtualView, batchSignalEnd, WeightMeasure, FrictionalFactory, DAYMILLSECONDS } from "wy-helper";
+import { createSignal, simpleEqualsNotEqual, YearMonthDayVirtualView, batchSignalEnd, DAYMILLSECONDS, ClampingScrollFactory } from "wy-helper";
 import fixRightTop from "../fixRightTop";
 import themeDropdown from "../themeDropdown";
 import firstDayOfWeek from "./firstDayOfWeek";
@@ -13,7 +13,7 @@ import { hookDestroy } from "mve-helper";
 import { defaultGetPageSnap } from "mve-dom-helper";
 
 // const fc = new FrictionalFactory()
-const bs = FrictionalFactory.get()
+const bs = ClampingScrollFactory.get()
 export default function () {
 
   renderMobileView(function ({

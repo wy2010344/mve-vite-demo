@@ -88,11 +88,12 @@ export default function () {
           }
         },
         onPointerDown(e) {
+          scrollY.stop()
           // moveLastPoint = e.original
           pointerMove(ScrollFromPage.from(e.original, {
             getPage: eventGetPageY,
             scrollDelta(delta, velocity) {
-              scrollY.set(scrollY.getTarget() + delta)
+              scrollY.set(scrollY.get() + delta)
               batchSignalEnd()
             },
             onFinish(velocity) {

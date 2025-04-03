@@ -105,9 +105,6 @@ export default function (date: StoreRef<YearMonthDayVirtualView>) {
               })
               fdom.div({
                 className: 'h-11 flex flex-col justify-center',
-                // children() {
-                //   fdom.hr()
-                // }
               })
               fdom.div({
                 className: 'flex-1 bg-linear-to-t from-base-100 to-100% to-base-100/90'

@@ -2,17 +2,17 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "d518ca9b4aea2e1936c6375e0f4c72f1",
+      "signature": "ec9f1a1c986915c32c91ecee8730555e",
       "file": true,
       "replaced": "^0.1.12"
     },
     "wy-dom-helper": {
-      "signature": "898f1cb8e2812d1b33d40c780e14a9cd",
+      "signature": "9887f8e0a223c34052d038c9a437bc4d",
       "file": true,
       "replaced": "^0.1.10"
     },
     "mve-core": {
-      "signature": "89bc429d901c2db5653b9369d53729e4",
+      "signature": "ba3720a0918d28f4a068cf2bb6181674",
       "file": true,
       "replaced": "^2.0.0"
     },
@@ -22,18 +22,14 @@
       "replaced": "^2.0.0"
     },
     "mve-helper": {
-      "signature": "83d55cc2581a033045cf6f3ae24f4696",
+      "signature": "bc86de20d4af1ed7adb4737da6f0e716",
       "file": true,
       "replaced": "^2.0.0"
     },
     "mve-dom-helper": {
-      "signature": "dd35b2187672d242c2e82875144bf854",
+      "signature": "6d82711bc2399adfbf65c450c36b8057",
       "file": true,
       "replaced": "^2.0.1"
-    },
-    "mve-icons": {
-      "signature": "818181d6cd073f9873674de9ef3f8539",
-      "file": true
     }
   }
 }
