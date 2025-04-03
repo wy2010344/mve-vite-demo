@@ -37,10 +37,11 @@ export default function () {
     className: 'touch-none w-full h-[80%] overflow-hidden',
     children(container: HTMLDivElement) {
       container.addEventListener("pointerdown", e => {
+        scrollY.stop()
         pointerMove(ScrollFromPage.from(e, {
           getPage: eventGetPageY,
           scrollDelta(delta, velocity) {
-            scrollY.set(scrollY.getTarget() + delta)
+            scrollY.set(scrollY.get() + delta)
             batchSignalEnd()
           },
           onFinish(velocity) {

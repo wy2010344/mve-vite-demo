@@ -60,10 +60,11 @@ export default function () {
       })
 
       container.addEventListener("pointerdown", e => {
+        scrollY.stop()
         pointerMove(ScrollFromPage.from(e, {
           getPage: eventGetPageY,
           scrollDelta(delta, velocity) {
-            scrollY.set(scrollY.getTarget() + delta)
+            scrollY.set(scrollY.get() + delta)
             batchSignalEnd()
           },
           onFinish(velocity) {
@@ -96,34 +97,34 @@ export default function () {
             height: number,
             color: string
             id: number
-          }, number, void>(function (callback) {
+          }, number>(function (callback) {
             const array = list.get()
             const { beginIndex, endIndex } = subList()
             for (let i = beginIndex; i < endIndex; i++) {
               const row = array[i]
-              callback(row.id, array[i], function (key, et) {
-                fdom.div({
-                  className: 'flex items-center justify-center min-h-0',
-                  s_height() {
-                    return et.getValue().height + 'px'
-                  },
-                  s_maxHeight() {
-                    return et.getValue().height + 'px'
-                  },
-                  s_background() {
-                    return et.getValue().color
-                  },
-                  children() {
-                    renderTextContent(() => {
-                      return et.getValue().id + "--"
-                    })
-                    fdom.input({
-                      className: 'daisy-input daisy-input-xs'
-                    })
-                  }
-                })
-              })
+              callback(row.id, array[i])
             }
+          }, function (key, et) {
+            fdom.div({
+              className: 'flex items-center justify-center min-h-0',
+              s_height() {
+                return et.getValue().height + 'px'
+              },
+              s_maxHeight() {
+                return et.getValue().height + 'px'
+              },
+              s_background() {
+                return et.getValue().color
+              },
+              children() {
+                renderTextContent(() => {
+                  return et.getValue().id + "--"
+                })
+                fdom.input({
+                  className: 'daisy-input daisy-input-xs'
+                })
+              }
+            })
           })
         }
       })

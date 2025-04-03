@@ -3,7 +3,7 @@ import { renderForEach } from "mve-core";
 import { fdom, renderText, renderTextContent } from "mve-dom";
 import { hookDestroy, hookTrackSignal } from "mve-helper";
 import { animateSignal, pointerMove } from "wy-dom-helper";
-import { addEffect, arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, ScrollFromPage } from "wy-helper";
+import { addEffect, arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, ScrollFromPage, StoreRef } from "wy-helper";
 
 
 
@@ -29,10 +29,11 @@ export default function () {
     className: 'touch-none w-full h-[80%] overflow-hidden',
     children(container: HTMLDivElement) {
       container.addEventListener("pointerdown", e => {
+        scrollY.stop()
         pointerMove(ScrollFromPage.from(e, {
           getPage: eventGetPageY,
           scrollDelta(delta, velocity) {
-            scrollY.set(scrollY.getTarget() + delta)
+            scrollY.set(scrollY.get() + delta)
             batchSignalEnd()
           },
           onFinish(velocity) {
@@ -164,45 +165,51 @@ export default function () {
             }
           })
 
-          renderForEach(function (callback) {
+          renderForEach<{
+            id: number,
+            color: string,
+            height: StoreRef<number | undefined>
+          }, number>(function (callback) {
             const bi = beginIndex.get()
             const ei = endIndex.get()
             const array = list.get()
             const maxLen = array.length
             for (let i = bi; i < ei && i < maxLen; i++) {
               const row = array[i]
-              callback(i, i, function (key) {
-                const randomHeight = faker.number.int({
-                  min: 30,
-                  max: 80
-                })
-                const div = fdom.div({
-                  className: 'flex items-center justify-center',
-                  s_height: randomHeight + 'px',
-                  data_i: row.id,
-                  s_background: row.color,
-                  children() {
-                    renderText`${row.id}`
-                    fdom.input()
-                  }
-                })
-
-                const ob = new ResizeObserver(entry => {
-                  const blockSize = entry[0].borderBoxSize[0].blockSize
-                  // console.log('entry', randomHeight, blockSize)
-                  if (needRemoveDiff == key) {
-                    scrollY.silentDiff(blockSize)
-                    needRemoveDiff = undefined
-                  }
-                  row.height.set(blockSize)
-                  batchSignalEnd()
-                })
-                ob.observe(div)
-                hookDestroy(() => {
-                  ob.disconnect()
-                })
-              })
+              callback(i, row)
             }
+          }, function (key, et) {
+            const randomHeight = faker.number.int({
+              min: 30,
+              max: 80
+            })
+            const div = fdom.div({
+              className: 'flex items-center justify-center',
+              s_height: randomHeight + 'px',
+              // data_i: row.id,
+              s_background() {
+                return et.getValue().color
+              },
+              children() {
+                renderText`${et.getValue().id}`
+                fdom.input()
+              }
+            })
+
+            const ob = new ResizeObserver(entry => {
+              const blockSize = entry[0].borderBoxSize[0].blockSize
+              // console.log('entry', randomHeight, blockSize)
+              if (needRemoveDiff == key) {
+                scrollY.silentDiff(blockSize)
+                needRemoveDiff = undefined
+              }
+              et.getValue().height.set(blockSize)
+              batchSignalEnd()
+            })
+            ob.observe(div)
+            hookDestroy(() => {
+              ob.disconnect()
+            })
           })
 
         }

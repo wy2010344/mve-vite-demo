@@ -40,47 +40,42 @@ export default function (
     onTouchMove(e) {
       e.preventDefault()
     },
-    onPointerDown: pointerMoveDir(function (e, dir) {
-      if (dir == 'y') {
-        return ScrollFromPage.from(e, {
-          getPage: eventGetPageY,
-          scrollDelta(delta, velocity) {
-            if (showCalendar()) {
-              calendarScroll(delta, velocity)
-            } else {
-              const y = scrollY.get()
-              scrollY.set(
-                y +
-                overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
-              )
-            }
-          },
-          onFinish(velocity) {
-            if (showCalendar()) {
-              calendarFinish(velocity)
-            } else {
-              if (scrollY.get() <= CREATE_SCROLLY) {
-                //创建
-                console.log("新建")
+    onPointerDown: pointerMoveDir(function () {
+      return {
+        onMove(e, dir) {
+          if (dir == 'y') {
+            return ScrollFromPage.from(e, {
+              getPage: eventGetPageY,
+              scrollDelta(delta, velocity) {
+                if (showCalendar()) {
+                  calendarScroll(delta, velocity)
+                } else {
+                  const y = scrollY.get()
+                  scrollY.set(
+                    y +
+                    overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
+                  )
+                }
+              },
+              onFinish(velocity) {
+                if (showCalendar()) {
+                  calendarFinish(velocity)
+                } else {
+                  if (scrollY.get() <= CREATE_SCROLLY) {
+                    //创建
+                    console.log("新建")
+                  }
+                  destinationWithMargin({
+                    frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
+                    scroll: scrollY,
+                    containerSize: container.clientHeight,
+                    contentSize: content.offsetHeight,
+                  })
+                }
               }
-              destinationWithMargin({
-                frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
-                scroll: scrollY,
-                containerSize: container.clientHeight,
-                contentSize: content.offsetHeight,
-                edgeBackConfig: defaultSpringAnimationConfig,
-                edgeConfig(velocity) {
-                  return ClampingScrollFactory.get(100).getFromVelocity(velocity).animationConfig()
-                  // return scrollInfinityIteration(velocity, {
-                  //   nextVelocity(n) {
-                  //     return n * 0.9
-                  //   },
-                  // })
-                },
-              })
-            }
+            })
           }
-        })
+        }
       }
     }),
     children() {

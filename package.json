@@ -39,7 +39,7 @@
     "mve-dom": "file:.yalc/mve-dom",
     "mve-dom-helper": "file:.yalc/mve-dom-helper",
     "mve-helper": "file:.yalc/mve-helper",
-    "mve-icons": "file:.yalc/mve-icons",
+    "mve-icons": "^5.5.0",
     "tailwindcss": "^4.0.13",
     "three": "^0.171.0",
     "tyme4ts": "^1.2.1",

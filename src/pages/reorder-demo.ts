@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker"
 import { fdom } from "mve-dom"
 import { renderArrayToArray } from "mve-helper"
-import { animateSignal, moveEdgeScroll, subscribeEventListener, subscribeScroller } from "wy-dom-helper"
+import { animateSignal, moveEdgeScroll, pointerMove, subscribeEventListener, subscribeScroller } from "wy-dom-helper"
 import { AnimateSignal, AnimationTime, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, reorderCheckTarget, storeRef, StoreRef, tween } from "wy-helper"
 import themeDropdown, { randomTheme } from "../themeDropdown"
 import fixRightTop from "../fixRightTop"
@@ -75,24 +75,24 @@ export default function () {
                   config: true
                 }
               })
-              const endMove = subscribeEventListener(document, 'pointermove', e => {
-                mes.changePoint(e.pageY)
-                transY.set(transY.get() + e.pageY - lastPageY)
-                lastPageY = e.pageY
-                const outList = outArray()
-                didMove(orderList, out, outList, marginTop)
-                // didMoveMarginTop(orderList, transY, div, getIndex(), outList, marginTop)
-                batchSignalEnd()
-              })
-              const endUp = subscribeEventListener(document, 'pointerup', e => {
-                endMove()
-                endUp()
-                destroyScroll()
-                mes.destroy()
-                transY.animateTo(0, ease1).then(() => {
-                  onDrag.set(undefined)
-                })
-                batchSignalEnd()
+              pointerMove({
+                onMove(e) {
+                  mes.changePoint(e.pageY)
+                  transY.set(transY.get() + e.pageY - lastPageY)
+                  lastPageY = e.pageY
+                  const outList = outArray()
+                  didMove(orderList, out, outList, marginTop)
+                  // didMoveMarginTop(orderList, transY, div, getIndex(), outList, marginTop)
+                  batchSignalEnd()
+                },
+                onEnd(e) {
+                  destroyScroll()
+                  mes.destroy()
+                  transY.animateTo(0, ease1).then(() => {
+                    onDrag.set(undefined)
+                  })
+                  batchSignalEnd()
+                },
               })
               batchSignalEnd()
             },
@@ -146,7 +146,6 @@ function didMove<T>(
   outList: MoveItem[],
   gap: number = 0
 ) {
-
   const n = reorderCheckTarget(
     outList,
     item.getIndex(),
