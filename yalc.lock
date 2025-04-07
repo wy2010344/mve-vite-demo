@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "ec9f1a1c986915c32c91ecee8730555e",
+      "signature": "1a98e8e5a20bc36e730f21f86b8b8a4f",
       "file": true,
       "replaced": "^0.1.12"
     },
@@ -27,7 +27,7 @@
       "replaced": "^2.0.0"
     },
     "mve-dom-helper": {
-      "signature": "6d82711bc2399adfbf65c450c36b8057",
+      "signature": "2244537c0aa9a64610a825ada48e2cf1",
       "file": true,
       "replaced": "^2.0.1"
     }
