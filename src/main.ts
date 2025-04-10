@@ -19,7 +19,7 @@ import reorderDemo from './pages/reorder-demo'
 import demo2 from './pages/demos/demo2'
 import calendar from './pages/calendar'
 import dailycost from './daily-record'
-import { history, historyState } from './history'
+import { history, getHistoryState } from './history'
 import { hookDestroy, hookPromiseSignal, promiseSignal, renderArray, renderIf, renderOne } from 'mve-helper'
 import themes from "daisyui/functions/themeOrder"
 import { IconContext } from "mve-icons";
@@ -44,12 +44,7 @@ const destroy = createRoot(app, () => {
 
 
   const { get, loading } = hookPromiseSignal(() => {
-    let pathname = historyState.get().location.pathname
-    if (pathname.startsWith('/')) {
-      pathname = pathname.slice(1)
-    }
-    // const load = (route as any)[pathname || 'index'];
-    console.log("pages", pathname, pages)
+    let pathname = getHistoryState().pathname
     const load = pages[`./pages/${pathname || 'index'}.ts`]
     return load
   })
@@ -68,11 +63,11 @@ const destroy = createRoot(app, () => {
           value.default()
         } catch (err) {
           console.error(err)
-          renderError(`该资源${historyState.get().location.pathname}执行失败 ${err}`)
+          renderError(`该资源${getHistoryState().pathname}执行失败 ${err}`)
         }
       } else {
         console.error(result.value)
-        renderError(`加载资源失败${historyState.get().location.pathname}, ${result.value}`)
+        renderError(`加载资源失败${getHistoryState().pathname}, ${result.value}`)
       }
     } else {
       renderIf(loading, () => {
@@ -80,7 +75,7 @@ const destroy = createRoot(app, () => {
           className: 'daisy-loading daisy-loading-spinner daisy-loading-xl',
         })
       }, () => {
-        renderError(`未找到资源${historyState.get().location.pathname}`)
+        renderError(`未找到资源${getHistoryState().pathname}`)
       })
     }
   })
