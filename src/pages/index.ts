@@ -7,6 +7,8 @@ import themes from "daisyui/functions/themeOrder"
 import { faker } from "@faker-js/faker";
 import fixRightTop from "../fixRightTop";
 import themeDropdown, { randomTheme } from "../themeDropdown";
+import explain from "../explain";
+import markdown from "../markdown";
 
 export default function () {
   renderCard()
@@ -63,7 +65,7 @@ function renderCard() {
         description: '入场动画、离场动画'
       })
       card({
-        href: '/virtual-list-3',
+        href: '/virtual-list',
         title: '虚拟列表,与自定义滚动',
         description: '虚拟列表,与自定义滚动'
       })

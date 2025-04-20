@@ -1,9 +1,8 @@
-import { fdom } from "mve-dom";
+import { dom, fdom } from "mve-dom";
+import { GetValue } from "wy-helper";
 
-export default function () {
+export default function (getQuery: GetValue<Record<string, any>>, getNodes: GetValue<string[]>) {
 
-  fdom.div({
-    childrenType: 'text',
-    children: 'default'
-  })
+  dom.div({
+  }).renderText`${() => JSON.stringify(getQuery())} -- ${() => getNodes().join('/')}`
 }
