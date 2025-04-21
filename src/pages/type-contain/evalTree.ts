@@ -1,7 +1,8 @@
 import { KVPair } from "wy-helper";
-import { EndNode, InfixEndNode, NNode, InfixNode } from "./parse";
+import { EndNode } from "./parse";
 import { AllMayType, allMayTypeToString, Any, Fun, include, Scope, toIntersect, toUnion } from "./define";
-import { KPair, pair } from "wy-helper/kanren";
+import { pair } from "wy-helper/kanren";
+import { symbol } from "d3";
 
 
 
@@ -33,6 +34,9 @@ function evalApply(
     errorFor(valueNode, '不是子集', noMessage)
     return [Any.empty, scope]
   }
+  if (noMessage) {
+    return [fun.apply(value), scope]
+  }
   try {
     return [fun.apply(value), scope]
   } catch (err) {
@@ -56,7 +60,7 @@ export function evalOneExp(n: EndNode, scope: Scope, noMessage: boolean): [AllMa
       return [pair<AllMayType, AllMayType>(left, right), scope]
     } else if (infixValue == ':') {
       const left = n.left
-      if (left.type != 'symbol' && left.type != 'string') {
+      if (left.type != 'ref' && left.type != 'string') {
         errorFor(left, '目前只支持symobl与string类型', noMessage)
         return [Any.empty, scope]
       }
@@ -73,7 +77,7 @@ export function evalOneExp(n: EndNode, scope: Scope, noMessage: boolean): [AllMa
       return [toIntersect(left, right), scope]
     } else if (infixValue == '=') {
       const left = n.left
-      if (left.type == 'symbol') {
+      if (left.type == 'ref') {
         const key = left.value
         const [value] = evalOneExp(n.right, scope, noMessage)
         if (!noMessage) {
@@ -98,7 +102,7 @@ export function evalOneExp(n: EndNode, scope: Scope, noMessage: boolean): [AllMa
       const head = n.left
       if (head.type == 'infix' && head.infix.value == '=') {
         const headKey = head.left
-        if (headKey.type != 'symbol') {
+        if (headKey.type != 'ref') {
           errorFor(headKey, "目前只支持函数类型", noMessage)
           return [Any.empty, scope]
         }
@@ -128,6 +132,8 @@ export function evalOneExp(n: EndNode, scope: Scope, noMessage: boolean): [AllMa
     return [n.value, scope]
   } else if (n.type == 'number') {
     return [n.value, scope]
+  } else if (n.type == 'symbol') {
+    return [Symbol(n.value), scope]
   } else {
     const ta = scope?.get(n.value)
     if (ta) {

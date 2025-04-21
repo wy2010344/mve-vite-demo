@@ -7,28 +7,19 @@ import demo6 from "./demo6";
 import demo1 from "./demo1";
 import demo2 from "./demo2";
 import { fdom } from "mve-dom";
+import { windowSize } from 'mve-dom-helper'
 import { hookDrawRect, renderCanvas, simpleFlex } from "mve-dom-helper/canvasRender";
 import demo4 from "../d3/force/demo4";
 
 export default function () {
-  const w = createSignal(window.innerWidth)
-  const h = createSignal(window.innerHeight)
-  function resize() {
-    w.set(window.innerWidth)
-    h.set(window.innerHeight)
-  }
-  window.addEventListener("resize", resize)
-  hookDestroy(() => {
-    window.removeEventListener("resize", resize)
-  })
   renderCanvas({
     className: 'touch-none',
-    width: w.get,
-    height: h.get,
+    width: windowSize.width,
+    height: windowSize.height,
   }, () => {
     hookDrawRect({
-      width: w.get,
-      height: h.get,
+      width: windowSize.width,
+      height: windowSize.height,
       layout() {
         return simpleFlex({
           direction: 'x',
