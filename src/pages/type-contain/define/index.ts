@@ -49,6 +49,7 @@ type AllMayBaseType = VarType
   | KPair<AllMayType, AllMayType>
   | string
   | number
+  | symbol
   | Any<'symbol'>
   | Any<"all">
   | Any<"string">
@@ -85,6 +86,8 @@ export function allMayTypeToString(n: AllMayType): string {
     return `(${allMayTypeToString(n.arg)} => ${allMayTypeToString(n.out)})`
   } else if (n instanceof VarType) {
     return `(var ${allMayTypeToString(n)})`
+  } else if (typeof n == 'symbol') {
+    return `#${n.description}#`
   } else {
     throw `unkonwn type ${n}`;
   }
@@ -148,12 +151,6 @@ export function include(a: AllMayType, b: AllMayType): boolean {
     return b.list.every(rb => include(a, rb))
   }
 
-  // if (a instanceof VarType) {
-  //   if (b instanceof VarType) {
-  //     return include(a, b.belong)
-  //   }
-  //   return false
-  // }
   if (a instanceof Any) {
     if (a.flag == 'all') {
       return true
@@ -163,6 +160,9 @@ export function include(a: AllMayType, b: AllMayType): boolean {
     }
     if (a.flag == 'number') {
       return typeof b == 'number'
+    }
+    if (a.flag == 'symbol') {
+      return typeof b == 'symbol'
     }
     return false
   }
@@ -240,27 +240,6 @@ export function toUnion(a: AllMayType, b: AllMayType): AllMayType {
     }
   })
   return listToAllMayType(axs)
-}
-/**
- * 差集,就是这个元素,属于a与b,但不属于a与b的交集
- * @param a 
- * @param b 
- */
-export function toExpect(a: AllMayType, b: AllMayType): AllMayType {
-  const list: AllMayBaseType[] = []
-  const axs = unionToList(a)
-  const bxs = unionToList(b)
-  axs.forEach(ax => {
-    if (!include(b, ax)) {
-      list.push(ax)
-    }
-  })
-  bxs.forEach(bx => {
-    if (!include(a, bx)) {
-      list.push(bx)
-    }
-  })
-  return listToAllMayType(list)
 }
 function listToAllMayType(list: AllMayBaseType[]): AllMayType {
   if (list.length > 1) {

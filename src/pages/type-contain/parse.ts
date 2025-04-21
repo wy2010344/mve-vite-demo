@@ -1,5 +1,5 @@
-import { BaseDisplayT, buildInfix, DisplayT, endNotFillToToken, InfixConfig, InfixToken, matchBetween, matchCommonExt, matchSymbolOrSpecial, ruleGetNumber, ruleGetString, skipWhiteOrComment, specialMatch } from "wy-helper/infixLang"
-import { andMatch, isChinese, isLowerEnglish, isUpperEnglish, or, orMatch, parseGet, Que } from "wy-helper/tokenParser"
+import { BaseDisplayT, buildInfix, endNotFillToToken, InfixConfig, InfixToken, matchBetween, matchCommonExt, matchSymbolOrSpecial, ruleGetNumber, ruleGetString, skipWhiteOrComment, specialMatch } from "wy-helper/infixLang"
+import { andMatch, isChinese, isLowerEnglish, isUpperEnglish, or, orMatch, parseGet, Que, ruleStrBetweenGet1 } from "wy-helper/tokenParser"
 export interface Token {
   begin: number;
   end: number;
@@ -16,6 +16,11 @@ export interface StringToken extends Token {
 }
 export interface SymbolToken extends Token {
   type: "symbol";
+  originalValue: string;
+  value: string;
+}
+export interface RefToken extends Token {
+  type: "ref";
   value: string;
 }
 export interface NumberToken extends Token {
@@ -23,9 +28,21 @@ export interface NumberToken extends Token {
   value: number;
   originalValue: string;
 }
+export function ruleGetSymbol() {
+  const [value, begin, end] = ruleStrBetweenGet1("#".charCodeAt(0))
+  const originalValue = begin.content.slice(begin.i, end.i)
+  return {
+    type: "symbol",
+    value,
+    originalValue,
+    begin: begin.i,
+    end: end.i
+  } as SymbolToken
+}
 
-export type NNode = StringToken | SymbolToken | NumberToken;
-export const symbolRule = andMatch(
+
+export type NNode = StringToken | RefToken | NumberToken | SymbolToken;
+export const refRule = andMatch(
   orMatch(
     isLowerEnglish.matchCharBetween(),
     isUpperEnglish.matchCharBetween(),
@@ -33,16 +50,16 @@ export const symbolRule = andMatch(
   ),
   matchCommonExt
 )
-export function ruleGetSymbol() {
-  return parseGet<Que, SymbolToken>(symbolRule, function (begin, end) {
+export function ruleGetRef() {
+  return parseGet<Que, RefToken>(refRule, function (begin, end) {
     const value = begin.content.slice(begin.i, end.i)
     return {
-      type: "symbol",
+      type: "ref",
       begin: begin.i,
       end: end.i,
       value,
       messages: []
-    } as SymbolToken
+    } as RefToken
   }, 'symbol')
 }
 function rGetNumber() {
@@ -128,6 +145,7 @@ export const { parseSentence, getInfixOrder } = buildInfix<EndNode>(infixLibArra
     return or([
       rGetStr,
       ruleGetSymbol,
+      ruleGetRef,
       rGetNumber,
     ])
   },
@@ -142,7 +160,9 @@ export const { parseSentence, getInfixOrder } = buildInfix<EndNode>(infixLibArra
   }
 )
 
-
+export type DisplayT = {
+  type: "white" | "keyword" | "number" | "string" | "variable" | "symbol";
+} & BaseDisplayT;
 type DisplayValue = DisplayT & {
   messages: Message[]
 }
@@ -172,7 +192,7 @@ export const toFillToken = endNotFillToToken<EndNode, DisplayValue>(function (en
       end: endNode.end,
       messages: endNode.messages
     })
-  } else if (endNode.type == 'symbol') {
+  } else if (endNode.type == 'ref') {
     return ({
       type: "variable",
       value: endNode.value,
@@ -180,6 +200,14 @@ export const toFillToken = endNotFillToToken<EndNode, DisplayValue>(function (en
       end: endNode.end,
       messages: endNode.messages
     })
+  } else if (endNode.type == 'symbol') {
+    return {
+      type: "symbol",
+      value: endNode.originalValue,
+      begin: endNode.begin,
+      end: endNode.end,
+      messages: endNode.messages
+    }
   } else {
     throw new Error("unknown type")
   }

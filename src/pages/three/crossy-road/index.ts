@@ -1,62 +1,57 @@
 import { hookAddResult } from 'mve-core';
 import * as THREE from 'three';
-import { initializeMap, map } from './crossy-road/Map';
-import { renderCode } from 'mve-dom-helper';
-import { animateVehicles } from './crossy-road/animateVehicles';
-import { movesQueue, player, position, queueMove, score } from './crossy-road/Player';
+import { initializeMap, map } from './Map';
+import { renderCode, windowSize } from 'mve-dom-helper';
+import { animateVehicles } from './animateVehicles';
+import { movesQueue, player, position, queueMove, score } from './Player';
 import { dom, fdom, renderText } from 'mve-dom';
-import { animatePlayer } from './crossy-road/animatePlayer';
-import { finished, hitTest } from './crossy-road/hitTest';
+import { animatePlayer } from './animatePlayer';
+import { finished, hitTest } from './hitTest';
+import { renderThreeView, ThreeContext } from '../../../hookThreeView';
 
 export default function () {
   fdom.div({
     s_fontFamily: `"Press Start 2P", cursive`,
     children() {
 
-      const renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        antialias: true
+
+      const renderer = renderThreeView({
+        camera: Camera(),
+        args: {
+          alpha: true,
+          antialias: true
+        },
+        width: windowSize.width,
+        height: windowSize.height,
+        render(scene) {
+
+          hookAddResult(player)
+          hookAddResult(map)
+          initializeMap()
+          hookAddResult(new THREE.AmbientLight())
+
+
+          const dirLight = DirectionLight()
+          player.add(dirLight)
+          dirLight.target = player
+          const { hookAnimationLoop, camera } = ThreeContext.consume()
+          player.add(camera)
+          hookAnimationLoop(() => {
+            animateVehicles()
+            animatePlayer()
+            hitTest()
+          })
+        },
       })
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      // renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(window.devicePixelRatio)
       renderer.shadowMap.enabled = true
-      hookAddResult(renderer.domElement)
-
-      const scene = new THREE.Scene();
-
-      const camera = Camera()
-      scene.add(player)
-      scene.add(map)
-      initializeMap()
-
-
-
-      scene.add(camera)
-
-      player.add(camera)
-      const ambientLight = new THREE.AmbientLight()
-      scene.add(ambientLight)
-      const dirLight = DirectionLight()
-      player.add(dirLight)
-      dirLight.target = player
 
 
 
 
 
 
-
-      window.addEventListener("resize", e => {
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.updateProjectionMatrix()
-      })
-      renderer.setAnimationLoop(function () {
-        animateVehicles()
-        animatePlayer()
-        hitTest()
-        renderer.render(scene, camera);
-      })
-      renderer.render(scene, camera);
 
       fdom.div({
         childrenType: 'text',
