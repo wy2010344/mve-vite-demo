@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { hookAddResult } from "mve-core";
 import { getPerspectiveCamera, hookOrbitControls, renderMesh, renderThreeView } from "../../../hookThreeView";
-import { windowSize } from "mve-dom-helper";
+import { windowSize } from "wy-dom-helper";
 
 export default function () {
   const camera = getPerspectiveCamera(windowSize.width, windowSize.height)

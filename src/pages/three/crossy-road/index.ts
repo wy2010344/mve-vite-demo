@@ -1,7 +1,7 @@
 import { hookAddResult } from 'mve-core';
 import * as THREE from 'three';
 import { initializeMap, map } from './Map';
-import { renderCode, windowSize } from 'mve-dom-helper';
+import { windowSize } from 'wy-dom-helper';
 import { animateVehicles } from './animateVehicles';
 import { movesQueue, player, position, queueMove, score } from './Player';
 import { dom, fdom, renderText } from 'mve-dom';

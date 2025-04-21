@@ -18,6 +18,10 @@ export function getPerspectiveCamera(
     camera.aspect = w() / h()
     camera.updateProjectionMatrix()
   })
+  camera.fov = 75
+  camera.near = 0.1
+  camera.far = 1000
+  camera.position.z = 5
   return camera
 }
 export function renderThreeView({
@@ -88,6 +92,15 @@ export const ThreeContext = createContext<{
 export function renderMesh() {
   const mesh = new THREE.Mesh()
   hookAddResult(mesh)
+  hookDestroy(() => {
+    mesh.geometry.dispose()
+    const ms = mesh.material
+    if (Array.isArray(ms)) {
+      ms.forEach(m => m.dispose())
+    } else {
+      ms.dispose()
+    }
+  })
   return mesh
 }
 
@@ -98,7 +111,7 @@ export function renderGroup(render: SetValue<THREE.Group>) {
   return group
 }
 
-const renderChildrenThree = createRenderChildren<THREE.Object3D>({
+export const n = createRenderChildren<THREE.Object3D>({
   moveBefore(parent, newChild, beforeChild) {
     newChild?.parent?.remove(newChild)
     parent.add(newChild)
@@ -118,6 +131,8 @@ const renderChildrenThree = createRenderChildren<THREE.Object3D>({
   },
 })
 
-
-
-export const renderChildren = renderChildrenThree.renderChildren
+export function renderChildren<N extends THREE.Object3D>(node: N, render: SetValue<N>) {
+  const getChildren = n.renderChildren(node, render as any);
+  (node as any)._children = getChildren
+  return getChildren
+}

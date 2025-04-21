@@ -7,7 +7,7 @@ import demo6 from "./demo6";
 import demo1 from "./demo1";
 import demo2 from "./demo2";
 import { fdom } from "mve-dom";
-import { windowSize } from 'mve-dom-helper'
+import { windowSize } from 'wy-dom-helper'
 import { hookDrawRect, renderCanvas, simpleFlex } from "mve-dom-helper/canvasRender";
 import demo4 from "../d3/force/demo4";
 

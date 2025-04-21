@@ -173,6 +173,21 @@ export function include(a: AllMayType, b: AllMayType): boolean {
     if (b instanceof Fun) {
       //(x:String)=>number包含(x:'abc')=>any
       if (include(a.arg, b.arg)) {
+        /**
+         * out是直接签名类型
+         * 不能使用out进行比较
+         * 因为函数本身就是一种类型签名,用于计算,依赖入参,返回返回的类型参数.
+         *  相当于泛型,根据值中带入的类型
+         * 
+         *  一个函数,类型代表入参的约束,一种校验
+         *  但真实的集合要小一些,返回的集合又与真实的集合相关
+         *  
+         *  在IDE检验时,也在执行Lambda了.
+         * 
+         *  联合很容易,即使里面有重合.
+         *  但交叉不容易,交叉减去部分,不确定
+         *    只能取可依赖的交叉,比如KVPair的交叉
+         */
         const v = new VarType(b.arg)
         const aOut = a.apply(v)
         const bOut = b.apply(v)
@@ -264,6 +279,8 @@ export function toIntersect(a: AllMayType, b: AllMayType): AllMayType {
   axs.forEach(ax => {
     if (include(b, ax)) {
       list.push(ax)
+    } else if (ax instanceof VarType) {
+      //这个如何缩小类型?
     } else if (ax instanceof KVPair) {
       bxs.forEach(bx => {
         if (bx instanceof KVPair) {
