@@ -54,6 +54,7 @@ export function renderThreeView({
         set.delete(fun)
       })
     },
+    renderer
   })
   renderChildren(scene, render as any)
   renderer.setAnimationLoop(function (time, frame) {
@@ -83,6 +84,7 @@ export function hookOrbitControls() {
 
 
 export const ThreeContext = createContext<{
+  renderer: THREE.WebGLRenderer
   camera: THREE.Camera
   domElement: HTMLCanvasElement
   hookAnimationLoop(fun: XRFrameRequestCallback): void
@@ -128,6 +130,9 @@ export const n = createRenderChildren<THREE.Object3D>({
     if (child.parent == parent) {
       parent.remove(child)
     }
+  },
+  nextSibling(child) {
+    return child.parent?.children[child.parent?.children.indexOf(child) + 1] || null
   },
 })
 

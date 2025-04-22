@@ -1,5 +1,5 @@
 import { renderMobileView } from "../../onlyMobile";
-import { addEffect, alignSelf, arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, flexDisplayUtil, memo, ScrollFromPage } from "wy-helper";
+import { addEffect, alignSelf, arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, flexDisplayUtil, memo, scrollForEdge, ScrollFromPage } from "wy-helper";
 import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap, renderCanvas } from "mve-dom-helper/canvasRender";
 
 import Scroller from 'scroller';
@@ -21,40 +21,10 @@ export default function () {
       height,
     }, () => {
 
-      // let moveLastPoint: PointerEvent | undefined
       const scrollY = animateSignal(0)
-      const data = arrayCountCreateWith(50, (i) => {
+      const data = arrayCountCreateWith(100, (i) => {
         return i
       })
-      // const scroller = new Scroller((left: number, top: number) => {
-      //   scrollTop.set(top)
-      // }, {
-      //   scrollingX: false,
-      //   scrollingY: true,
-      //   decelerationRate: 0.95,
-      //   penetrationAcceleration: 0.08,
-      // })
-      // window.addEventListener("pointermove", e => {
-      //   if (moveLastPoint) {
-      //     moveLastPoint = e
-      //     scroller.doTouchMove([moveLastPoint], moveLastPoint.timeStamp);
-      //   }
-      // })
-
-      // function end(e: PointerEvent) {
-      //   if (moveLastPoint) {
-      //     moveLastPoint = undefined
-      //     scroller.doTouchEnd(e.timeStamp);
-      //   }
-      // }
-      // window.addEventListener("pointerup", end)
-      // window.addEventListener("pointercancel", end)
-
-      // hookTrackSignal(() => {
-      //   addEffect(() => {
-      //     scroller.setDimensions(420, 700, 420, (80 + 30) * data.length - 30);
-      //   })
-      // })
 
       const totalHeight = memo(() => {
         let totalHeight = 0
@@ -93,8 +63,7 @@ export default function () {
           pointerMove(ScrollFromPage.from(e.original, {
             getPage: eventGetPageY,
             scrollDelta(delta, velocity) {
-              scrollY.set(scrollY.get() + delta)
-              batchSignalEnd()
+              scrollForEdge(scrollY, delta, container.axis.y.size(), totalHeight())
             },
             onFinish(velocity) {
               return destinationWithMargin({
@@ -165,9 +134,16 @@ export default function () {
                       directionFix: "start",
                       alignFix: true,
                       alignItems: "start",
-                      gap: 8
+                      gap: 12
                     })
                   },
+                  // draw(ctx, n, path) {
+                  //   return {
+                  //     operates: [
+                  //       { type: "fill", style: "yellow" }
+                  //     ]
+                  //   }
+                  // },
                   alignSelf: alignSelf('stretch'),
                   grow: 1,
                   children() {
@@ -176,14 +152,33 @@ export default function () {
                         text: faker.person.fullName()
                       },
                     })
+                    // hookDrawRect({
+                    //   grow: 1,
+                    //   alignSelf: alignSelf('stretch'),
+                    //   draw(ctx, n, path) {
+                    //     return {
+                    //       operates: [
+                    //         { type: "fill", style: "blue" }
+                    //       ]
+                    //     }
+                    //   },
+                    // })
                     hookDrawTextWrap({
                       config: {
-                        maxLines: 2,
+                        maxLines: 3,
                         text: faker.lorem.lines(4),
                         fontSize: '12px'
                       },
                       alignSelf: alignSelf('stretch'),
-                      grow: 1,
+                      // grow: 1,
+                      // draw(ctx, n, draw, p) {
+                      //   return {
+                      //     operates: [
+                      //       { type: "fill", style: "red" },
+                      //       { type: "draw", callback: draw }
+                      //     ]
+                      //   }
+                      // },
                     })
                   }
                 })
