@@ -109,6 +109,10 @@ export default function () {
               fdom.hr({
                 s_flex: 1
               })
+              fdom.span({
+                childrenType: "text",
+                children: getIndex
+              })
             }
           })
 

@@ -1,11 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { animate } from "motion";
-import { fdom } from "mve-dom";
-import { renderExitArrayClone } from "mve-dom-helper";
-import { ExitModel, getExitAnimateArray, hookTrackSignal, renderArray } from "mve-helper";
+import { fdom, renderTextContent } from "mve-dom";
+import { ExitArrayCloneOut, ExitArrayCloneOutList, renderExitArrayClone } from "mve-dom-helper";
+import { ExitModel, getExitAnimateArray, hookTrackSignal, renderArray, renderIf, renderOne } from "mve-helper";
 import { createSignal, GetValue } from "wy-helper";
 import explain from "../../explain";
 import markdown from "../../markdown";
+import { hookAddResult } from "mve-core";
 
 
 /**
@@ -154,6 +155,10 @@ export default function () {
           `
           renderArray(getList, (row, getIndex) => {
             const div = renderRow(row, getIndex)
+
+            renderOne(row.step, v => {
+              renderTextContent(v)
+            })
             hookTrackSignal(row.step, function (value) {
               if (!row.promise()) {
                 return
@@ -170,7 +175,6 @@ export default function () {
             })
           })
 
-
           markdown`
 退出时,采用对旧元素clone的方式,使元素内的数据保持不变
           `
@@ -185,7 +189,6 @@ export default function () {
               node: div,
               applyAnimate(node) {
                 if (row.promise()) {
-
                   animate(node as HTMLDivElement, {
                     x: [0, '100%']
                   }).then(row.resolve)
