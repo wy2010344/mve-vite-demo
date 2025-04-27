@@ -1,5 +1,7 @@
 import { KVPair, quote, removeWhere } from "wy-helper"
 import { KPair } from "wy-helper/kanren"
+import { Union } from "./union"
+import { Intersect } from "./intersect"
 
 export class Any<T extends string> {
   private constructor(
@@ -37,14 +39,10 @@ export class Fun<T> {
 }
 
 
-export class Union<T> {
-  constructor(
-    public readonly list: T[]
-  ) { }
-}
 
-type AllMayBaseType = VarType
-  | KVPair<AllMayType>
+
+
+export type AllMaySimpleType = KVPair<AllMayType>
   | Fun<AllMayType>
   | KPair<AllMayType, AllMayType>
   | string
@@ -55,6 +53,8 @@ type AllMayBaseType = VarType
   | Any<"string">
   | Any<"number">
   | Any<"empty">
+export type AllMayBaseType = VarType | AllMaySimpleType | Intersect
+
 export type AllMayType = AllMayBaseType | Union<AllMayBaseType>
 
 export function allMayTypeToString(n: AllMayType): string {
@@ -150,6 +150,9 @@ export function include(a: AllMayType, b: AllMayType): boolean {
   if (b instanceof Union) {
     return b.list.every(rb => include(a, rb))
   }
+  if (b instanceof Intersect) {
+    return include(a, b.superType)
+  }
 
   if (a instanceof Any) {
     if (a.flag == 'all') {
@@ -169,10 +172,17 @@ export function include(a: AllMayType, b: AllMayType): boolean {
   if (a instanceof Union) {
     return a.list.some(v => include(v, b))
   }
+  if (a instanceof Intersect) {
+    return a.list.every(v => include(v, b))
+  }
   if (a instanceof Fun) {
     if (b instanceof Fun) {
-      //(x:String)=>number包含(x:'abc')=>any
-      if (include(a.arg, b.arg)) {
+      /**
+       * a:(x:'abc')=>number包含b: (x:String)=>99
+       * 即需要类型a的地方,可以把b传递过去
+       * 调用a时只会传递'abc',返回只要求是number
+       */
+      if (include(b.arg, a.arg)) {
         /**
          * out是直接签名类型
          * 不能使用out进行比较
@@ -187,11 +197,17 @@ export function include(a: AllMayType, b: AllMayType): boolean {
          *  联合很容易,即使里面有重合.
          *  但交叉不容易,交叉减去部分,不确定
          *    只能取可依赖的交叉,比如KVPair的交叉
+         * 
+         * 这里把集合当成一个值
+         * 
+         * 函数之间的合集,要能正常使用,入参取较小那个,出参取较大那个 较大的集合
+         * 函数之间的交集,要能正常使用,入参取较大那个,出参取较小那个 较小的集合
+         *   ts中是这样的
          */
-        const v = new VarType(b.arg)
+        const v = new VarType(a.arg)
         const aOut = a.apply(v)
         const bOut = b.apply(v)
-        return include(bOut, aOut)
+        return include(aOut, bOut)
       }
     }
     return false
@@ -235,85 +251,6 @@ export function include(a: AllMayType, b: AllMayType): boolean {
   return false
 }
 
-function unionToList(a: AllMayType, slice?: boolean) {
-  return a instanceof Union ? slice ? a.list.slice() : a.list : [a]
-}
-
-/**
- * 求并集
- * @param a 
- * @param b 
- * @returns 
- */
-export function toUnion(a: AllMayType, b: AllMayType): AllMayType {
-  const axs = unionToList(a, true)
-  const bxs = unionToList(b)
-  bxs.forEach(bx => {
-    if (!axs.find(v => include(v, bx))) {
-      removeWhere(axs, v => include(bx, v))
-      axs.push(bx)
-    }
-  })
-  return listToAllMayType(axs)
-}
-function listToAllMayType(list: AllMayBaseType[]): AllMayType {
-  if (list.length > 1) {
-    return new Union(list)
-  }
-  if (list.length == 1) {
-    return list[0]
-  }
-  return Any.empty
-}
-/**
- * 求交集
- * 如果a中有{x:u},b中有{y:z},即会出现{x:u,y:z}
- * 情况比较复杂,ts中没有能化简
- * @param a 
- * @param b 
- */
-export function toIntersect(a: AllMayType, b: AllMayType): AllMayType {
-  const list: AllMayBaseType[] = []
-  const axs = unionToList(a)
-  const bxs = unionToList(b)
-  axs.forEach(ax => {
-    if (include(b, ax)) {
-      list.push(ax)
-    } else if (ax instanceof VarType) {
-      //这个如何缩小类型?
-    } else if (ax instanceof KVPair) {
-      bxs.forEach(bx => {
-        if (bx instanceof KVPair) {
-          let doCheck = true
-          let ret = ax
-          let bTemp: KVPair<AllMayType> | undefined = bx
-          while (bTemp && doCheck) {
-            const key = bTemp.key
-            const value = bTemp.value
-            const af = ax.get(key)
-            if (af) {
-              const av = af.value
-              const fv = toIntersect(value, av)
-              if (fv == Any.empty) {
-                doCheck = false
-              } else {
-                ret = ret.add(key, fv)
-              }
-            } else {
-              ret = ret.add(key, value)
-            }
-            bTemp = bTemp.rest
-          }
-          if (doCheck) {
-            list.push(ret)
-          }
-        }
-      })
-    }
-  })
-  return listToAllMayType(list)
-}
-
 type a = "x" | {
   y: 9
 }
@@ -328,3 +265,15 @@ let m: c = {
   y: 9,
   x: 8
 }
+
+type x1 = (a: string) => 9
+type x2 = (a: '9') => number
+
+type x3 = x1 | x2
+type x4 = x1 & x2
+
+let m1!: x3
+let m1x = m1('9')
+
+let m2!: x4
+let m2x = m2('dd')

@@ -41,6 +41,7 @@ export default function () {
       }
     }
   }))
+  const nDim = 2
   const getNodesAndLinks = memo<{
     nodes: readonly ForceNode<MNode, SignalForceDir>[],
     links: readonly ForceLink<MLink, MNode, SignalForceDir>[]
@@ -88,9 +89,9 @@ export default function () {
   const renderDirY = forceDir('y')
   function didTick() {
     const gl = getNodesAndLinks()
-    tickForce(config, gl.nodes, (alpha) => {
-      renderLink(gl.links, config.nDim, alpha)
-      renderManyBody(gl.nodes, config.nDim, alpha)
+    tickForce(nDim, config, gl.nodes, (alpha) => {
+      renderLink(gl.links, nDim, alpha)
+      renderManyBody(gl.nodes, nDim, alpha)
       renderDirX(gl.nodes, alpha)
       renderDirY(gl.nodes, alpha)
     })

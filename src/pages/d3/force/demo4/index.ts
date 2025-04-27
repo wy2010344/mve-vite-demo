@@ -80,11 +80,12 @@ export default function () {
     const renderManyBody = forceManybody({
       getStrenth: asLazy(-30)
     })
+    const nDim = 2
     function didTick() {
       const gl = getNodesAndLinks()
-      tickForce(config, gl.nodes, (alpha) => {
-        renderLink(gl.links, config.nDim, alpha)
-        renderManyBody(gl.nodes, config.nDim, alpha)
+      tickForce(nDim, config, gl.nodes, (alpha) => {
+        renderLink(gl.links, nDim, alpha)
+        renderManyBody(gl.nodes, nDim, alpha)
       })
     }
     hookDestroy(subscribeRequestAnimationFrame(() => {

@@ -1,8 +1,10 @@
 import { KVPair } from "wy-helper";
 import { EndNode } from "./parse";
-import { AllMayType, allMayTypeToString, Any, Fun, include, Scope, toIntersect, toUnion } from "./define";
+import { AllMayType, allMayTypeToString, Any, Fun, include, Scope } from "./define";
 import { pair } from "wy-helper/kanren";
 import { symbol } from "d3";
+import { Union } from "./define/union";
+import { toIntersect } from "./define/intersect";
 
 
 
@@ -70,7 +72,7 @@ export function evalOneExp(n: EndNode, scope: Scope, noMessage: boolean): [AllMa
     } else if (infixValue == '|') {
       const [left] = evalOneExp(n.left, scope, noMessage)
       const [right] = evalOneExp(n.right, scope, noMessage)
-      return [toUnion(left, right), scope]
+      return [Union.from(left, right), scope]
     } else if (infixValue == '&') {
       const [left] = evalOneExp(n.left, scope, noMessage)
       const [right] = evalOneExp(n.right, scope, noMessage)

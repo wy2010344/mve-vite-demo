@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "4338b81f910d59c85cf3307d8d84cb21",
+      "signature": "062f75d5e486047aaac44703034dee5e",
       "file": true,
       "replaced": "^0.1.12"
     },
@@ -12,7 +12,7 @@
       "replaced": "^0.1.10"
     },
     "mve-core": {
-      "signature": "1e0355aad549360ab7a8bc98c0d509f0",
+      "signature": "4ed5087395d8a8246b17f1e93386bad9",
       "file": true,
       "replaced": "^2.0.0"
     },
@@ -27,7 +27,7 @@
       "replaced": "^2.0.0"
     },
     "mve-dom-helper": {
-      "signature": "af962f18d12945de7d87ca7daf0175c5",
+      "signature": "0993409bad6263308ff258cbcc90f963",
       "file": true,
       "replaced": "^2.0.1"
     }

@@ -29,6 +29,7 @@ export function renderThreeView({
   width,
   height,
   render,
+  notRender,
   args
 }: {
   camera: THREE.Camera
@@ -36,13 +37,18 @@ export function renderThreeView({
   height: ValueOrGet<number>,
   render(scene: THREE.Scene): void
   args?: THREE.WebGLRendererParameters
+  notRender?: boolean
 }) {
   const renderer = new THREE.WebGLRenderer(args);
   const scene = new THREE.Scene();
+  hookDestroy(() => {
+    renderer.dispose()
+  })
   const w = valueOrGetToGet(width)
   const h = valueOrGetToGet(height)
   const set = new Set<XRFrameRequestCallback>()
   ThreeContext.provide({
+    scene,
     camera,
     domElement: renderer.domElement,
     hookAnimationLoop(fun) {
@@ -56,17 +62,19 @@ export function renderThreeView({
     },
     renderer
   })
-  renderChildren(scene, render as any)
-  renderer.setAnimationLoop(function (time, frame) {
-    renderer.render(scene, camera);
-    set.forEach(fun => {
-      fun(time, frame)
-    })
-  })
   hookTrackSignal(() => {
     renderer.setSize(w(), h())
   })
   hookAddResult(renderer.domElement)
+  renderChildren(scene, render as any)
+  renderer.setAnimationLoop(function (time, frame) {
+    if (!notRender) {
+      renderer.render(scene, camera);
+    }
+    set.forEach(fun => {
+      fun(time, frame)
+    })
+  })
   return renderer
 }
 
@@ -84,6 +92,7 @@ export function hookOrbitControls() {
 
 
 export const ThreeContext = createContext<{
+  scene: THREE.Scene,
   renderer: THREE.WebGLRenderer
   camera: THREE.Camera
   domElement: HTMLCanvasElement
