@@ -83,6 +83,8 @@ const destroy = createRoot(app, () => {
   renderIf(getBranch, function () {
     console.log("get", getBranch())
     renderBranch(getBranch as GetValue<BranchOrLeaf>)
+  }, function () {
+    renderError(`未找到该页面`)
   })
   renderPop()
 })

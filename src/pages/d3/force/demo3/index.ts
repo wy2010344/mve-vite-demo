@@ -62,10 +62,11 @@ export default function () {
       },
       iterations: 3
     })
+    const nDim = 2
     hookDestroy(subscribeRequestAnimationFrame(() => {
       const nodes = getNodes()
-      tickForce(config, nodes, alpha => {
-        renderManyBody(nodes, config.nDim, alpha)
+      tickForce(nDim, config, nodes, alpha => {
+        renderManyBody(nodes, nDim, alpha)
         renderDirX(nodes, alpha)
         renderDirY(nodes, alpha)
         renderCollide(nodes, 2)

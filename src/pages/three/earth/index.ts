@@ -20,71 +20,19 @@ export default function () {
     width: windowSize.width,
     height: windowSize.height,
     render(scene) {
-      // hookAddResult(
-      //   new THREE.HemisphereLight(0x0099ff, 0xaa5500)
-      // )
-      const { hookAnimationLoop } = ThreeContext.consume()
-      const detail = 12;
-
-      const earthMesh = renderMesh()
-      earthMesh.geometry = new THREE.IcosahedronGeometry(1.0, detail)
-      const loader = new THREE.TextureLoader()
-      earthMesh.material = new THREE.MeshPhongMaterial({
-        map: loader.load(earthmap1k),
-        specularMap: loader.load(earthspec1k),
-        bumpMap: loader.load(earthbump1k),
-      })
-      hookAnimationLoop(() => {
-        earthMesh.rotation.y += 0.002
-      })
-
-
-      const lightsMesh = renderMesh()
-      lightsMesh.geometry = earthMesh.geometry
-      lightsMesh.material = new THREE.MeshBasicMaterial({
-        map: loader.load(earthlights1k),
-        blending: THREE.AdditiveBlending,
-      });
-      hookAnimationLoop(() => {
-        lightsMesh.rotation.y += 0.002;
-      })
-
-
       renderGroup(function (group) {
         group.rotation.z = -23.4 * Math.PI / 180;
-        const cloudsMesh = renderMesh()
-        cloudsMesh.geometry = earthMesh.geometry
-        cloudsMesh.material = new THREE.MeshStandardMaterial({
-          map: loader.load(earthcloudmap),
-          transparent: true,
-          opacity: 0.8,
-          blending: THREE.AdditiveBlending,
-          alphaMap: loader.load(earthcloudmaptrans),
-          // alphaTest: 0.3,
-        });
-        cloudsMesh.scale.setScalar(1.003);
-        hookAnimationLoop(() => {
-          cloudsMesh.rotation.y += 0.0023;
-        })
+        const detail = 12;
+        const geometry = new THREE.IcosahedronGeometry(1.0, detail)
+        renderEarthMesh(geometry)
+        renderLightMesh(geometry)
+        renderCloudMesh(geometry)
+        renderGlowMesh(geometry)
 
-
-
-        const glowMesh = renderMesh()
-        glowMesh.geometry = earthMesh.geometry
-        glowMesh.material = getFresnelMat();
-        glowMesh.scale.setScalar(1.01);
-        hookAnimationLoop(() => {
-          glowMesh.rotation.y += 0.002;
-        })
       })
 
+      renderStars()
 
-
-      const starts = getStarfield({ numStars: 2000 })
-      hookAddResult(starts)
-      hookAnimationLoop(() => {
-        starts.rotation.y -= 0.002;
-      })
 
       const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
       sunLight.position.set(-2, 0.5, 1.5);
@@ -98,4 +46,89 @@ export default function () {
 
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+}
+
+
+function renderStars() {
+  const { hookAnimationLoop } = ThreeContext.consume()
+  const starts = getStarfield({ numStars: 2000 })
+  hookAddResult(starts)
+  hookAnimationLoop(() => {
+    starts.rotation.y -= 0.002;
+  })
+}
+
+/**
+ * 正面图层
+ * @param geometry 
+ */
+function renderEarthMesh(geometry: THREE.BufferGeometry) {
+  const loader = new THREE.TextureLoader()
+  const { hookAnimationLoop } = ThreeContext.consume()
+  const earthMesh = renderMesh()
+  earthMesh.geometry = geometry
+  earthMesh.material = new THREE.MeshPhongMaterial({
+    map: loader.load(earthmap1k),
+    specularMap: loader.load(earthspec1k),
+    bumpMap: loader.load(earthbump1k),
+  })
+  hookAnimationLoop(() => {
+    earthMesh.rotation.y += 0.002
+  })
+}
+
+/**
+ * 背光面的图层
+ * @param geometry 
+ */
+function renderLightMesh(geometry: THREE.BufferGeometry) {
+
+  const loader = new THREE.TextureLoader()
+  const { hookAnimationLoop } = ThreeContext.consume()
+  const lightsMesh = renderMesh()
+  lightsMesh.geometry = geometry
+  lightsMesh.material = new THREE.MeshBasicMaterial({
+    map: loader.load(earthlights1k),
+    blending: THREE.AdditiveBlending,
+  });
+  hookAnimationLoop(() => {
+    lightsMesh.rotation.y += 0.002;
+  })
+}
+/**
+ * 云层
+ * @param geometry 
+ */
+function renderCloudMesh(geometry: THREE.BufferGeometry) {
+  const loader = new THREE.TextureLoader()
+  const { hookAnimationLoop } = ThreeContext.consume()
+  const cloudsMesh = renderMesh()
+  cloudsMesh.geometry = geometry
+  cloudsMesh.material = new THREE.MeshStandardMaterial({
+    map: loader.load(earthcloudmap),
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    alphaMap: loader.load(earthcloudmaptrans),
+    // alphaTest: 0.3,
+  });
+  cloudsMesh.scale.setScalar(1.003);
+  hookAnimationLoop(() => {
+    cloudsMesh.rotation.y += 0.0023;
+  })
+}
+
+/**
+ * 外边的蓝色光辉
+ * @param geometry 
+ */
+function renderGlowMesh(geometry: THREE.BufferGeometry) {
+  const { hookAnimationLoop } = ThreeContext.consume()
+  const glowMesh = renderMesh()
+  glowMesh.geometry = geometry
+  glowMesh.material = getFresnelMat();
+  glowMesh.scale.setScalar(1.01);
+  hookAnimationLoop(() => {
+    glowMesh.rotation.y += 0.002;
+  })
 }
