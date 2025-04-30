@@ -3,7 +3,7 @@ import { renderContentEditableTrans } from "mve-dom-helper";
 import { renderArray } from "mve-helper";
 import { animateSignal, cns, cssMap, pointerMoveDir, } from "wy-dom-helper";
 import { contentEditableText } from "wy-dom-helper/contentEditable";
-import { arrayCountCreateWith, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, FrictionalFactory, numberStoreTranfrom, overScrollSlow, quote, scrollEdgeIteration, ScrollFromPage, scrollInfinityIteration, spring, tw } from "wy-helper";
+import { AnimateSignal, arrayCountCreateWith, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, FrictionalFactory, numberStoreTranfrom, overScrollSlow, quote, scrollEdgeIteration, scrollForEdge, ScrollFromPage, scrollInfinityIteration, spring, tw } from "wy-helper";
 
 //保持有限的位移
 // const fr = FrictionalFactory.get(0.004)//0.0006
@@ -72,63 +72,70 @@ export default function () {
         scrollType() == '原生' ? tw`overflow-auto` : tw`touch-none overflow-hidden`
       )
     },
-    onPointerDown: pointerMoveDir(function (e, dir) {
-      if (scrollType() == '原生') {
-        return
-      }
-      return ScrollFromPage.from(e, {
-        getPage: eventGetPageY,
-        scrollDelta(delta, velocity) {
-          const y = scrollY.getTarget()
-          // const y = scrollY.get()
-          scrollY.set(
-            y +
-            overScrollSlow(y, delta, container.clientHeight, content.offsetHeight)
-          )
-        },
-        onFinish(velocity) {
-          initV.set(velocity)
-          console.log("v1", velocity)
-          //使用惯性
-          return destinationWithMargin({
-            scroll: scrollY,
-            frictional: fr.getFromVelocity(velocity),
-            // multiple: 2,
-            containerSize: container.clientHeight,
-            contentSize: content.offsetHeight,
-            edgeConfig(velocity) {
-              console.log("v", velocity)
-              return fb2.getFromVelocity(velocity).animationConfig()
-              return scrollInfinityIteration(velocity, {
-                nextVelocity(v) {
-                  return v * 0.93
-                }
-              })
-              // return fr2.getFromVelocity(velocity).animationConfig('in')
+    onPointerDown: pointerMoveDir(function () {
+      scrollY.stop()
+      return {
+        onMove(e, dir) {
+          if (scrollType() == '原生') {
+            return
+          }
+
+
+          function onFinish(velocity: number) {
+            initV.set(velocity)
+            console.log("v1", velocity)
+            //使用惯性
+            return destinationWithMargin({
+              scroll: scrollY,
+              frictional: fr.getFromVelocity(velocity),
+              // multiple: 2,
+              containerSize: container.clientHeight,
+              contentSize: content.offsetHeight,
+              edgeConfig(velocity) {
+                console.log("v", velocity)
+                return fb2.getFromVelocity(velocity).animationConfig()
+                return scrollInfinityIteration(velocity, {
+                  nextVelocity(v) {
+                    return v * 0.93
+                  }
+                })
+                // return fr2.getFromVelocity(velocity).animationConfig('in')
+              },
+              edgeBackConfig: defaultSpringAnimationConfig,
+            })
+
+            scrollEdgeIteration(scrollY, {
+              velocity,
+              containerSize: container.clientHeight,
+              contentSize: content.offsetHeight,
+              // nextVelocity(n) {
+              //   return n * 0.9978
+              // },
+              // edgeNextVelocity(n) {
+              //   return n * 0.93
+              // }
+            }).then(value => {
+              if (value) {
+                scrollY.changeTo(value.target, spring({
+                  initialVelocity: value.velocity
+                }))
+              }
+            })
+          }
+          return ScrollFromPage.from(e, {
+            getPage: eventGetPageY,
+            scrollDelta(delta, velocity) {
+              // const y = scrollY.get()
+              scrollForEdge(scrollY, delta, container.clientHeight, content.offsetHeight)
             },
-            edgeBackConfig: defaultSpringAnimationConfig,
+            onFinish
           })
-
-          scrollEdgeIteration(scrollY, {
-            velocity,
-            containerSize: container.clientHeight,
-            contentSize: content.offsetHeight,
-            // nextVelocity(n) {
-            //   return n * 0.9978
-            // },
-            // edgeNextVelocity(n) {
-            //   return n * 0.93
-            // }
-          }).then(value => {
-            if (value) {
-              scrollY.changeTo(value.target, spring({
-                initialVelocity: value.velocity
-              }))
-            }
-          })
-
-        }
-      })
+        },
+        onCancel(e) {
+          console.log("stop", e)
+          scrollY.stop()
+        },
+      }
     }),
     children() {
       content = fdom.div({
@@ -155,7 +162,6 @@ export default function () {
     className: cs.footer
   })
 }
-
 const cs = cssMap({
   title: `
 	position: absolute;

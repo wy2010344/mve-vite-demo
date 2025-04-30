@@ -2,7 +2,7 @@ import { dom, fdom } from "mve-dom";
 import { renderArray } from "mve-helper";
 import { cns, cssMap } from "wy-dom-helper";
 import { arrayCountCreateWith, createSignal, quote } from "wy-helper";
-import { Scroller } from "../scroller";
+import { Scroller } from "../pages/virtual-list/scroller";
 // import Scroller from 'scroller'
 export default function () {
   const list = createSignal(arrayCountCreateWith(150, quote))

@@ -1,0 +1,1 @@
+import{a as t,bV as n,cn as r}from"./three.core-IZwRyLr5.js";function i(o){const e=new t(new n(12,33,12),new r({color:3355443,flatShading:!0}));return e.position.x=o,e.position.z=6,e}export{i as Wheel};

@@ -1,7 +1,7 @@
 import { dom } from "mve-dom";
 import { renderArray } from "mve-helper";
 import { arrayCountCreateWith, quote } from "wy-helper";
-import { Scroller } from "../scroller";
+import { Scroller } from "../pages/virtual-list/scroller";
 
 export default function () {
   dom.div({

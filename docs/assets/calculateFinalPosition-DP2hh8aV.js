@@ -1,0 +1,1 @@
+function I(x,d){return d.reduce((e,r)=>r==="forward"?{rowIndex:e.rowIndex+1,tileIndex:e.tileIndex}:r==="backward"?{rowIndex:e.rowIndex-1,tileIndex:e.tileIndex}:r==="left"?{rowIndex:e.rowIndex,tileIndex:e.tileIndex-1}:r==="right"?{rowIndex:e.rowIndex,tileIndex:e.tileIndex+1}:e,x)}export{I as calculateFinalPosition};

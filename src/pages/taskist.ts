@@ -77,10 +77,10 @@ export default function () {
             const maxIndex = mlist.length - 1
             const beforeIndex = index == 0 ? maxIndex : index - 1
             const afterIndex = index == maxIndex ? 1 : index + 1
-            callback(beforeIndex, mlist[beforeIndex], renderView)
-            callback(index, mlist[index], renderView)
-            callback(afterIndex, mlist[afterIndex], renderView)
-          })
+            callback(beforeIndex, mlist[beforeIndex])
+            callback(index, mlist[index])
+            callback(afterIndex, mlist[afterIndex],)
+          }, renderView)
         }
         const scrollX = animateSignal(0)
         const mp = movePage(scrollX, () => container.clientWidth)
@@ -98,15 +98,19 @@ export default function () {
         }))
         const container = fdom.div({
           className: 'relative flex-1 min-h-0',
-          onPointerDown: pointerMoveDir(function (e, dir) {
-            if (dir == 'x') {
-              return mp.pointerDown(e, {
-                getPage: eventGetPageX,
-                callback(direction, velocity) {
-                  const max = model.get().length
-                  selectIndex.set(circleFormat(selectIndex.get() + direction, max))
-                },
-              })
+          onPointerDown: pointerMoveDir(function () {
+            return {
+              onMove(e, dir) {
+                if (dir == 'x') {
+                  return mp.pointerDown(e, {
+                    getPage: eventGetPageX,
+                    callback(direction, velocity) {
+                      const max = model.get().length
+                      selectIndex.set(circleFormat(selectIndex.get() + direction, max))
+                    },
+                  })
+                }
+              }
             }
           }),
           children() {
@@ -234,10 +238,12 @@ export default function () {
               }
             })
 
-            hookExitAnimate(btn, div => {
-              return animate(div, {
-                opacity: 0
-              })
+            hookExitAnimate(btn, {
+              operateClone(div) {
+                return animate(div, {
+                  opacity: 0
+                })
+              },
             })
           }
         })

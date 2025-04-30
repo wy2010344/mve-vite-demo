@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { dom } from "mve-dom";
 import { cssMap } from "wy-dom-helper";
 import { createSignal } from "wy-helper";
@@ -5,7 +6,6 @@ import { createSignal } from "wy-helper";
 export default function clipDemo() {
 
   const version = createSignal(0)
-
   dom.div({
     className: s.container,
     style() {

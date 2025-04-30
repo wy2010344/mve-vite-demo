@@ -2,7 +2,10 @@ import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import viteImportMap from 'wy-helper/viteImportmap'
 import path from 'path'
+// import vitePluginRequire from "vite-plugin-require";
+
 export default defineConfig({
+	assetsInclude: ['**/*.glb', '**/*.gltf'],
 	server: {
 		watch: {
 			usePolling: true,

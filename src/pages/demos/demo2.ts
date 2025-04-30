@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { fdom } from "mve-dom";
 import { animateSignal, pointerMoveDir, } from "wy-dom-helper";
-import { eventGetPageX, FrictionalFactory, overScrollSlow, ScrollFromPage } from "wy-helper";
+import { eventGetPageX, FrictionalFactory, scrollForEdge, ScrollFromPage } from "wy-helper";
 
 export default function () {
 
@@ -24,26 +24,27 @@ export default function () {
         s_height: '240px',
         s_overflow: 'hidden',
         s_background: '#444',
-        onPointerDown: pointerMoveDir(function (e, dir) {
-          return ScrollFromPage.from(e, {
-            getPage: eventGetPageX,
-            scrollDelta(delta, velocity) {
-              const y = scrollX.get()
-              scrollX.set(
-                y +
-                overScrollSlow(y, delta, container.clientWidth, content.offsetWidth)
-              )
-            },
-            onFinish(velocity) {
-              // const out = bs.destinationWithMarginIscroll({
-              //   velocity,
-              //   current: scrollX.get(),
-              //   containerSize: container.clientWidth,
-              //   contentSize: content.offsetWidth
-              // })
-              // destinationWithMarginTrans(out, scrollX)
+        onPointerDown: pointerMoveDir(function () {
+          scrollX.stop()
+          return {
+            onMove(e, dir) {
+              return ScrollFromPage.from(e, {
+                getPage: eventGetPageX,
+                scrollDelta(delta, velocity) {
+                  scrollForEdge(scrollX, delta, container.clientWidth, content.offsetWidth)
+                },
+                onFinish(velocity) {
+                  // const out = bs.destinationWithMarginIscroll({
+                  //   velocity,
+                  //   current: scrollX.get(),
+                  //   containerSize: container.clientWidth,
+                  //   contentSize: content.offsetWidth
+                  // })
+                  // destinationWithMarginTrans(out, scrollX)
+                }
+              })
             }
-          })
+          }
         }),
         children() {
           content = fdom.div({
