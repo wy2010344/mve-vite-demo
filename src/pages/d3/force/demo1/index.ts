@@ -1,4 +1,4 @@
-import { dom, fdom, fsvg } from 'mve-dom'
+import { dom, fdom, fsvg, renderText } from 'mve-dom'
 import data from './graph.json'//'./block.json'//
 import * as d3 from "d3";
 import { cns, dragInit, pointerMove, subscribeDragMove, subscribeEventListener, subscribeRequestAnimationFrame } from 'wy-dom-helper';
@@ -52,7 +52,7 @@ export default function () {
   })
 
   const model = createSignal(data)
-  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  const colorOrdinal = d3.scaleOrdinal(d3.schemeCategory10);
   const renderLink = forceLink()
   const renderManyBody = forceManybody()
   const renderDirX = forceDir('x')
@@ -161,7 +161,7 @@ export default function () {
                   r: 5,
                   cx: node.x.dSignal.get,
                   cy: node.y.dSignal.get,
-                  fill: color(node.value.group),
+                  fill: colorOrdinal(node.value.group),
                   ...(dragInit(e => {
                     const rec = svg.getBoundingClientRect()
                     const halfX = rec.left + rec.width / 2
@@ -189,7 +189,30 @@ export default function () {
         }
       })
     } else if (type == '3D') {
+      const hoverShpere = createSignal<THREE.Mesh<THREE.SphereGeometry, THREE.MeshPhongMaterial> | undefined>(undefined)
 
+      const pointerMouse = createSignal<PointerEvent | undefined>(undefined)
+      renderOne(hoverShpere.get, function (sphere) {
+        if (!sphere) {
+          return
+        }
+        const node = sphere.userData as ForceNode<NNode>
+        fdom.div({
+          className: 'text-white px-3 py-4 rounded-[8px]',
+          s_position: 'fixed',
+          s_border: ' 1px solid rgba(255,255,255,0.1)',
+          s_background: 'linear-gradient(135deg, #2c3e50, #4ca1af)',
+          s_left() {
+            return (pointerMouse.get()?.clientX || 0) + 15 + 'px'
+          },
+          s_top() {
+            return (pointerMouse.get()?.clientY || 0) + 15 + 'px'
+          },
+          children() {
+            renderText`${node.value.group}--${node.value.citing_patents_count || ''}`
+          }
+        })
+      })
       const renderDirZ = forceDir('z')
       const { getNodesAndLinks, didTick, config } = nodesAndLink(3, (gl, alpha) => {
         renderDirX(gl.nodes, alpha)
@@ -205,32 +228,24 @@ export default function () {
         render(scene) {
           const { renderer } = ThreeContext.consume()
           scene.background = new THREE.Color(0xf5f7fa); // 浅灰色背景
-          // // 添加环境光使各个方向光照均匀
-          // const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-          // scene.add(ambientLight);
 
-          // // 添加轻微的方向光创造立体感
-          // const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-          // directionalLight.position.set(1, 1, 1).normalize();
-          // scene.add(directionalLight);
-
-
-
-          // 光照设置 - 调整为适合白色主题
-          const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // 更强的环境光
+          // 创建更复杂的光照系统
+          const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
           scene.add(ambientLight);
 
-          // 主光源 - 创造柔和的阴影效果
-          const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-          directionalLight.position.set(1, 1, 1).normalize();
+          // 主光源 - 产生阴影
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+          directionalLight.position.set(5, 10, 7);
           directionalLight.castShadow = true;
           directionalLight.shadow.mapSize.width = 1024;
           directionalLight.shadow.mapSize.height = 1024;
+          directionalLight.shadow.camera.near = 0.5;
+          directionalLight.shadow.camera.far = 50;
           scene.add(directionalLight);
 
-          // 辅助光源 - 减少阴影对比度
+          // 辅助光源 - 减少阴影硬度
           const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-          fillLight.position.set(-1, -0.5, -1).normalize();
+          fillLight.position.set(-5, 5, 5);
           scene.add(fillLight);
 
 
@@ -259,29 +274,43 @@ export default function () {
             n.x = (mouseX / rect.width) * 2 - 1;
             n.y = -((mouseY / rect.height) * 2 - 1); // Y轴需要反转
           }
-          hookDestroy(subscribeEventListener(canvas, 'pointerdown', e => {
 
-            const rect = canvas.getBoundingClientRect();
+          function getPointerShpere(e: PointerEvent, rect: DOMRect) {
             toCallOne(mouse, e, rect)
             // 设置射线
             raycaster.setFromCamera(mouse, camera);
             // 计算相交对象
             const intersects = raycaster.intersectObjects(spheres);
             if (intersects.length > 0) {
-              orbitControls.enabled = false
               const sphere = intersects[0].object as THREE.Mesh<THREE.SphereGeometry, THREE.MeshPhongMaterial>
+              return sphere
+            }
+          }
 
 
-              const node = sphere.userData as ForceNode<any>
+          hookDestroy(subscribeEventListener(canvas, 'pointermove', e => {
+            const rect = canvas.getBoundingClientRect();
+            const sphere = getPointerShpere(e, rect)
+            if (sphere) {
+              hoverShpere.set(sphere)
+              pointerMouse.set(e)
+            } else {
+              hoverShpere.set(undefined)
+            }
+          }))
 
+          hookDestroy(subscribeEventListener(canvas, 'pointerdown', e => {
+            const rect = canvas.getBoundingClientRect();
+            const sphere = getPointerShpere(e, rect)
+            if (sphere) {
+              orbitControls.enabled = false
+              const node = sphere.userData as ForceNode<NNode>
               node.z.f = node.z.d
               config.alphaTarget = 0.3
               didTick()
               pointerMove({
                 onMove(e) {
-                  const rect = renderer.domElement.getBoundingClientRect();
-                  mouse.x = ((e.clientX - rect.left) / 800) * 2 - 1;
-                  mouse.y = -((e.clientY - rect.top) / 800) * 2 + 1;
+                  toCallOne(mouse, e, rect)
                   // 计算新位置
                   raycaster.setFromCamera(mouse, camera);
                   const direction = raycaster.ray.direction;
@@ -303,11 +332,15 @@ export default function () {
 
           renderArray(() => getNodesAndLinks().nodes, node => {
             // 创建材质
+            const color = colorOrdinal(node.value.group)
             const sphereMaterial = new THREE.MeshPhongMaterial({
-              color: color(node.value.group),
-              specular: 0x111111, shininess: 30, emissive: 0x000000,
-              flatShading: false,
-              side: THREE.DoubleSide
+              color,
+              specular: 0x111111,
+              shininess: 50,
+              bumpMap: createBumpTexture(),
+              bumpScale: 0.5,
+              emissive: 0x000000,
+              flatShading: false
             });
 
             // 创建球体
@@ -318,6 +351,13 @@ export default function () {
             spheres.push(sphere)
             hookDestroy(() => {
               removeEqual(spheres, sphere)
+            })
+            hookTrackSignal(() => {
+              if (hoverShpere.get() == sphere) {
+                sphereMaterial.emissive.setHex(0x333333);
+              } else {
+                sphereMaterial.emissive.set(color)
+              }
             })
             hookTrackSignal(() => {
               setV3(sphere.position, node)
@@ -345,9 +385,30 @@ export default function () {
               line.geometry = lineGeometry.setFromPoints(points)
             })
           })
+
         },
       })
+
     }
   })
 }
 
+
+// 创建随机凹凸纹理
+function createBumpTexture() {
+  const size = 64;
+  const data = new Uint8Array(size * size * 4);
+
+  for (let i = 0; i < size * size; i++) {
+    const stride = i * 4;
+    const v = Math.random() * 255;
+    data[stride] = v;
+    data[stride + 1] = v;
+    data[stride + 2] = v;
+    data[stride + 3] = 255;
+  }
+
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  texture.needsUpdate = true;
+  return texture;
+}

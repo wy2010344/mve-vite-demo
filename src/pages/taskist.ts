@@ -238,10 +238,12 @@ export default function () {
               }
             })
 
-            hookExitAnimate(btn, div => {
-              return animate(div, {
-                opacity: 0
-              })
+            hookExitAnimate(btn, {
+              operateClone(div) {
+                return animate(div, {
+                  opacity: 0
+                })
+              },
             })
           }
         })

@@ -1,5 +1,5 @@
 import { fdom } from "mve-dom";
-import { memo, numberIntFillWithN0, simpleEqualsEqual, tw, YearMonthDayVirtualView, YearMonthVirtualView, WeekVirtualView, StoreRef, GetValue, dateFromYearMonthDay, ScrollFromPage, eventGetPageY, FrictionalFactory, emptyArray, emptyObject } from "wy-helper";
+import { memo, numberIntFillWithN0, simpleEqualsEqual, tw, YearMonthDayVirtualView, YearMonthVirtualView, WeekVirtualView, StoreRef, GetValue, dateFromYearMonthDay, ScrollFromPage, eventGetPageY, FrictionalFactory, emptyArray, emptyObject, Compare } from "wy-helper";
 import { getExitAnimateArray, hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { animateSignal, cns, pointerMoveDir } from "wy-dom-helper";
 import hookTrackLayout from "./hookTrackLayout";
@@ -121,7 +121,7 @@ export default function (
                 renderArray(memoArray(() => {
                   const ym = yearMonth()
                   return [ym.lastMonth(), ym, ym.nextMonth()]
-                }, simpleEqualsEqual), function (yearMonth, getIndex) {
+                }, simpleEqualsEqual as Compare<YearMonthVirtualView>), function (yearMonth, getIndex) {
                   renderCalendar(
                     yearMonth,
                     getIndex,
@@ -133,7 +133,7 @@ export default function (
                 renderArray(memoArray(() => {
                   const wk = week()
                   return [wk.beforeWeek(), wk, wk.nextWeek()]
-                }, simpleEqualsEqual), function (week, getIndex) {
+                }, simpleEqualsEqual as Compare<WeekVirtualView>), function (week, getIndex) {
                   renderWeekday(week, getIndex, date)
                 })
               })

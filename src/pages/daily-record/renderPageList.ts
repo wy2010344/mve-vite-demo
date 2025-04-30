@@ -1,5 +1,5 @@
 import { fdom } from "mve-dom";
-import { dateFromYearMonthDay, DAYMILLSECONDS, memo, simpleEqualsEqual, YearMonthDayVirtualView, StoreRef, FrictionalFactory, eventGetPageX, ClampingScrollFactory } from "wy-helper";
+import { dateFromYearMonthDay, DAYMILLSECONDS, memo, simpleEqualsEqual, YearMonthDayVirtualView, StoreRef, FrictionalFactory, eventGetPageX, ClampingScrollFactory, Compare } from "wy-helper";
 import { hookTrackSignal, memoArray, renderArray } from "mve-helper";
 import { animateSignal, pointerMoveDir, } from "wy-dom-helper";
 import renderPage from "./renderPage";
@@ -66,7 +66,7 @@ export default function (
               d,
               d.nextDay()
             ]
-          }, simpleEqualsEqual), function (w, getIndex) {
+          }, simpleEqualsEqual as Compare<YearMonthDayVirtualView>), function (w, getIndex) {
             renderPage(getIndex, () => {
               return bodyScrollX.onAnimation()
             })

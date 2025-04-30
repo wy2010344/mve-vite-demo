@@ -2,7 +2,7 @@ import { windowSize } from "wy-dom-helper";
 import { getPerspectiveCamera, hookOrbitControls, renderGroup, renderThreeView } from "../../../hookThreeView";
 
 import * as THREE from 'three'
-import { hookDrawThree } from "mve-dom-helper";
+import { hookDrawThree, hookThreeCenterPosition, hookThreePosition } from "mve-dom-helper";
 import { emptyFun, flexDisplayUtil, LayoutNode, Point, PointKey, simpleFlex } from "wy-helper";
 import { hookTrackSignal } from "mve-helper";
 import { any } from "wy-helper/kanren";
@@ -64,21 +64,9 @@ export default function () {
         })
 
 
-        addTrackEffect(n.axis.x.position, (v) => {
-          return function () {
-            box.position.x = v
-          }
-        })
-        addTrackEffect(n.axis.y.position, (v) => {
-          return function () {
-            box.position.y = v
-          }
-        })
-        addTrackEffect(n.axis.z.position, (v) => {
-          return function () {
-            box.position.z = v
-          }
-        })
+
+
+        hookThreeCenterPosition(n)
         addTrackEffect(() => new THREE.BoxGeometry(
           n.axis.x.size(),
           n.axis.y.size(),
@@ -94,18 +82,22 @@ export default function () {
 
 
       hookDrawThree({
+        x: 1,
+        y: 1,
+        z: 1,
+        // paddingLeft: 1,
+        // paddingBack: 1,
+        // paddingTop: 1,
         layout(v) {
           return flexDisplayUtil('x', {
             gap: 1
+          }, {
+            alignItems: 'start'
           })
         },
         render(n) {
           return renderGroup((group) => {
-            hookTrackSignal(() => {
-              group.position.x = n.axis.x.position()
-              group.position.y = n.axis.y.position()
-              group.position.z = n.axis.z.position()
-            })
+            hookThreePosition(n as any)
 
             hookDrawThree({
               width: 1,

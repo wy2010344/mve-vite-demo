@@ -5,6 +5,7 @@ import path from 'path'
 // import vitePluginRequire from "vite-plugin-require";
 
 export default defineConfig({
+	assetsInclude: ['**/*.glb', '**/*.gltf'],
 	server: {
 		watch: {
 			usePolling: true,

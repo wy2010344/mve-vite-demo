@@ -2,7 +2,7 @@ import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, pointerMoveDir, animateSignal } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, FrictionalFactory, spring, defaultSpringAnimationConfig, scrollInfinityIteration, destinationWithMargin, ClampingScrollFactory, eventGetPageX, scrollForEdge, } from "wy-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, FrictionalFactory, spring, defaultSpringAnimationConfig, scrollInfinityIteration, destinationWithMargin, ClampingScrollFactory, eventGetPageX, scrollForEdge, Compare, } from "wy-helper";
 import explain from "../../explain";
 import { renderMobileView } from "../../onlyMobile";
 import hookTrackLayout from "../daily-record/hookTrackLayout";
@@ -286,15 +286,15 @@ export default function () {
 
                           renderArray(memoArray(() => {
                             const w = week()
-                            return [w.beforeWeek(), w, w.nextWeek()]
-                          }, simpleEqualsEqual), function (w, i) {
+                            return [w.beforeWeek(), w, w.nextWeek()] as const
+                          }, simpleEqualsEqual as Compare<WeekVirtualView>), function (w, i) {
                             renderWeek(w, i)
                           })
                         }, function () {
                           renderArray(memoArray(() => {
                             const ym = yearMonth()
-                            return [ym.lastMonth(), ym, ym.nextMonth()]
-                          }, simpleEqualsEqual), function (m, i) {
+                            return [ym.lastMonth(), ym, ym.nextMonth()] as const
+                          }, simpleEqualsEqual as Compare<YearMonthVirtualView>), function (m, i) {
                             renderCalendarView(m, i)
                           })
                         })
@@ -355,7 +355,7 @@ export default function () {
                     renderArray(memoArray(() => {
                       const d = date.get()
                       return [d.beforeDay(), d, d.nextDay()]
-                    }, simpleEqualsEqual), function (w, getIndex) {
+                    }, simpleEqualsEqual as Compare<YearMonthDayVirtualView>), function (w, getIndex) {
                       mdom.div({
                         attrs(v) {
                           const i = getIndex()

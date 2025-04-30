@@ -1,9 +1,9 @@
 import { removeWhere } from "wy-helper"
 import { AllMayBaseType, AllMayType, Any, include } from "."
 
-function unionToList(a: AllMayType): readonly AllMayBaseType[]
-function unionToList(a: AllMayType, slice: true): AllMayBaseType[]
-function unionToList(a: AllMayType, slice?: boolean) {
+export function unionToList(a: AllMayType): readonly AllMayBaseType[]
+export function unionToList(a: AllMayType, slice: true): AllMayBaseType[]
+export function unionToList(a: AllMayType, slice?: boolean) {
   return a instanceof Union ? slice ? a.list.slice() : a.list : [a]
 }
 
