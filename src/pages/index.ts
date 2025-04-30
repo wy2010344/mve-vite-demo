@@ -64,10 +64,56 @@ function renderCard() {
         title: '退出动画',
         description: '入场动画、离场动画'
       })
-      card({
-        href: '/virtual-list',
-        title: '虚拟列表,与自定义滚动',
-        description: '虚拟列表,与自定义滚动'
+      fdom.div({
+
+        data_theme: randomTheme(),
+        className: 'daisy-card bg-primary text-primary-content w-96',
+        children() {
+
+          fdom.div({
+            className: 'daisy-card-body',
+            children() {
+              fdom.h2({
+                className: 'daisy-card-title',
+                childrenType: 'text',
+                children: '虚拟列表',
+              })
+              fdom.div({
+                className: "grid grid-cols-2 gap-1",
+                children() {
+                  fLink({
+                    href: '/virtual-list',
+                    className: "daisy-btn",
+                    childrenType: 'text',
+                    data_theme: randomTheme(),
+                    children: '原生滚动,动态高度'
+                  })
+                  fLink({
+                    href: '/virtual-list/fix-height',
+                    className: "daisy-btn",
+                    childrenType: 'text',
+                    data_theme: randomTheme(),
+                    children: '自定义滚动,固定高度'
+                  })
+                  fLink({
+                    href: '/virtual-list/dynamic-height',
+                    className: "daisy-btn",
+                    childrenType: 'text',
+                    data_theme: randomTheme(),
+                    children: '自定义滚动,动态高度'
+                  })
+                  fLink({
+                    href: '/virtual-list/fix-height-reverse',
+                    className: "daisy-btn",
+                    childrenType: 'text',
+                    data_theme: randomTheme(),
+                    children: '自定义滚动,固定高度,自底向顶'
+                  })
+                }
+              })
+            }
+          })
+        }
       })
       fdom.div({
 
@@ -145,6 +191,23 @@ function renderCard() {
         href: '/magnified-dock',
         title: `magnified-dock`,
         description: `一个类似mac上的dock的实现`
+      })
+      card({
+        href: '/taro-cards',
+        title: `塔罗卡片`,
+        description: `展示使用mve拖拽信号的灵活`
+      })
+
+      card({
+        href: '/taro-cards',
+        title: `塔罗卡片`,
+        description: `展示使用mve拖拽信号的灵活`
+      })
+
+      card({
+        href: '/onboard',
+        title: '导航动画',
+        description: '一个导航动画'
       })
     }
   })

@@ -1,5 +1,6 @@
 import { KVPair } from "wy-helper";
-import { AllMayBaseType, AllMayType, Any, include, VarType } from ".";
+import { AllMayBaseType, AllMayType, Any, include } from ".";
+import { Union, unionToList } from "./union";
 
 /**
  * 交集类似于加法
@@ -28,30 +29,7 @@ import { AllMayBaseType, AllMayType, Any, include, VarType } from ".";
  * 也许函数不应该参与类型演算
  * 或者不应该求交集 
  */
-export class Intersect {
-  constructor(
-    /**
-     * 可以确定范围的集合
-     */
-    readonly superType: AllMayType,
-    /**
-     * 不包含Union,使用分配率,使Intersect优先结合
-     * include时,需要同时属于多个list
-     * 被include时,只需要superType被包含
-     */
-    readonly list: readonly AllMayBaseType[]
-  ) { }
-}
 
-
-
-function joinVar(a: VarType, b: AllMayBaseType, list: AllMayBaseType[]) {
-
-  const superType = toIntersect(a.belong, b)
-  if (superType != Any.empty) {
-    list.push(new Intersect(superType, [a, b]))
-  }
-}
 function toIntersectOne(
   a: AllMayBaseType,
   b: AllMayBaseType,
@@ -62,11 +40,11 @@ function toIntersectOne(
   } else if (include(b, a)) {
     list.push(a)
   } else {
-    if (a instanceof VarType) {
-      joinVar(a, b, list)
-    } else if (b instanceof VarType) {
-      joinVar(b, a, list)
-    } else if (a instanceof KVPair && b instanceof KVPair) {
+
+    //函数的包含可以化简
+    //类型彼此之间的包含不能化简
+
+    if (a instanceof KVPair && b instanceof KVPair) {
       let doCheck = true
       let ret = a
       let bTemp: KVPair<AllMayType> | undefined = b
@@ -110,5 +88,13 @@ export function toIntersect(a: AllMayType, b: AllMayType): AllMayType {
       toIntersectOne(ax, bx, list)
     })
   })
-  return listToAllMayType(list)
+
+  if (list.length) {
+    let ret: AllMayType = list[0]
+    for (let i = 1; i < list.length; i++) {
+      ret = Union.from(ret, list[i])
+    }
+    return ret
+  }
+  return Any.empty
 }

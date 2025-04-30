@@ -1,7 +1,6 @@
 import { KVPair, quote, removeWhere } from "wy-helper"
 import { KPair } from "wy-helper/kanren"
 import { Union } from "./union"
-import { Intersect } from "./intersect"
 
 export class Any<T extends string> {
   private constructor(
@@ -17,12 +16,9 @@ export class Any<T extends string> {
 
 /**
  * 泛型类型
+ * 似乎不需要,因为把类型当值来计算
+ * 
  */
-export class VarType {
-  constructor(
-    public readonly belong: AllMayType
-  ) { }
-}
 
 export class Fun<T> {
   constructor(
@@ -42,7 +38,7 @@ export class Fun<T> {
 
 
 
-export type AllMaySimpleType = KVPair<AllMayType>
+export type AllMayBaseType = KVPair<AllMayType>
   | Fun<AllMayType>
   | KPair<AllMayType, AllMayType>
   | string
@@ -53,7 +49,6 @@ export type AllMaySimpleType = KVPair<AllMayType>
   | Any<"string">
   | Any<"number">
   | Any<"empty">
-export type AllMayBaseType = VarType | AllMaySimpleType | Intersect
 
 export type AllMayType = AllMayBaseType | Union<AllMayBaseType>
 
@@ -84,8 +79,6 @@ export function allMayTypeToString(n: AllMayType): string {
     return `(${n.key}:${allMayTypeToString(n.value)}${n.rest ? `& ${allMayTypeToString(n.rest)}` : ''})`
   } else if (n instanceof Fun) {
     return `(${allMayTypeToString(n.arg)} => ${allMayTypeToString(n.out)})`
-  } else if (n instanceof VarType) {
-    return `(var ${allMayTypeToString(n)})`
   } else if (typeof n == 'symbol') {
     return `#${n.description}#`
   } else {
@@ -144,16 +137,9 @@ export function include(a: AllMayType, b: AllMayType): boolean {
     //空集合
     return true
   }
-  if (b instanceof VarType) {
-    return include(a, b.belong)
-  }
   if (b instanceof Union) {
     return b.list.every(rb => include(a, rb))
   }
-  if (b instanceof Intersect) {
-    return include(a, b.superType)
-  }
-
   if (a instanceof Any) {
     if (a.flag == 'all') {
       return true
@@ -171,9 +157,6 @@ export function include(a: AllMayType, b: AllMayType): boolean {
   }
   if (a instanceof Union) {
     return a.list.some(v => include(v, b))
-  }
-  if (a instanceof Intersect) {
-    return a.list.every(v => include(v, b))
   }
   if (a instanceof Fun) {
     if (b instanceof Fun) {
@@ -204,10 +187,8 @@ export function include(a: AllMayType, b: AllMayType): boolean {
          * 函数之间的交集,要能正常使用,入参取较大那个,出参取较小那个 较小的集合
          *   ts中是这样的
          */
-        const v = new VarType(a.arg)
-        const aOut = a.apply(v)
-        const bOut = b.apply(v)
-        return include(aOut, bOut)
+        const bOut = b.apply(a.arg)
+        return include(a.out, bOut)
       }
     }
     return false
@@ -266,14 +247,44 @@ let m: c = {
   x: 8
 }
 
-type x1 = (a: string) => 9
-type x2 = (a: '9') => number
+type x1<T extends '7' | '6'> = (a: '9' | '7' | T) => 9
+type x2 = (a: '9' | '8') => number
 
-type x3 = x1 | x2
-type x4 = x1 & x2
+type x3<T extends '6'> = x1<T> | x2
+type x4<T extends '7'> = x1<T> & x2
 
-let m1!: x3
+let m1!: x3<'6'>
 let m1x = m1('9')
 
-let m2!: x4
-let m2x = m2('dd')
+let m2!: x4<'7'>
+let m2x = m2('8')
+
+
+function ab(x: x3<'6'>) {
+
+}
+
+ab(m2)
+
+
+type K3 = x2 & {
+  a: 9
+}
+
+function k1<T extends number>(n: T) {
+  return {
+    x: n,
+    y: n
+  }
+}
+
+let xm = k1(9)
+
+function abb(
+  g: <T extends 9 | 8>(n: T) => {
+    x: T, y: T
+  }
+) {
+
+}
+abb(k1)

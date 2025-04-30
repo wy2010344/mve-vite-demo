@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { hookAddResult } from "mve-core";
 import { getPerspectiveCamera, hookOrbitControls, renderGroup, renderMesh, renderThreeView, ThreeContext } from "../../../hookThreeView";
-import { windowSize } from "mve-dom-helper";
 import earthmap1k from './00_earthmap1k.jpg'
 import earthbump1k from './01_earthbump1k.jpg'
 import earthspec1k from './02_earthspec1k.jpg'
@@ -10,6 +9,7 @@ import earthcloudmap from './04_earthcloudmap.jpg'
 import earthcloudmaptrans from './05_earthcloudmaptrans.jpg'
 import { getFresnelMat } from './getFresnelMat';
 import getStarfield from './getStarfield';
+import { windowSize } from 'wy-dom-helper';
 /**
  * https://www.youtube.com/watch?v=UMqNHi1GDAE
  */
