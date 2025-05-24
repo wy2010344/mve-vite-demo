@@ -114,7 +114,7 @@ export default function () {
         const interpolateScale = memoFun(() => {
           return getInterpolate({
             0: 1,
-            [width() / 2]: 16,
+            [width() / 2]: 8,
             [width()]: 1
           }, extrapolationClamp)
         })
