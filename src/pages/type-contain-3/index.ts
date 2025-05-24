@@ -1,29 +1,27 @@
+import { dom, fdom, renderPortal } from "mve-dom";
 import { renderCode } from "mve-dom-helper";
-import { contentEditableText, initContentEditableModel } from "wy-dom-helper/contentEditable";
-import { batchSignalEnd, createSignal, emptyFun, tw } from "wy-helper";
-import { Message, parseSentence, toFillToken } from "./parse";
-import { runParse } from "wy-helper/tokenParser";
-import { evalOneExp } from "./evalTree";
-import { dom, fdom, renderPortal, renderText } from "mve-dom";
 import { hookDestroy, hookTrackSignal } from "mve-helper";
-import { topScope } from "./define";
-import { endNotFillToToken } from "wy-helper/infixLang";
-import { cns, initPrisma, subscribeEventListener } from "wy-dom-helper";
-import { arrow, autoPlacement, autoUpdate, computePosition, hide, offset } from '@floating-ui/dom';
-
+import { initPrisma, subscribeEventListener } from "wy-dom-helper";
+import { contentEditableText, initContentEditableModel } from "wy-dom-helper/contentEditable";
+import { createSignal, tw } from "wy-helper";
+import { runParse } from "wy-helper/tokenParser";
+import { Message, parseSentence, toFillToken } from './parse'
 initPrisma()
 export default function () {
+
   fdom.div({
-    className: "flex",
+    className: 'flex',
     children() {
-      renderInputArea("A1")
-      // renderInputArea("A2")
+
+      renderInputArea('AA1')
     }
   })
 }
 
 
+
 function renderInputArea(saveKey: string) {
+
   const model = createSignal(
     initContentEditableModel(localStorage.getItem(saveKey) || '')
   )
@@ -33,6 +31,8 @@ function renderInputArea(saveKey: string) {
   }, value => {
     localStorage.setItem(saveKey, value)
   })
+
+
   renderContentEditable({
     render(value, a) {
       const div = fdom.pre({
@@ -44,9 +44,10 @@ function renderInputArea(saveKey: string) {
           try {
             const text = current().value
             const out = runParse(text, parseSentence)
-            console.log("out", out, evalOneExp(out, topScope, false))
-            const mlist = toFillToken(out, text)
 
+            // const out1 = evalOneExp(out, undefined, false)
+
+            const mlist = toFillToken(out, text)
             let id = 0
             mlist.forEach(row => {
               const span = dom.span({
@@ -100,15 +101,6 @@ function renderInputArea(saveKey: string) {
   })
 }
 
-
 function hasError(messages: Message[]) {
   return messages?.some(message => message.type == 'error')
 }
-/*
-(a=Any,b=Mnuz)=>(
-y=Str,
-z=Any,
-m=Num
-),
-M=98
-*/

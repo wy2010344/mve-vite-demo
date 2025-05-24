@@ -199,12 +199,6 @@ function renderCard() {
       })
 
       card({
-        href: '/taro-cards',
-        title: `塔罗卡片`,
-        description: `展示使用mve拖拽信号的灵活`
-      })
-
-      card({
         href: '/onboard',
         title: '导航动画',
         description: '一个导航动画'
