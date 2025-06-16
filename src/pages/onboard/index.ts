@@ -30,15 +30,10 @@ export default function () {
       }
     })
     const mp = movePage(scrollX, width, (v) => sp)//tween(6000, easeFns.inOut(easeFns.circ)))
-    hookTrackSignal(memo<number>((beforeIndex, init) => {
-      const i = index.get()
-      if (init) {
-        const direction = circleFindNearst(i - beforeIndex!, data.length)
-        mp.changePage(direction)
-      }
-      return i
-    }))
 
+    mp.hookCompare(index.get, function (i, beforeIndex) {
+      return circleFindNearst(i - beforeIndex, data.length)
+    })
 
     const getVX = memo(() => {
       //是需要知道方向的
@@ -66,23 +61,10 @@ export default function () {
       }
     })
 
-    hookDestroy(subscribeEventListener(window, 'pointerdown', pointerMoveDir(() => {
-      return {
-        onMove(e, dir) {
-          if (dir == 'x') {
-            return mp.pointerDown(e, {
-              getPage: eventGetPageX,
-              callback(direction, velocity) {
-                if (direction) {
-                  updateIndex(direction)
-                }
-              },
-            })
-          }
-        }
-      }
+    hookDestroy(subscribeEventListener(window, 'pointerdown', mp.getOnPointerDown({
+      direction: 'x',
+      callback: updateIndex,
     })))
-
 
     const currentRow = memo(() => data.at(index.get()))
 

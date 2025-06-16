@@ -1,12 +1,12 @@
 import { faker } from "@faker-js/faker";
-import { fdom } from "mve-dom";
+import { dom, fdom } from "mve-dom";
 import { hookDestroy, hookTrackSignal, renderOne } from "mve-helper";
 import { addEffect, arrayCountCreateWith, createSignal } from "wy-helper";
 
 export default function () {
 
 
-  const tags = arrayCountCreateWith(10, i => {
+  const tags = arrayCountCreateWith(50, i => {
     return faker.food.fruit()
   })
 
@@ -43,6 +43,7 @@ export default function () {
     })
   })
   const ob = new ResizeObserver(() => {
+    showCounts.set(1)
     version.set(version.get() + 1)
   })
   addEffect(() => {
@@ -52,9 +53,9 @@ export default function () {
     ob.disconnect()
   })
   const div = fdom.div({
-    className: 'w-30 h-30 bg-amber-200 resize overflow-hidden flex gap-1',
+    className: 'w-30 h-30 bg-amber-200 resize-x overflow-hidden flex gap-1',
     children() {
-      renderOne(showCounts.get, function (n) {
+      renderOne(() => Math.min(showCounts.get(), tags.length), function (n) {
         for (let i = 0; i < n; i++) {
           fdom.div({
             className: 'daisy-badge whitespace-nowrap',
@@ -74,4 +75,14 @@ export default function () {
       })
     }
   })
+  dom.button({
+    onClick() {
+      div.style.width = '300px'
+    }
+  }).renderText`突变为300px`
+  dom.button({
+    onClick() {
+      div.style.width = '900px'
+    }
+  }).renderText`突变为900px`
 }

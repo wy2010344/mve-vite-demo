@@ -8,6 +8,7 @@ import { arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSign
 import explain from "../../../explain"
 import markdown from "../../../markdown"
 import hookMeasureHeight from "../hookMeasureHeight"
+import { forEachSub, forEachSubReverse } from "../dynamicHeight"
 
 /**
  * 参考react-window,需要对每条记录预估高度
@@ -59,7 +60,6 @@ export default function () {
         }
         return h
       })
-
       container.addEventListener("pointerdown", e => {
         scrollY.stop()
         pointerMove(ScrollFromPage.from(e, {
@@ -100,15 +100,7 @@ export default function () {
           return paddingBegin() + 'px'
         },
         children() {
-          renderForEach<Row, number>(function (callback) {
-            const array = list.get()
-            const [beginIndex, endIndex] = subList()
-            console.log("range", beginIndex, endIndex)
-            for (let i = endIndex; i > beginIndex; i--) {
-              const row = array[i - 1]
-              callback(row.id, row)
-            }
-          }, function (key, et) {
+          renderForEach<Row, number>(forEachSubReverse(list.get, v => v.id, subList), function (key, et) {
             fdom.div({
               className: 'flex items-center justify-center min-h-0',
               s_height() {

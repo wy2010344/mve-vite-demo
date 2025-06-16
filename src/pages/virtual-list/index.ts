@@ -1,12 +1,13 @@
 import { faker } from "@faker-js/faker"
 import { renderForEach } from "mve-core"
 import { dom, fdom, renderTextContent } from "mve-dom"
-import { getSubListInfo, hookDestroy } from "mve-helper"
+import { getSubListInfo, hookDestroy, hookTrackSignal } from "mve-helper"
 import { animateSignal, pointerMove } from "wy-dom-helper"
 import { arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, destinationWithMargin, eventGetPageY, getSubListForVirtualList, memo, ScrollFromPage } from "wy-helper"
 import hookMeasureHeight from "./hookMeasureHeight"
 import explain from "../../explain"
 import markdown from "../../markdown"
+import { dynamicHeight, forEachSub } from "./dynamicHeight"
 
 export default function () {
 
@@ -40,37 +41,18 @@ export default function () {
         batchSignalEnd()
       })
 
-      const version = createSignal(0)
-      const cacheMap = new Map<number, number>()
-      const averageHeight = memo(() => {
-        let h = 0
-        let c = 0
-        version.get()
-        cacheMap.forEach(v => {
-          h = h + v
-          c++
-        })
-        if (c) {
-          return h / c
-        }
-        return 100
-      })
-
-      function getHeight(v: Row) {
-        version.get()
-        const h = cacheMap.get(v.id)
-        if (typeof h == 'number') {
-          return h
-        }
-        return averageHeight() || 100
+      const { getHeightWithId, averageHeight, measureHeight } = dynamicHeight()
+      function getHeight(row: Row) {
+        return getHeightWithId(row.id)
       }
       const { paddingBegin, subList } = getSubListInfo(() => {
-        return getSubListForVirtualList(
+        const o = getSubListForVirtualList(
           list.get(),
           scrollY.get(),
           containerHeight.get(),
           getHeight
         )
+        return o
       })
       fdom.div({
         s_height() {
@@ -80,15 +62,7 @@ export default function () {
           return paddingBegin() + 'px'
         },
         children() {
-          renderForEach<Row, number>(function (callback) {
-            const array = list.get()
-            const [beginIndex, endIndex] = subList()
-            console.log("range", beginIndex, endIndex)
-            for (let i = beginIndex; i < endIndex; i++) {
-              const row = array[i]
-              callback(row.id, row)
-            }
-          }, function (key, et) {
+          renderForEach<Row, number>(forEachSub(list.get, v => v.id, subList), function (key, et) {
             const div = fdom.div({
               s_background() {
                 return et.getValue().color
@@ -103,11 +77,7 @@ export default function () {
                 dom.p().renderTextContent(() => et.getValue().content)
               }
             })
-            hookMeasureHeight(div, function () {
-              cacheMap.set(key, div.clientHeight)
-              version.set(version.get() + 1)
-              batchSignalEnd()
-            })
+            measureHeight(key, div)
           })
         }
       })

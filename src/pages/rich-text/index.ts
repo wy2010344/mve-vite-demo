@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { dom, fdom, renderPortal, renderTextContent } from "mve-dom";
-import { renderCode, renderCodeChange } from "mve-dom-helper";
+import { renderCodeChange, renderContentEditable, useContentEditable } from "mve-dom-helper";
 import { hookDestroy, hookTrackSignal } from "mve-helper";
-import { contentEditableText, initContentEditableModel } from "wy-dom-helper/contentEditable";
+import { contentEditableText, addSimpleEvent } from "wy-dom-helper/contentEditable";
 import { addEffect, batchSignalEnd, createSignal, tw } from "wy-helper";
 import explain from "../../explain";
 import markdown from "../../markdown";
@@ -38,7 +38,10 @@ export default function () {
   hookTrackSignal(value.get, value => {
     localStorage.setItem(storeKey, value)
   })
-  const { current, renderContentEditable } = renderCode(renderCodeChange(value.get, value.set))
+
+
+  const model = renderCodeChange(value.get, value.set)
+  const { current, renderContentEditable } = useContentEditable(model.get)
 
   const readonly = createSignal(false)
   fdom.div({
@@ -62,9 +65,8 @@ export default function () {
       }).renderText`重置`
       renderContentEditable({
 
-        render(value, a) {
-          return fdom.pre({
-            ...a,
+        children(value) {
+          return addSimpleEvent(model, fdom.pre({
             className: 'prose daisy-prose whitespace-pre-wrap ',
             contentEditable() {
               return readonly.get() ? false : contentEditableText
@@ -188,7 +190,7 @@ export default function () {
                 }
               })
             }
-          })
+          }))
         },
       })
     }
