@@ -64,10 +64,10 @@ export default function () {
       },
       async calendarClose() {
         if (showYearMonth()) {
-          yearMonthScrollY.changeTo(scrollYearMonthOpenHeight())
-          calendarScrollY.changeTo(calendarOpenHeight())
+          yearMonthScrollY.animateTo(scrollYearMonthOpenHeight())
+          calendarScrollY.animateTo(calendarOpenHeight())
         } else {
-          calendarScrollY.changeTo(calendarOpenHeight())
+          calendarScrollY.animateTo(calendarOpenHeight())
         }
       },
       calendarScroll(delta, velocity) {
