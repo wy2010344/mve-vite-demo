@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { dom, fdom, renderPortal, renderTextContent } from "mve-dom";
-import { renderCode } from "mve-dom-helper";
+import { renderCodeChange, renderContentEditable, useContentEditable } from "mve-dom-helper";
 import { hookDestroy, hookTrackSignal } from "mve-helper";
-import { contentEditableText, initContentEditableModel } from "wy-dom-helper/contentEditable";
+import { contentEditableText, addSimpleEvent } from "wy-dom-helper/contentEditable";
 import { addEffect, batchSignalEnd, createSignal, tw } from "wy-helper";
 import explain from "../../explain";
 import markdown from "../../markdown";
@@ -33,17 +33,16 @@ export default function () {
     }
     return map[name]
   }
-  const model = createSignal(storeValue ? {
-    currentIndex: 0,
-    history: [
-      JSON.parse(storeValue)
-    ]
-  } : initContentEditableModel(`abc @john check this https://chatgpt.com and email me at test@example.com`))
-  const { current, renderContentEditable } = renderCode(model)
-
-  hookTrackSignal(current, value => {
-    localStorage.setItem(storeKey, JSON.stringify(value))
+  const initValue = `abc @john check this https://chatgpt.com and email me at test@example.com`
+  const value = createSignal(storeValue || initValue)
+  hookTrackSignal(value.get, value => {
+    localStorage.setItem(storeKey, value)
   })
+
+
+  const model = renderCodeChange(value.get, value.set)
+  const { current, renderContentEditable } = useContentEditable(model.get)
+
   const readonly = createSignal(false)
   fdom.div({
     className: 'overflow-auto',
@@ -58,11 +57,16 @@ export default function () {
           return readonly.get() ? '转为编辑' : '转为只读'
         }
       })
+      dom.button({
+        className: 'daisy-btn',
+        onClick() {
+          value.set(initValue)
+        }
+      }).renderText`重置`
       renderContentEditable({
 
-        render(value, a) {
-          return fdom.pre({
-            ...a,
+        children(value) {
+          return addSimpleEvent(model, fdom.pre({
             className: 'prose daisy-prose whitespace-pre-wrap ',
             contentEditable() {
               return readonly.get() ? false : contentEditableText
@@ -186,7 +190,7 @@ export default function () {
                 }
               })
             }
-          })
+          }))
         },
       })
     }

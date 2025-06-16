@@ -1,17 +1,22 @@
 import { fdom } from "mve-dom";
 import { FaArrowRight } from "mve-icons/fa";
 import { renderSizeSvg } from "../mve-icon";
-import { fLink } from "../history";
-
+import { fLink } from 'daisy-mobile-helper'
 import themes from "daisyui/functions/themeOrder"
 import { faker } from "@faker-js/faker";
 import fixRightTop from "../fixRightTop";
 import themeDropdown, { randomTheme } from "../themeDropdown";
 import explain from "../explain";
 import markdown from "../markdown";
+import { renderMobileView } from "../onlyMobile";
 
 export default function () {
-  renderCard()
+  renderMobileView(function ({
+    width,
+    height
+  }, mock) {
+    renderCard()
+  })
 }
 
 
@@ -19,6 +24,7 @@ function renderCard() {
   fixRightTop(function () {
     themeDropdown()
   })
+
   fdom.div({
     className: 'w-full h-full overflow-y-auto flex flex-col items-center gap-1 pt-1 pb-1',
     children() {
@@ -199,15 +205,31 @@ function renderCard() {
       })
 
       card({
-        href: '/taro-cards',
-        title: `塔罗卡片`,
-        description: `展示使用mve拖拽信号的灵活`
-      })
-
-      card({
         href: '/onboard',
         title: '导航动画',
         description: '一个导航动画'
+      })
+
+      card({
+        href: '/bigspin',
+        title: '大转盘抽奖',
+        description: ''
+      })
+
+      card({
+        href: '/adjust-tag',
+        title: '自适应tag标签',
+        description: '展示的tag与宽度相匹配'
+      })
+      card({
+        href: '/kanban-board',
+        title: '看板拖拽',
+        description: `在不同面板拖动与调整顺序`
+      })
+      card({
+        href: '/staggered-grid-animation',
+        title: '点击效果',
+        description: ''
       })
     }
   })
