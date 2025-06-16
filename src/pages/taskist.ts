@@ -9,9 +9,10 @@ import { hookDestroy, hookTrackSignal, renderArray, renderArrayKey } from "mve-h
 import { hookExitAnimate, movePage, renderInputBool } from "mve-dom-helper";
 import { ImPlus } from "mve-icons/im";
 import { IoMdClose } from "mve-icons/io";
-import { history } from "../history";
 import { createPop, createTimeoutPop } from "../pop";
 import { animate } from "motion";
+import { routerConsume } from "daisy-mobile-helper";
+import { mb } from "wy-dom-helper/contentEditable";
 
 
 
@@ -45,6 +46,7 @@ const data = arrayCountCreateWith(7, function (i) {
 type Model = typeof data[0]
 const bs = FrictionalFactory.get()
 export default function () {
+  const { router } = routerConsume()
   renderMobileView(function () {
 
     const model = createSignal(data)
@@ -61,7 +63,7 @@ export default function () {
             fdom.button({
               className: 'daisy-btn daisy-btn-ghost daisy-btn-circle',
               onClick() {
-                history.push(`/taskist/total`)
+                router.push(`/taskist/total`)
               },
               children() {
                 IoMdClose()
@@ -85,33 +87,24 @@ export default function () {
         const scrollX = animateSignal(0)
         const mp = movePage(scrollX, () => container.clientWidth)
 
+        mp.hookCompare(selectIndex.get, function (index, oldIndex) {
+          return circleFindNearst(index - oldIndex, model.get().length)
+        })
         hookTrackSignal(memo<number>(oldIndex => {
           const index = selectIndex.get()
           if (typeof oldIndex == 'number') {
-            const dif = circleFindNearst(index - oldIndex, model.get().length)
-            const d = Math.sign(dif)
-            if (d) {
-              mp.changePage(d)
-            }
           }
           return index
         }))
         const container = fdom.div({
           className: 'relative flex-1 min-h-0',
-          onPointerDown: pointerMoveDir(function () {
-            return {
-              onMove(e, dir) {
-                if (dir == 'x') {
-                  return mp.pointerDown(e, {
-                    getPage: eventGetPageX,
-                    callback(direction, velocity) {
-                      const max = model.get().length
-                      selectIndex.set(circleFormat(selectIndex.get() + direction, max))
-                    },
-                  })
-                }
-              }
-            }
+          onPointerDown: mp.getOnPointerDown({
+            direction: 'x',
+            callback(direction, velocity) {
+
+              const max = model.get().length
+              selectIndex.set(circleFormat(selectIndex.get() + direction, max))
+            },
           }),
           children() {
             fdom.div({

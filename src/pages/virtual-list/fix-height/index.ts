@@ -8,6 +8,7 @@ import { arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSign
 import explain from "../../../explain"
 import markdown from "../../../markdown"
 import hookMeasureHeight from "../hookMeasureHeight"
+import { forEachSub } from "../dynamicHeight"
 
 /**
  * 参考react-window,需要对每条记录预估高度
@@ -42,6 +43,7 @@ export default function () {
   const scrollY = animateSignal(0)
   const fr = ClampingScrollFactory.get()
   const edgeFr = ClampingScrollFactory.get(100)
+
   fdom.div({
     className: 'touch-none w-[90%] h-[90%] overflow-hidden border-red-100 border-1',
     children(container: HTMLDivElement) {
@@ -98,15 +100,7 @@ export default function () {
           return paddingBegin() + 'px'
         },
         children() {
-          renderForEach<Row, number>(function (callback) {
-            const array = list.get()
-            const [beginIndex, endIndex] = subList()
-            console.log("range", beginIndex, endIndex)
-            for (let i = beginIndex; i < endIndex; i++) {
-              const row = array[i]
-              callback(row.id, row)
-            }
-          }, function (key, et) {
+          renderForEach<Row, number>(forEachSub(list.get, v => v.id, subList), function (key, et) {
             fdom.div({
               className: 'flex items-center justify-center min-h-0',
               s_height() {

@@ -7,6 +7,7 @@ import { arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSign
 import hookMeasureHeight from "../hookMeasureHeight"
 import explain from "../../../explain"
 import markdown from "../../../markdown"
+import { dynamidHeight2, forEachSub } from "../dynamicHeight"
 
 export default function () {
   explain(() => {
@@ -37,6 +38,10 @@ export default function () {
   const scrollY = animateSignal(0)
   const fr = ClampingScrollFactory.get()
   const edgeFr = ClampingScrollFactory.get(100)
+
+  const { getHeight, averageHeight } = dynamidHeight2(list.get, function (c) {
+    return c.height.get()
+  })
   fdom.div({
     className: 'touch-none w-[90%] h-[90%] overflow-hidden border-red-100 border-1',
     children(container: HTMLDivElement) {
@@ -44,26 +49,6 @@ export default function () {
       hookMeasureHeight(container, () => {
         containerHeight.set(container.clientHeight)
         batchSignalEnd()
-      })
-      const averageHeight = memo(() => {
-        const array = list.get()
-        let h = 0
-        let c = 0
-        for (let i = 0; i < array.length; i++) {
-          const rowHeight = array[i].height.get()
-          if (typeof rowHeight == 'number') {
-            h = h + rowHeight
-            c++
-          }
-        }
-        if (c) {
-          /**
-           * 计算平均高度
-           */
-          return h / c
-        }
-        //不设个最小高度,会从0到结束
-        return 100
       })
       container.addEventListener("pointerdown", e => {
         scrollY.stop()
@@ -89,14 +74,6 @@ export default function () {
       })
 
 
-      function getHeight(v: Row) {
-        const h = v.height.get()
-        if (typeof h == 'number') {
-          return h
-        }
-        return averageHeight()
-      }
-
       const { paddingBegin, subList } = getSubListInfo(() => {
         return getSubListForVirtualList(
           list.get(),
@@ -113,15 +90,7 @@ export default function () {
           return paddingBegin() + 'px'
         },
         children() {
-          renderForEach<Row, number>(function (callback) {
-            const array = list.get()
-            const [beginIndex, endIndex] = subList()
-            console.log("range", beginIndex, endIndex)
-            for (let i = beginIndex; i < endIndex; i++) {
-              const row = array[i]
-              callback(row.id, row)
-            }
-          }, function (key, et) {
+          renderForEach<Row, number>(forEachSub(list.get, v => v.id, subList), function (key, et) {
             const div = fdom.div({
               s_background() {
                 return et.getValue().color
@@ -140,6 +109,7 @@ export default function () {
               et.getValue().height.set(div.clientHeight)
               batchSignalEnd()
             })
+            //
           })
         }
       })

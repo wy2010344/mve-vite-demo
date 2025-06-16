@@ -18,6 +18,9 @@
     "noEmit": true,
     "allowJs": true,
     "skipLibCheck": true,
+    "jsx": "preserve",
+    "jsxFactory": "mve.createElement",
+    "jsxFragmentFactory": "mve.Fragment",
     /* Linting */
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,

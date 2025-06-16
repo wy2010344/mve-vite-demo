@@ -1,8 +1,8 @@
 import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
-import { cns, pointerMoveDir, animateSignal } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, ScrollFromPage, eventGetPageY, overScrollSlow, FrictionalFactory, spring, defaultSpringAnimationConfig, scrollInfinityIteration, destinationWithMargin, ClampingScrollFactory, eventGetPageX, scrollForEdge, Compare, } from "wy-helper";
+import { cns, animateSignal } from "wy-dom-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, FrictionalFactory, spring, Compare, PointKey, tween, easeFns, } from "wy-helper";
 import explain from "../../explain";
 import { renderMobileView } from "../../onlyMobile";
 import hookTrackLayout from "../daily-record/hookTrackLayout";
@@ -11,8 +11,8 @@ import fixRightTop from "../../fixRightTop";
 import themeDropdown from "../../themeDropdown";
 import demoList from "../daily-record/demoList";
 import { faker } from "@faker-js/faker";
-import { movePage } from 'mve-dom-helper'
-import { fchmod } from "fs";
+import { movePage, pluginSimpleMovePage } from 'mve-dom-helper'
+import { pluginOnScroll } from "mve-dom-helper";
 
 
 const selectShadowCell = 'select-cell'
@@ -31,6 +31,7 @@ export default function () {
         themeDropdown()
       })
     }
+    const directionLock = createSignal<PointKey | undefined>(undefined)
     const date = createSignal(YearMonthDayVirtualView.fromDate(new Date()), simpleEqualsNotEqual)
     const yearMonth = memo<YearMonthVirtualView>((m) => {
       const d = date.get()
@@ -45,8 +46,6 @@ export default function () {
     w.__date = date
 
     const scrollY = animateSignal(0)
-    let content: HTMLElement
-    const bs = FrictionalFactory.get()
     function perSize() {
       return getFullWidth() / 7
     }
@@ -86,38 +85,27 @@ export default function () {
                 }
               }))
             }
-            // setTimeout(() => {
-            // }, 200)
           })
         }
         lastDate = date.get()
       }
     })
-    hookTrackSignal(memo<YearMonthVirtualView>(oldMonth => {
-      const ym = yearMonth()
-      if (oldMonth && !showWeek()) {
-        const direction = Math.sign(ym.toNumber() - oldMonth.toNumber())
-        if (direction) {
-          mp.changePage(direction)
-        }
-      }
-      return ym
-    }))
-    hookTrackSignal(memo<WeekVirtualView>(oldWeek => {
-      const w = week()
-      if (oldWeek && showWeek()) {
-        const direction = Math.sign(w.cells[0].toNumber() - oldWeek.cells[0].toNumber())
-        if (direction) {
-          mp.changePage(direction)
-        }
-      }
-      return w
-    }))
-
     function getContainerWidth() {
       return container.clientWidth
     }
     const mp = movePage(calendarScrollX, getContainerWidth)
+    mp.hookCompare(week, function (a, b) {
+      if (showWeek()) {
+        return a.cells[0].toNumber() - b.cells[0].toNumber()
+      }
+      return 0
+    })
+    mp.hookCompare(yearMonth, function (a, b) {
+      if (showWeek()) {
+        return 0
+      }
+      return a.toNumber() - b.toNumber()
+    })
     hookTrackLayout(date.get, selectShadowCell)
 
     const interpolateH = memoFun(() => {
@@ -135,40 +123,8 @@ export default function () {
       onTouchMove(e) {
         e.preventDefault()
       },
-      onPointerDown: pointerMoveDir(function () {
-        scrollY.stop()
-        return {
-          onMove(e, dir) {
-            if (dir == 'y') {
-              //上下滑动
-              return ScrollFromPage.from(e, {
-                getPage: eventGetPageY,
-                scrollDelta(delta) {
-                  scrollForEdge(scrollY, delta, container.clientHeight, content.offsetHeight)
-                },
-                onFinish(velocity) {
-                  const snap = dragSnapWithList([
-                    {
-                      beforeForce: 0.005,
-                      size: perSize() * 5,
-                      afterForce: 0.005
-                    }
-                  ])
-                  destinationWithMargin({
-                    scroll: scrollY,
-                    frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
-                    containerSize: container.clientHeight,
-                    contentSize: content.offsetHeight,
-                    targetSnap: snap,
-                  })
-                }
-              })
-            }
-          }
-        }
-      }),
-      children() {
-        content = fdom.div({
+      children(container: HTMLElement) {
+        fdom.div({
           s_transform() {
             return `translateY(${-scrollY.get()}px)`
           },
@@ -177,6 +133,20 @@ export default function () {
           s_minHeight() {
             return `calc(100% + ${getFullWidth()}px * 5 / 7)`
           },
+          plugins: [
+            pluginOnScroll({
+              container,
+              scroll: scrollY,
+              direction: 'y',
+              targetSnap: dragSnapWithList([
+                {
+                  beforeForce: 0.005,
+                  size: perSize() * 5,
+                  afterForce: 0.005
+                }
+              ])
+            })
+          ],
           children() {
             //header
             fdom.div({
@@ -222,9 +192,6 @@ export default function () {
                 // })
               }
             })
-
-
-
             fdom.div({
               s_zIndex: 1,
               s_position: 'relative',
@@ -245,35 +212,27 @@ export default function () {
                     const ty = Math.max(scrollY.get(), 0)
                     return `translateY(${ty}px)`
                   },
-                  onPointerDown: pointerMoveDir(function () {
-                    return {
-                      onMove(e, dir) {
-                        if (dir == 'x') {
-                          return mp.pointerDown(e, {
-                            getPage: eventGetPageX,
-                            callback(direction, velocity) {
-                              if (showWeek()) {
-                                //星期
-                                const m = dateFromYearMonthDay(date.get())
-                                m.setTime(m.getTime() + direction * WEEKTIMES)
-                                if (direction) {
-                                  date.set(YearMonthDayVirtualView.fromDate(m))
-                                }
-                              } else {
-                                //月份
-                                const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
-                                if (date.get().day > c.days) {
-                                  date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
-                                } else {
-                                  date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
-                                }
-                              }
+                  onPointerDown: mp.getOnPointerDown({
+                    direction: 'x',
+                    callback(direction, velocity) {
+                      if (showWeek()) {
 
-                            },
-                          })
+                        //星期
+                        const m = dateFromYearMonthDay(date.get())
+                        m.setTime(m.getTime() + direction * WEEKTIMES)
+                        if (direction) {
+                          date.set(YearMonthDayVirtualView.fromDate(m))
+                        }
+                      } else {
+                        //月份
+                        const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth();
+                        if (date.get().day > c.days) {
+                          date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days));
+                        } else {
+                          date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day));
                         }
                       }
-                    }
+                    },
                   }),
                   children() {
                     fdom.div({
@@ -304,47 +263,34 @@ export default function () {
                 })
               }
             })
-
-
-            hookTrackSignal(memo<YearMonthDayVirtualView>((lastDate) => {
-              const d = date.get()
-              if (lastDate) {
-                const lastTime = dateFromYearMonthDay(lastDate).valueOf()
-                const thisTime = dateFromYearMonthDay(d).valueOf()
-                const diff = thisTime - lastTime
-                let direction = 0
-                if (diff >= DAYMILLSECONDS) {
-                  direction = 1
-                } else if (diff <= -DAYMILLSECONDS) {
-                  direction = -1
-                }
-                if (direction) {
-                  mp2.changePage(direction)
-                }
-              }
-              return d
-            }))
-            const mp2 = movePage(bodyScrollX, getContainerWidth)
             fdom.div({
               className: ' flex-1',
-              onPointerDown: pointerMoveDir(function () {
-                return {
-                  onMove(e, dir) {
-                    if (dir == 'x') {
-                      return mp2.pointerDown(e, {
-                        getPage: eventGetPageX,
-                        callback(direction, velocity) {
-                          const m = dateFromYearMonthDay(date.get())
-                          m.setTime(m.getTime() + direction * DAYMILLSECONDS)
-                          if (direction) {
-                            date.set(YearMonthDayVirtualView.fromDate(m))
-                          }
-                        },
-                      })
+              data_a: '99',
+              plugins: [
+                pluginSimpleMovePage({
+                  direction: 'x',
+                  scroll: bodyScrollX,
+                  getValue: date.get,
+                  getSize: getContainerWidth,
+                  compare(d, lastDate) {
+                    const lastTime = dateFromYearMonthDay(lastDate).valueOf()
+                    const thisTime = dateFromYearMonthDay(d).valueOf()
+                    const diff = thisTime - lastTime
+                    let direction = 0
+                    if (diff >= DAYMILLSECONDS) {
+                      direction = 1
+                    } else if (diff <= -DAYMILLSECONDS) {
+                      direction = -1
                     }
-                  }
-                }
-              }),
+                    return direction
+                  },
+                  callback(direction) {
+                    const m = dateFromYearMonthDay(date.get())
+                    m.setTime(m.getTime() + direction * DAYMILLSECONDS)
+                    date.set(YearMonthDayVirtualView.fromDate(m))
+                  },
+                })
+              ],
               children() {
                 fdom.div({
                   className: 'relative',

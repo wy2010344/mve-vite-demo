@@ -1,0 +1,1 @@
+function h(n,r){n.length>r.length&&([n,r]=[r,n]);const e=n.length,c=r.length;let o=new Array(e+1).fill(0),f=new Array(e+1).fill(0);for(let i=0;i<c;i++){for(let l=0;l<e;l++)n[l]==r[i]?f[l+1]=o[l]+1:f[l+1]=Math.max(o[l+1],f[l]);[o,f]=[f,o]}return o[e]}console.log(h("oxcpqrsvwf","shmtulqrypy"));

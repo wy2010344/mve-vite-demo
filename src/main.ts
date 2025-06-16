@@ -1,59 +1,21 @@
 import { createRoot, fdom, fsvg, svg } from 'mve-dom'
-import { getHistoryState } from './history'
-import { hookPromiseSignal, renderIf, renderOne, renderOneKey } from 'mve-helper'
+import { routerProvide } from 'daisy-mobile-helper'
+import { argForceNumber, createTreeRoute, getBranchKey, renderOneKey, } from 'mve-helper'
 import { IconContext } from "mve-icons";
 import { renderPop } from 'mve-dom-helper'
-import { AbortPromiseResult, EmptyFun, GetValue, memo, quote } from 'wy-helper';
-import { PairBranch, PairLeaf, PairNotfound, TreeRoute } from 'wy-helper/router';
+import { createHashHistory } from 'history';
 const app = document.querySelector<HTMLDivElement>('#app')!
 const pages = import.meta.glob('./pages/**')
-type BranchLoader = {
-  default(arg: GetValue<Record<string, any>>, renderChildren: EmptyFun): void
-}
-type LeafLoader = {
-  default(arg: GetValue<Record<string, any>>): void
-}
-type NotfoundLoader = {
-  default(arg: GetValue<Record<string, any>>, rest: GetValue<string[]>): void
-}
-const tree = new TreeRoute<BranchLoader, LeafLoader, NotfoundLoader>({
-  number(n: string) {
-    if (!n) {
-      throw new Error('不允许省略')
-    }
-    const x = Number(n)
-    if (isNaN(x)) {
-      throw new Error('not a number ' + n)
-    }
-    return x
-  }
+const { renderBranch, getBranch, preLoad } = createTreeRoute({
+  treeArg: {
+    number: argForceNumber
+  },
+  pages,
+  prefix: './pages/',
+  renderError
 })
-tree.buildFromMap(pages, './pages/')
-tree.finishBuild()
-type BranchOrLeaf = PairBranch<BranchLoader, LeafLoader, NotfoundLoader> | PairLeaf<LeafLoader> | PairNotfound<NotfoundLoader>
-function renderBranch(getBranch: GetValue<BranchOrLeaf>) {
-  renderOneKey(getBranch, v => v.loader, function (loader) {
-    const branch = getBranch()
-    //在终止中
-    const { get } = hookPromiseSignal(() => loader)
-    renderOne(get, function (value?: AbortPromiseResult<any>) {
-      if (value?.type == 'success') {
-        if (branch.type == 'branch') {
-          value.value.default(() => getBranch().query, () => renderBranch(() => getBranch().next!))
-        } else if (branch.type == 'leaf') {
-          value.value.default(() => getBranch().query)
-        } else if (branch.type == 'notfound') {
-          value.value.default(() => getBranch().query, () => getBranch().restNodes!)
-        }
-      } else if (value?.type == 'error') {
-        renderError(`加载资源失败${getHistoryState().pathname}, ${value.value}`)
-      } else {
-
-      }
-    })
-  })
-}
 const destroy = createRoot(app, () => {
+  const { getHistoryState } = routerProvide(createHashHistory())
   IconContext.provide({
     renderItem(tag, attrs, children) {
       svg[tag as 'svg'](attrs).render(children)
@@ -67,25 +29,13 @@ const destroy = createRoot(app, () => {
       }).render(children)
     }
   })
-
-
-
-  const getBranch = memo(() => {
-    try {
-      const nodes = getHistoryState().pathname.split('/').filter(quote)
-      const out = tree.matchNodes(nodes)
-      console.log("out", out)
-      return out
-    } catch (err) {
-      console.log("err", err)
+  renderOneKey(
+    getBranch(() => getHistoryState().pathname),
+    getBranchKey,
+    function (key, branch) {
+      renderBranch(branch)
     }
-  })
-  renderIf(getBranch, function () {
-    console.log("get", getBranch())
-    renderBranch(getBranch as GetValue<BranchOrLeaf>)
-  }, function () {
-    renderError(`未找到该页面`)
-  })
+  )
   renderPop()
 })
 

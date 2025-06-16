@@ -50,63 +50,44 @@ export default function (
     children() {
       //星期与天都需要滚动
       const scrollX = animateSignal(0)
-      hookTrackSignal(memo<YearMonthVirtualView>(oldMonth => {
-        const ym = yearMonth()
-        if (oldMonth && showCalendar()) {
-          const direction = Math.sign(ym.toNumber() - oldMonth.toNumber())
-          if (direction) {
-            mp.changePage(direction)
-          }
-        }
-        return ym
-      }))
-
-      hookTrackSignal(memo<WeekVirtualView>(oldWeek => {
-        const w = week()
-        if (oldWeek && !showCalendar()) {
-          const direction = Math.sign(w.cells[0].toNumber() - oldWeek.cells[0].toNumber())
-          if (direction) {
-            mp.changePage(direction)
-          }
-        }
-        return w
-      }))
-
-
       const mp = movePage(scrollX, getContainerWidth)
+      mp.hookCompare(week, function (a, b) {
+        if (showCalendar()) {
+          return 0
+        }
+        return a.cells[0].toNumber() - b.cells[0].toNumber()
+      })
+      mp.hookCompare(yearMonth, function (ym, oldMonth) {
+        if (!showCalendar()) {
+          return 0
+        }
+        return ym.toNumber() - oldMonth.toNumber()
+      })
       function getContainerWidth() {
         return container.clientWidth
       }
       const container = fdom.div({
         className: 'overflow-hidden  bg-base-300 touch-none',
-        onPointerDown: pointerMoveDir(function () {
-          return {
-            onMove(e, dir) {
-              if (dir == 'x') {
-                return mp.pointerDown(e, {
-                  callback(direction, velocity) {
-
-                    if (showCalendar()) {
-                      //切换月份
-                      const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
-                      if (date.get().day > c.days) {
-                        date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
-                      } else {
-                        date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
-                      }
-                    } else {
-                      //切换周
-                      const m = dateFromYearMonthDay(date.get())
-                      m.setTime(m.getTime() + direction * WEEKTIMES)
-                      if (direction) {
-                        date.set(YearMonthDayVirtualView.fromDate(m))
-                      }
-                    }
-                  },
-                })
+        onPointerDown: mp.getOnPointerDown({
+          direction: "x",
+          callback(direction, velocity) {
+            if (showCalendar()) {
+              //切换月份
+              const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth()
+              if (date.get().day > c.days) {
+                date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days))
+              } else {
+                date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day))
+              }
+            } else {
+              //切换周
+              const m = dateFromYearMonthDay(date.get())
+              m.setTime(m.getTime() + direction * WEEKTIMES)
+              if (direction) {
+                date.set(YearMonthDayVirtualView.fromDate(m))
               }
             }
-          }
+          },
         }),
         children() {
           //滚动区域
@@ -226,7 +207,7 @@ export default function (
                     //为了使越界触发
                     calendarClose()
                   } else {
-                    calendarScrollY.changeTo(0)
+                    calendarScrollY.animateTo(0)
                   }
                 }
               })

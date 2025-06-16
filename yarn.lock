@@ -1274,6 +1274,11 @@ tyme4ts@^1.2.1:
   resolved "https://registry.yarnpkg.com/tyme4ts/-/tyme4ts-1.2.2.tgz#11f81265702c77a2388f17d77eb3f58db5776d88"
   integrity sha512-vuKf3fkVmoJH//p9oJ6h2h+iYvry73IuP70xpsdja47cUqGFxf4L7ugIl7DzajYOe8jYVf2I3TuLCeniI2eirQ==
 
+typed.js@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/typed.js/-/typed.js-2.1.0.tgz#b97a06111a5f57d6a59acfdd36d4f9b891ee13b4"
+  integrity sha512-bDuXEf7YcaKN4g08NMTUM6G90XU25CK3bh6U0THC/Mod/QPKlEt9g/EjvbYB8x2Qwr2p6J6I3NrsoYaVnY6wsQ==
+
 typescript@^5.8.2:
   version "5.8.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.8.2.tgz#8170b3702f74b79db2e5a96207c15e65807999e4"
