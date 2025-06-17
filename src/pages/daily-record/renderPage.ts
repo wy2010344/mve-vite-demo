@@ -1,6 +1,6 @@
 import { fdom, mdom } from "mve-dom"
 import { animateSignal, pointerMoveDir } from "wy-dom-helper"
-import { addEffect, ClampingScrollFactory, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, scrollForEdge, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
+import { addEffect, ClampingScrollFactory, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, getMaxScroll, GetValue, memoFun, overScrollSlow, scrollForEdge, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
 import demoList from "./demoList"
 import { faker } from "@faker-js/faker"
 import { hookTrackSignal } from "mve-helper"
@@ -65,8 +65,7 @@ export default function (
                   destinationWithMargin({
                     frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
                     scroll: scrollY,
-                    containerSize: container.clientHeight,
-                    contentSize: content.offsetHeight,
+                    maxScroll: getMaxScroll(container.clientHeight, content.offsetHeight)
                   })
                 }
               }

@@ -9,6 +9,7 @@ import explain from "../../../explain"
 import markdown from "../../../markdown"
 import hookMeasureHeight from "../hookMeasureHeight"
 import { forEachSub, forEachSubReverse } from "../dynamicHeight"
+import { OnScroll } from "mve-dom-helper"
 
 /**
  * 参考react-window,需要对每条记录预估高度
@@ -51,37 +52,16 @@ export default function () {
         containerHeight.set(container.clientHeight)
         batchSignalEnd()
       })
-
-      const totalHeight = memo(() => {
-        const array = list.get()
-        let h = 0
-        for (let i = 0; i < array.length; i++) {
-          h = h + array[i].height
-        }
-        return h
-      })
-      container.addEventListener("pointerdown", e => {
-        scrollY.stop()
-        pointerMove(ScrollFromPage.from(e, {
-          getPage: eventGetPageY,
-          scrollDelta(delta, velocity) {
-            scrollY.set(scrollY.get() + delta)
-            batchSignalEnd()
-          },
-          opposite: true,
-          onFinish(velocity) {
-            return destinationWithMargin({
-              scroll: scrollY,
-              frictional: fr.getFromVelocity(velocity),
-              containerSize: containerHeight.get(),
-              contentSize: totalHeight(),
-
-              edgeConfig(velocity) {
-                return edgeFr.getFromVelocity(velocity).animationConfig()
-              }
-            })
+      const onScroll = OnScroll.hookGet('y', container, {
+        opposite: true,
+        maxScroll() {
+          const array = list.get()
+          let h = 0
+          for (let i = 0; i < array.length; i++) {
+            h = h + array[i].height
           }
-        }))
+          return h - containerHeight.get()
+        }
       })
 
       function getHeight(v: Row) {
@@ -89,12 +69,12 @@ export default function () {
       }
 
       const { paddingBegin, subList } = getSubListInfo(() => {
-        return getSubListForVirtualList(list.get(), scrollY.get(), containerHeight.get(), getHeight)
+        return getSubListForVirtualList(list.get(), onScroll.get(), containerHeight.get(), getHeight)
       })
       fdom.div({
         className: 'absolute w-full',
         s_bottom() {
-          return -scrollY.get() + 'px'
+          return -onScroll.get() + 'px'
         },
         s_paddingBottom() {
           return paddingBegin() + 'px'
