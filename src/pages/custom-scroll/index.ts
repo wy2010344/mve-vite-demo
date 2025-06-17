@@ -2,13 +2,22 @@ import { fdom } from "mve-dom";
 import { hookDestroy } from "mve-helper";
 import { animateSignal, pointerMove } from "wy-dom-helper";
 import { addEffect, ClampingScrollFactory, createSignal, destinationWithMargin, eventGetPageX, eventGetPageY, scrollForEdge, ScrollFromPage } from "wy-helper";
-import { OnScroll } from "./scrollX";
+import { measureMaxScroll, OnScroll, OnScrollHelper } from 'mve-dom-helper';
 
 export default function () {
 
 
-  const scrollX = animateSignal(0)
-  const scrollY = animateSignal(0)
+
+  const helperX = new OnScrollHelper('x')
+  const helperY = new OnScrollHelper('y')
+  const maxScrollX = helperX.measureMaxScroll()
+  const scrollX = helperX.hookLazyInit({
+    maxScroll: maxScrollX.get
+  })
+  const maxScrollY = helperY.measureMaxScroll()
+  const scrollY = helperY.hookLazyInit({
+    maxScroll: maxScrollY.get
+  })
   fdom.div({
     className: 'w-100 h-100 overflow-hidden relative',
     children(container: HTMLElement) {
@@ -22,18 +31,8 @@ export default function () {
           return -scrollX.get() + 'px'
         }
       })
-
-
-      OnScroll.hookGet(content, {
-        container,
-        scroll: scrollX,
-        direction: 'x'
-      })
-      OnScroll.hookGet(content, {
-        container,
-        scroll: scrollY,
-        direction: 'y'
-      })
+      maxScrollX.hookInit(container, content,)
+      maxScrollY.hookInit(container, content,)
     }
   })
 }

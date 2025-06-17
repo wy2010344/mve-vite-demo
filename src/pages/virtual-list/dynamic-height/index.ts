@@ -8,6 +8,7 @@ import hookMeasureHeight from "../hookMeasureHeight"
 import explain from "../../../explain"
 import markdown from "../../../markdown"
 import { dynamidHeight2, forEachSub } from "../dynamicHeight"
+import { OnScroll } from "mve-dom-helper"
 
 export default function () {
   explain(() => {
@@ -35,7 +36,7 @@ export default function () {
 
   type Row = typeof baseList[number]
 
-  const scrollY = animateSignal(0)
+  // const scrollY = animateSignal(0)
   const fr = ClampingScrollFactory.get()
   const edgeFr = ClampingScrollFactory.get(100)
 
@@ -50,41 +51,25 @@ export default function () {
         containerHeight.set(container.clientHeight)
         batchSignalEnd()
       })
-      container.addEventListener("pointerdown", e => {
-        scrollY.stop()
-        pointerMove(ScrollFromPage.from(e, {
-          getPage: eventGetPageY,
-          scrollDelta(delta, velocity) {
-            scrollY.set(scrollY.get() + delta)
-            batchSignalEnd()
-          },
-          onFinish(velocity) {
-            return destinationWithMargin({
-              scroll: scrollY,
-              frictional: fr.getFromVelocity(velocity),
-              containerSize: containerHeight.get(),
-              contentSize: averageHeight() * list.get().length,
 
-              edgeConfig(velocity) {
-                return edgeFr.getFromVelocity(velocity).animationConfig()
-              }
-            })
-          }
-        }))
+      const onScroll = OnScroll.hookGet('y', container, {
+        maxScroll: memo(() => {
+          return averageHeight() * list.get().length - containerHeight.get()
+        })
       })
 
 
       const { paddingBegin, subList } = getSubListInfo(() => {
         return getSubListForVirtualList(
           list.get(),
-          scrollY.get(),
+          onScroll.get(),
           containerHeight.get(),
           getHeight
         )
       })
       fdom.div({
         s_transform() {
-          return `translateY(${-scrollY.get()}px)`
+          return `translateY(${-onScroll.get()}px)`
         },
         s_paddingTop() {
           return paddingBegin() + 'px'

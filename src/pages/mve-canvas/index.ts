@@ -4,8 +4,9 @@ import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextW
 
 import Scroller from 'scroller';
 import { hookTrackSignal } from "mve-helper";
-import { faker } from "@faker-js/faker";
+import { faker, he } from "@faker-js/faker";
 import { animateSignal, pointerMove } from "wy-dom-helper";
+import { OnScroll, OnScrollHelper } from "mve-dom-helper";
 
 const fr = ClampingScrollFactory.get()
 const edgeFr = ClampingScrollFactory.get(100)
@@ -21,7 +22,6 @@ export default function () {
       height,
     }, () => {
 
-      const scrollY = animateSignal(0)
       const data = arrayCountCreateWith(100, (i) => {
         return i
       })
@@ -33,11 +33,12 @@ export default function () {
         })
         return totalHeight
       })
+      const helper = new OnScrollHelper('y')
       const container = hookDrawRect({
         width,
         height,
         paddingTop() {
-          return -scrollY.get()
+          return -helper.get()
         },
         layout() {
           return simpleFlex({
@@ -58,27 +59,7 @@ export default function () {
           }
         },
         onPointerDown(e) {
-          scrollY.stop()
-          // moveLastPoint = e.original
-          pointerMove(ScrollFromPage.from(e.original, {
-            getPage: eventGetPageY,
-            scrollDelta(delta, velocity) {
-              scrollForEdge(scrollY, delta, container.axis.y.size(), totalHeight())
-            },
-            onFinish(velocity) {
-              return destinationWithMargin({
-                scroll: scrollY,
-                frictional: fr.getFromVelocity(velocity),
-                containerSize: container.axis.y.size(),
-                contentSize: totalHeight(),
-                edgeConfig(velocity) {
-                  return edgeFr.getFromVelocity(velocity).animationConfig()
-                },
-                edgeBackConfig: defaultSpringAnimationConfig,
-              })
-            }
-          }))
-          // scroller.doTouchStart([moveLastPoint], moveLastPoint.timeStamp);
+          scrollY.pointerEventListner(e.original)
         },
         paddingRight: 4,
         children() {
@@ -186,6 +167,12 @@ export default function () {
             })
           })
         },
+      })
+
+      const scrollY = helper.hookLazyInit({
+        maxScroll() {
+          return totalHeight() - container.axis.y.size()
+        }
       })
     })
   })
