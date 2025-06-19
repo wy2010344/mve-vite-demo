@@ -2,7 +2,7 @@ import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, animateSignal } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, FrictionalFactory, spring, Compare, PointKey, tween, easeFns, getMaxScroll, } from "wy-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, Compare, PointKey, } from "wy-helper";
 import explain from "../../explain";
 import { renderMobileView } from "../../onlyMobile";
 import hookTrackLayout from "../daily-record/hookTrackLayout";
@@ -11,8 +11,7 @@ import fixRightTop from "../../fixRightTop";
 import themeDropdown from "../../themeDropdown";
 import demoList from "../daily-record/demoList";
 import { faker } from "@faker-js/faker";
-import { measureMaxScroll, movePage, OnScroll, OnScrollHelper, pluginSimpleMovePage } from 'mve-dom-helper'
-import { } from "mve-dom-helper";
+import { movePage, OnScroll, pluginSimpleMovePage } from 'mve-dom-helper'
 
 
 const selectShadowCell = 'select-cell'
@@ -45,19 +44,19 @@ export default function () {
     const w = window as any
     w.__date = date
 
-    const helper = new OnScrollHelper('y')
-
-    const maxScrollY = helper.measureMaxScroll()
-    const scrollY = helper.hookLazyInit({
-      maxScroll: maxScrollY.get,
+    const scrollY: OnScroll = new OnScroll('y', {
+      maxScroll() {
+        return maxScrollY.get()
+      },
       targetSnap: dragSnapWithList([
         {
-          beforeForce: 0.005,
+          beforeForce: 1,
           size: perSize() * 5,
-          afterForce: 0.005
+          afterForce: 1
         }
       ])
     })
+    const maxScrollY = scrollY.measureMaxScroll()
     function perSize() {
       return getFullWidth() / 7
     }

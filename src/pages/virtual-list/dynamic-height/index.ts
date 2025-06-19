@@ -76,21 +76,39 @@ export default function () {
         },
         children() {
           renderForEach<Row, number>(forEachSub(list.get, v => v.id, subList), function (key, et) {
+            if (key == 0) {
+              console.log("init", `${key}-abc`)
+              hookDestroy(() => {
+                console.log('destroy', `${key}-abc`)
+              })
+            }
             const div = fdom.div({
+              id: `key--${key}`,
               s_background() {
                 return et.getValue().color
               },
               children() {
+                // debugger
                 renderTextContent(() => {
-                  return et.getValue().id + "--"
+                  return et.getValue().id + "--" + et.getIndex()
                 })
                 fdom.input({
                   className: 'daisy-input daisy-input-xs'
                 })
                 dom.p().renderTextContent(() => et.getValue().content)
+                if (key == 0) {
+                  console.log("initxx", `${key}-abc`)
+                  hookDestroy(() => {
+                    console.log('destroyxx', `${key}-abc`)
+                  })
+                }
               }
             })
             hookMeasureHeight(div, function () {
+              const h = div.clientHeight
+              if (!h) {
+                return
+              }
               et.getValue().height.set(div.clientHeight)
               batchSignalEnd()
             })

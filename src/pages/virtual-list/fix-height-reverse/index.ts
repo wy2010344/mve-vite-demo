@@ -94,7 +94,7 @@ export default function () {
               },
               children() {
                 renderTextContent(() => {
-                  return et.getValue().id + "--"
+                  return et.getValue().id + "--" + et.getIndex()
                 })
                 fdom.input({
                   className: 'daisy-input daisy-input-xs'
