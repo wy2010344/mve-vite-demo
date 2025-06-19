@@ -1,12 +1,9 @@
 import { renderMobileView } from "../../onlyMobile";
-import { addEffect, alignSelf, arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, flexDisplayUtil, memo, scrollForEdge, ScrollFromPage } from "wy-helper";
+import { alignSelf, arrayCountCreateWith, ClampingScrollFactory, memo } from "wy-helper";
 import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap, renderCanvas } from "mve-dom-helper/canvasRender";
 
-import Scroller from 'scroller';
-import { hookTrackSignal } from "mve-helper";
-import { faker, he } from "@faker-js/faker";
-import { animateSignal, pointerMove } from "wy-dom-helper";
-import { OnScroll, OnScrollHelper } from "mve-dom-helper";
+import { faker } from "@faker-js/faker";
+import { OnScroll } from "mve-dom-helper";
 
 const fr = ClampingScrollFactory.get()
 const edgeFr = ClampingScrollFactory.get(100)
@@ -33,12 +30,17 @@ export default function () {
         })
         return totalHeight
       })
-      const helper = new OnScrollHelper('y')
+
+      const scrollY = new OnScroll('y', {
+        maxScroll() {
+          return totalHeight() - container.axis.y.size()
+        }
+      })
       const container = hookDrawRect({
         width,
         height,
         paddingTop() {
-          return -helper.get()
+          return -scrollY.get()
         },
         layout() {
           return simpleFlex({
@@ -129,8 +131,10 @@ export default function () {
                   grow: 1,
                   children() {
                     hookDrawText({
-                      config: {
-                        text: faker.person.fullName()
+                      config() {
+                        return {
+                          text: faker.person.fullName() + '   ' + i
+                        }
                       },
                     })
                     // hookDrawRect({
@@ -169,11 +173,6 @@ export default function () {
         },
       })
 
-      const scrollY = helper.hookLazyInit({
-        maxScroll() {
-          return totalHeight() - container.axis.y.size()
-        }
-      })
     })
   })
 

@@ -1,26 +1,26 @@
 import { fdom } from "mve-dom";
-import { hookDestroy } from "mve-helper";
-import { animateSignal, pointerMove } from "wy-dom-helper";
-import { addEffect, ClampingScrollFactory, createSignal, destinationWithMargin, eventGetPageX, eventGetPageY, scrollForEdge, ScrollFromPage } from "wy-helper";
-import { measureMaxScroll, OnScroll, OnScrollHelper } from 'mve-dom-helper';
+import { OnScroll } from 'mve-dom-helper';
+import { createSignal } from "wy-helper";
 
 export default function () {
 
 
 
-  const helperX = new OnScrollHelper('x')
-  const helperY = new OnScrollHelper('y')
-  const maxScrollX = helperX.measureMaxScroll()
-  const scrollX = helperX.hookLazyInit({
-    maxScroll: maxScrollX.get
-  })
-  const maxScrollY = helperY.measureMaxScroll()
-  const scrollY = helperY.hookLazyInit({
-    maxScroll: maxScrollY.get
-  })
   fdom.div({
     className: 'w-100 h-100 overflow-hidden relative',
     children(container: HTMLElement) {
+      const scrollX: OnScroll = OnScroll.hookGet('x', container, {
+        maxScroll() {
+          return maxScrollX.get()
+        }
+      })
+      const scrollY: OnScroll = OnScroll.hookGet('y', container, {
+        maxScroll() {
+          return maxScrollY.get()
+        }
+      })
+      const maxScrollX = scrollX.measureMaxScroll()
+      const maxScrollY = scrollY.measureMaxScroll()
       const content = fdom.div({
         className: 'w-500 h-500 absolute',
         s_background: `conic-gradient(red, orange, yellow, green, blue)`,
