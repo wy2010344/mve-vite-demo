@@ -1,1 +1,0 @@
-import{k as o,ah as f}from"./index-DSI5ljsY.js";function t({condition:r,whenTrue:e,whenFalse:n}){o(r,e,n)}function d({render:r}){r()}function i({getArray:r,getKey:e,render:n}){f(r,e,n)}export{i as ArrayRender,d as HookRender,t as If};

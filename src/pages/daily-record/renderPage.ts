@@ -1,10 +1,11 @@
 import { fdom, mdom } from "mve-dom"
 import { animateSignal, pointerMoveDir } from "wy-dom-helper"
-import { addEffect, ClampingScrollFactory, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, GetValue, memoFun, overScrollSlow, scrollForEdge, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
+import { addEffect, ClampingScrollFactory, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, extrapolationClamp, FrictionalFactory, getInterpolate, getMaxScroll, GetValue, memoFun, overScrollSlow, scrollForEdge, ScrollFromPage, scrollInfinityIteration } from "wy-helper"
 import demoList from "./demoList"
 import { faker } from "@faker-js/faker"
 import { hookTrackSignal } from "mve-helper"
 import { topContext } from "./context"
+import { OnScroll } from "mve-dom-helper"
 
 const CREATE_SCROLLY = -50
 
@@ -16,8 +17,17 @@ export default function (
   getIndex: GetValue<number>,
   onScrollX: GetValue<any>
 ) {
-  const { showCalendar, calendarFinish, calendarScroll } = topContext.consume()
-  const scrollY = animateSignal(0)
+  const { showCalendar, showYearMonth, yearMonthScrollY, calendarScrollY } = topContext.consume()
+  // const scrollY = animateSignal(0)
+  const scrollY: OnScroll = new OnScroll('y', {
+    edgeSlow: 2,
+    maxScroll() {
+      return maxScroll.get()
+    }
+  })
+  const maxScroll = scrollY.measureMaxScroll()
+
+
   hookTrackSignal(onScrollX, function (v) {
     if (!v && getIndex() != 1) {
       //滚动出去后,归位
@@ -25,9 +35,11 @@ export default function (
         scrollY.set(0)
       })
     }
+    // if (!v && getIndex() == 1) {
+    //   scrollY.minNextScroll = calendarScrollY
+    // }
   })
-  let content: HTMLElement
-  const container = mdom.div({
+  mdom.div({
     attrs(v) {
       const i = getIndex()
       v.className = 'absolute inset-0 select-none bg-base-100 overflow-hidden'
@@ -40,42 +52,56 @@ export default function (
     onTouchMove(e) {
       e.preventDefault()
     },
-    onPointerDown: pointerMoveDir(function () {
-      scrollY.stop()
-      return {
-        onMove(e, dir) {
-          if (dir == 'y') {
-            return ScrollFromPage.from(e, {
-              getPage: eventGetPageY,
-              scrollDelta(delta, velocity) {
-                if (showCalendar()) {
-                  calendarScroll(delta, velocity)
-                } else {
-                  scrollForEdge(scrollY, delta, container.clientHeight, content.offsetHeight)
-                }
-              },
-              onFinish(velocity) {
-                if (showCalendar()) {
-                  calendarFinish(velocity)
-                } else {
-                  if (scrollY.get() <= CREATE_SCROLLY) {
-                    //创建
-                    console.log("新建")
-                  }
-                  destinationWithMargin({
-                    frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
-                    scroll: scrollY,
-                    containerSize: container.clientHeight,
-                    contentSize: content.offsetHeight,
-                  })
-                }
-              }
-            })
-          }
-        }
+    onPointerDown(e) {
+      if (yearMonthScrollY.onAnimation()) {
+        return
       }
-    }),
-    children() {
+      if (calendarScrollY.onAnimation()) {
+        return
+      }
+      if (showYearMonth()) {
+        return yearMonthScrollY.pointerEventListner(e)
+      }
+      if (showCalendar()) {
+        return calendarScrollY.pointerEventListner(e)
+      }
+      scrollY.pointerEventListner(e)
+    },
+    // onPointerDown: pointerMoveDir(function () {
+    //   scrollY.stop()
+    //   return {
+    //     onMove(e, dir) {
+    //       if (dir == 'y') {
+    //         return ScrollFromPage.from(e, {
+    //           getPage: eventGetPageY,
+    //           scrollDelta(delta, velocity) {
+    //             if (showCalendar()) {
+    //               calendarScroll(delta, velocity)
+    //             } else {
+    //               scrollForEdge(scrollY, delta, container.clientHeight, content.offsetHeight)
+    //             }
+    //           },
+    //           onFinish(velocity) {
+    //             if (showCalendar()) {
+    //               calendarFinish(velocity)
+    //             } else {
+    //               if (scrollY.get() <= CREATE_SCROLLY) {
+    //                 //创建
+    //                 console.log("新建")
+    //               }
+    //               destinationWithMargin({
+    //                 frictional: ClampingScrollFactory.get().getFromVelocity(velocity),
+    //                 scroll: scrollY,
+    //                 maxScroll: getMaxScroll(container.clientHeight, content.offsetHeight)
+    //               })
+    //             }
+    //           }
+    //         })
+    //       }
+    //     }
+    //   }
+    // }),
+    children(container: HTMLElement) {
 
       const interpolateIndex = memoFun(() => {
         return getInterpolate({
@@ -95,7 +121,7 @@ export default function (
         }
       })
       //home页面
-      content = fdom.div({
+      const content = fdom.div({
         s_transform() {
           return `translateY(${-scrollY.get()}px)`
         },
@@ -108,6 +134,7 @@ export default function (
           }))
         }
       })
+      maxScroll.hookInit(container, content)
     }
   })
 }

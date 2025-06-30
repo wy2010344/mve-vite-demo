@@ -85,24 +85,24 @@ export default function () {
             initV.set(velocity)
             console.log("v1", velocity)
             //使用惯性
-            return destinationWithMargin({
-              scroll: scrollY,
-              frictional: fr.getFromVelocity(velocity),
-              // multiple: 2,
-              containerSize: container.clientHeight,
-              contentSize: content.offsetHeight,
-              edgeConfig(velocity) {
-                console.log("v", velocity)
-                return fb2.getFromVelocity(velocity).animationConfig()
-                return scrollInfinityIteration(velocity, {
-                  nextVelocity(v) {
-                    return v * 0.93
-                  }
-                })
-                // return fr2.getFromVelocity(velocity).animationConfig('in')
-              },
-              edgeBackConfig: defaultSpringAnimationConfig,
-            })
+            // return destinationWithMargin({
+            //   scroll: scrollY,
+            //   frictional: fr.getFromVelocity(velocity),
+            //   // multiple: 2,
+            //   // containerSize: container.clientHeight,
+            //   contentSize: content.offsetHeight,
+            //   edgeConfig(velocity) {
+            //     console.log("v", velocity)
+            //     return fb2.getFromVelocity(velocity).animationConfig()
+            //     return scrollInfinityIteration(velocity, {
+            //       nextVelocity(v) {
+            //         return v * 0.93
+            //       }
+            //     })
+            //     // return fr2.getFromVelocity(velocity).animationConfig('in')
+            //   },
+            //   edgeBackConfig: defaultSpringAnimationConfig,
+            // })
 
             scrollEdgeIteration(scrollY, {
               velocity,

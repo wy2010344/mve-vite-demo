@@ -231,6 +231,11 @@ function renderCard() {
         title: '点击效果',
         description: ''
       })
+      card({
+        href: '/resize-panel',
+        title: '自动高度面板',
+        description: ''
+      })
     }
   })
 }

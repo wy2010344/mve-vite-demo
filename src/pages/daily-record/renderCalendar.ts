@@ -7,10 +7,11 @@ import { firstDayOfWeekIndex, WEEKS } from "./firstDayOfWeek";
 import { topContext } from "./context";
 import { renderFirstDayWeek, renderWeekHeader } from "./renderWeekday";
 import renderCell from "./renderCell";
+import { OnScroll } from "mve-dom-helper";
 export default function (
   yearMonth: YearMonthVirtualView,
   getIndex: GetValue<number>,
-  calendarScrollY: AnimateSignal,
+  calendarScrollY: OnScroll,
   date: StoreRef<YearMonthDayVirtualView>,
   fullWidth: GetValue<number>
 ) {

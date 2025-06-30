@@ -77,8 +77,8 @@ export default function ({
     return newId;
   }
   return (
-    <div className="daisy-card bg-base-200 w-80 h-fit">
-      <div className="daisy-card-body p-4">
+    <div className="daisy-card bg-base-200 w-80 shrink-0 h-full">
+      <div className="daisy-card-body p-4 flex flex-col h-full ">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <h3 className="daisy-card-title text-sm font-medium">{title}</h3>
@@ -117,7 +117,7 @@ export default function ({
         </div>
 
         <div
-          className="space-y-3 min-h-[200px]"
+          className="space-y-3 min-h-[200px] flex-1 overflow-y-auto -mx-4 px-4"
           onDragOver={(e) => {
             e.preventDefault();
             e.dataTransfer!.dropEffect = "move";

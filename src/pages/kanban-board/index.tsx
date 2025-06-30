@@ -4,6 +4,8 @@ import { mve } from "mve-dom-helper";
 import column from "./column";
 import { renderStateHolder } from "mve-core";
 import { HookRender } from "./xmlRender";
+import { createTabList } from "daisy-mobile-helper";
+import { fdom, renderTextContent } from "mve-dom";
 
 const initialTasks: Task[] = [
   {
@@ -55,6 +57,7 @@ type Column = {
   title: string;
 };
 
+const dragTypes = ["拖拽API", "Pointer"] as const;
 export default function () {
   const tasks = createSignal(initialTasks);
 
@@ -77,31 +80,47 @@ export default function () {
     dragId,
     tasks,
   });
-  mve.renderChild(
-    <div className="min-h-screen bg-base-300 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-base-content mb-2">
-            项目看板
-          </h1>
-          <p className="text-base-content/70">
-            拖拽任务卡片来更新状态，点击 + 添加新任务
-          </p>
-        </div>
-        <div className="flex gap-6 overflow-x-auto pb-6">
-          <HookRender
-            render={() => {
-              {
-                columns.map((c) => {
-                  renderStateHolder(() => {
-                    mve.renderChild(column(c));
+
+  const dragType = createSignal<(typeof dragTypes)[number]>("拖拽API");
+  fdom.div({
+    className:
+      "bg-base-300 p-6 pb-0 overflow-x-auto w-full flex flex-col h-full",
+    children() {
+      createTabList({
+        className: "mx-auto w-fit",
+        options: dragTypes,
+        value: dragType.get,
+        onChange: dragType.set,
+        renderChild(v) {
+          renderTextContent(v);
+        },
+      });
+
+      mve.renderChild(
+        <>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-base-content mb-2">
+              项目看板
+            </h1>
+            <p className="text-base-content/70">
+              拖拽任务卡片来更新状态，点击 + 添加新任务
+            </p>
+          </div>
+          <div className="flex gap-6 overflow-x-auto overflow-y-hidden pb-6 flex-1">
+            <HookRender
+              render={() => {
+                {
+                  columns.map((c) => {
+                    renderStateHolder(() => {
+                      mve.renderChild(column(c));
+                    });
                   });
-                });
-              }
-            }}
-          />
-        </div>
-      </div>
-    </div>
-  );
+                }
+              }}
+            />
+          </div>
+        </>
+      );
+    },
+  });
 }

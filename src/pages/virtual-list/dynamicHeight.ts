@@ -34,9 +34,12 @@ export function dynamicHeight() {
     averageHeight,
     measureHeight(key: number, div: HTMLElement) {
       hookMeasureHeight(div, function () {
-        cacheMap.set(key, div.clientHeight)
-        version.set(version.get() + 1)
-        batchSignalEnd()
+        const h = div.clientHeight
+        if (h) {
+          cacheMap.set(key, div.clientHeight)
+          version.set(version.get() + 1)
+          batchSignalEnd()
+        }
       })
     }
   }
@@ -74,7 +77,7 @@ export function dynamidHeight2<T>(
     if (typeof h == 'number') {
       return h
     }
-    return averageHeight()
+    return averageHeight() || 100
   }
 
   return {
@@ -91,6 +94,7 @@ export function forEachSub<T, K>(
   return function (callback: (key: K, value: T) => void) {
     const array = getList()
     const [beginIndex, endIndex] = subList()
+    // console.log("b", beginIndex, endIndex)
     for (let i = beginIndex; i < endIndex; i++) {
       const row = array[i]
       callback(getId(row), row)

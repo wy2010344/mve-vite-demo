@@ -1,6 +1,6 @@
 import { fdom } from "mve-dom";
 import { renderMobileView } from "../../onlyMobile";
-import { createSignal, simpleEqualsNotEqual, YearMonthDayVirtualView, batchSignalEnd, DAYMILLSECONDS, ClampingScrollFactory } from "wy-helper";
+import { createSignal, simpleEqualsNotEqual, YearMonthDayVirtualView, batchSignalEnd, DAYMILLSECONDS, ClampingScrollFactory, dragSnapWithList } from "wy-helper";
 import fixRightTop from "../../fixRightTop";
 import themeDropdown from "../../themeDropdown";
 import firstDayOfWeek from "./firstDayOfWeek";
@@ -10,7 +10,7 @@ import { topContext } from "./context";
 import { animateSignal } from "wy-dom-helper";
 import renderScrollYear from "./renderYearMonthChoose";
 import { hookDestroy } from "mve-helper";
-import { defaultGetPageSnap } from "mve-dom-helper";
+import { defaultGetPageSnap, OnScroll } from "mve-dom-helper";
 
 // const fc = new FrictionalFactory()
 const bs = ClampingScrollFactory.get()
@@ -47,14 +47,41 @@ export default function () {
       // return 3 * getFullWidth() / 7
     }
     //日历滚动,只用这个表达开关
-    const calendarScrollY = animateSignal(calendarOpenHeight())
-    const yearMonthScrollY = animateSignal(scrollYearMonthOpenHeight())
+    const calendarScrollY = new OnScroll('y', {
+      init: calendarOpenHeight(),
+      maxScroll: calendarOpenHeight,
+      targetSnap: dragSnapWithList([
+        {
+          beforeForce: 1,
+          size: calendarOpenHeight(),
+          afterForce: 1
+        }
+      ])
+    })
+
+    //年月picker的滚动,默认滚动到最大
+    const yearMonthScrollY = new OnScroll('y', {
+      init: scrollYearMonthOpenHeight(),
+      maxScroll: scrollYearMonthOpenHeight,
+      targetSnap: dragSnapWithList([
+        {
+          beforeForce: 1,
+          size: scrollYearMonthOpenHeight(),
+          afterForce: 1
+        }
+      ])
+    })
+
+    yearMonthScrollY.maxNextScroll = calendarScrollY
+    calendarScrollY.minNextScroll = yearMonthScrollY
+    // animateSignal(scrollYearMonthOpenHeight())
 
     function showYearMonth() {
       return yearMonthScrollY.get() != scrollYearMonthOpenHeight()
     }
     topContext.provide({
       yearMonthScrollY,
+      showYearMonth,
       scrollYearMonthOpenHeight,
       calendarScrollY,
       calendarOpenHeight,
@@ -68,62 +95,6 @@ export default function () {
           calendarScrollY.animateTo(calendarOpenHeight())
         } else {
           calendarScrollY.animateTo(calendarOpenHeight())
-        }
-      },
-      calendarScroll(delta, velocity) {
-        if (showYearMonth()) {
-          //操作年月
-          const wValue = yearMonthScrollY.get() + delta
-          if (wValue >= scrollYearMonthOpenHeight()) {
-            //回到顶问她
-            yearMonthScrollY.set(scrollYearMonthOpenHeight())
-            batchSignalEnd()
-          } else if (wValue <= 0) {
-            //有惯性
-            yearMonthScrollY.set(yearMonthScrollY.get() + delta / 3)
-          } else {
-            yearMonthScrollY.set(wValue)
-          }
-        } else {
-          const wValue = calendarScrollY.get() + delta
-          if (wValue >= calendarOpenHeight()) {
-            //回到顶部
-            // showCalendar.set(false)
-            calendarScrollY.set(calendarOpenHeight())
-            batchSignalEnd()
-          } else if (wValue <= 0) {
-            //向下拉,可能带动更上一层的滚动
-            //自身清零
-            calendarScrollY.set(0)
-            //将偏移量给上位
-            yearMonthScrollY.changeDiff(wValue)
-          } else {
-            calendarScrollY.set(wValue)
-          }
-        }
-      },
-      calendarFinish(velocity) {
-        if (showYearMonth()) {
-          const dis = bs.getFromVelocity(velocity)
-          const targetDis = dis.distance + yearMonthScrollY.get()
-          if (targetDis > scrollYearMonthOpenHeight() / 2) {
-            yearMonthScrollY.changeTo(scrollYearMonthOpenHeight(),
-              defaultGetPageSnap(velocity))
-          } else {
-            yearMonthScrollY.changeTo(0,
-              defaultGetPageSnap(velocity))
-          }
-        } else {
-          const dis = bs.getFromVelocity(velocity)
-          const targetDis = dis.distance + calendarScrollY.get()
-          if (targetDis > calendarOpenHeight() / 2) {
-            calendarScrollY.changeTo(calendarOpenHeight(),
-              defaultGetPageSnap(velocity))
-          } else {
-            calendarScrollY.changeTo(0,
-              defaultGetPageSnap(velocity),
-            )
-          }
         }
       },
     })
