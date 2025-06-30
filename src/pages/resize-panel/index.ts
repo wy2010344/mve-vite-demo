@@ -141,6 +141,22 @@ export default function () {
                       })
                     }
                   })
+                  renderOne(onAutoHeight.get, function (autoHeight) {
+                    if (!autoHeight) {
+                      fdom.button({
+                        className: 'daisy-btn daisy-btn-link',
+                        childrenType: 'text',
+                        children: '重新生成',
+                        onClick() {
+                          onAutoHeight.set(true)
+                          text.set('')
+                          setTimeout(() => {
+                            text.set(faker.lorem.paragraphs(6))
+                          }, 3000)
+                        }
+                      })
+                    }
+                  })
                 }
               })
             }

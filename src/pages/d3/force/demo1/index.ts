@@ -6,9 +6,8 @@ import { addEffect, batchSignalEnd, createSignal, emptyArray, emptyFun, memo, Po
 import { hookDestroy, hookTrackSignal, renderArray, renderIf, renderOne } from 'mve-helper';
 import { mergeNodesAndLinks, initToNode, createSignalForceDir, emptySignalForceDir, SignalForceDir, ForceNode, ForceLink, tickForce, forceLink, forceManybody, forceDir, initForceConfig, DIMType } from 'wy-helper/forceLayout';
 import { animate } from 'motion';
-import { hookTabLayout } from '../../../../components/daisy-tab-layout';
 import { getPerspectiveCamera, hookOrbitControls, renderThreeView, ThreeContext } from '../../../../hookThreeView';
-
+import { createTabList } from 'daisy-mobile-helper'
 import * as THREE from 'three';
 import { hookAddDestroy, hookAddResult } from 'mve-core';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
@@ -26,29 +25,14 @@ type RenderType = typeof renderTypes[number]
 export default function () {
 
   const type = createSignal<RenderType>('3D')
-  fdom.div({
-    role: 'tablist',
-    className: 'daisy-tabs daisy-tabs-box',
-    children() {
-      renderTypes.forEach(rt => {
-        fdom.button({
-          className() {
-            return cns(
-              "daisy-tab",
-              rt == type.get() && 'daisy-tab-active fd1-tab-active'
-            )
-          },
-          role: "tab",
-          onClick() {
-            type.set(rt)
-          },
-          children() {
-            dom.span().renderTextContent(rt)
-          }
-        })
-      })
-      hookTabLayout(type.get, 'fd1-tab-active')
-    }
+
+  createTabList({
+    options: renderTypes,
+    value: type.get,
+    onChange: type.set,
+    renderChild(v) {
+      dom.span().renderTextContent(v)
+    },
   })
 
   const model = createSignal(data)
