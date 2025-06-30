@@ -1,0 +1,1 @@
+import{h as a,f,ak as l}from"./index-BdTCZeBf.js";function g(c,o){a(c,()=>{const t=document.getElementById(o);if(t){let e=t.getBoundingClientRect();f(()=>{t.isConnected&&(e=t.getBoundingClientRect());const n=document.getElementById(o);if(n){const i=n.getBoundingClientRect();l(n,{x:[e.left-i.left,0],y:[e.top-i.top,0]})}},3)}})}export{g as default};

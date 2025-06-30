@@ -17,7 +17,7 @@ export default function (
   date: StoreRef<YearMonthDayVirtualView>,
   getFullWidth: GetValue<number>
 ) {
-  const { calendarScrollY, calendarClose, showCalendar, calendarScroll, calendarFinish, today } = topContext.consume()
+  const { showYearMonth, yearMonthScrollY, calendarScrollY, calendarClose, showCalendar, today } = topContext.consume()
   hookTrackLayout(date.get, selectShadowCell)
   const yearMonth = memo<YearMonthVirtualView>((m) => {
     const d = date.get()
@@ -30,23 +30,16 @@ export default function (
   //顶部固定区域
   fdom.div({
     className: "relative",
-    onPointerDown: pointerMoveDir(function () {
-      return {
-        onMove(e, dir) {
-          if (dir == 'y') {
-            return ScrollFromPage.from(e, {
-              getPage: eventGetPageY,
-              scrollDelta(delta, velocity) {
-                calendarScroll(delta, velocity)
-              },
-              onFinish(velocity) {
-                calendarFinish(velocity)
-              }
-            })
-          }
-        }
+    onPointerDown(e) {
+      if (calendarScrollY.onAnimation()) {
+        return
       }
-    }),
+      if (showYearMonth()) {
+        yearMonthScrollY.pointerEventListner(e)
+      } else {
+        calendarScrollY.pointerEventListner(e)
+      }
+    },
     children() {
       //星期与天都需要滚动
       const scrollX = animateSignal(0)

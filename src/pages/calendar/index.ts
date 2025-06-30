@@ -2,7 +2,7 @@ import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, animateSignal } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, FrictionalFactory, spring, Compare, PointKey, tween, easeFns, } from "wy-helper";
+import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, Compare, PointKey, } from "wy-helper";
 import explain from "../../explain";
 import { renderMobileView } from "../../onlyMobile";
 import hookTrackLayout from "../daily-record/hookTrackLayout";
@@ -11,8 +11,7 @@ import fixRightTop from "../../fixRightTop";
 import themeDropdown from "../../themeDropdown";
 import demoList from "../daily-record/demoList";
 import { faker } from "@faker-js/faker";
-import { movePage, pluginSimpleMovePage } from 'mve-dom-helper'
-import { pluginOnScroll } from "mve-dom-helper";
+import { movePage, OnScroll, pluginSimpleMovePage } from 'mve-dom-helper'
 
 
 const selectShadowCell = 'select-cell'
@@ -45,7 +44,19 @@ export default function () {
     const w = window as any
     w.__date = date
 
-    const scrollY = animateSignal(0)
+    const scrollY: OnScroll = new OnScroll('y', {
+      maxScroll() {
+        return maxScrollY.get()
+      },
+      targetSnap: dragSnapWithList([
+        {
+          beforeForce: 1,
+          size: perSize() * 5,
+          afterForce: 1
+        }
+      ])
+    })
+    const maxScrollY = scrollY.measureMaxScroll()
     function perSize() {
       return getFullWidth() / 7
     }
@@ -71,19 +82,15 @@ export default function () {
         if (!lastDate.equals(date.get())) {
           addEffect(() => {
             if (showWeek()) {
-              scrollY.changeTo(perSize() * 5, spring({
-                config: {
+              /** 
+               * config: {
                   zta: 0.7,
                   omega0: 20,
                 }
-              }))
+               */
+              scrollY.animateTo(perSize() * 5)
             } else {
-              scrollY.changeTo(0, spring({
-                config: {
-                  zta: 0.7,
-                  omega0: 20,
-                }
-              }))
+              scrollY.animateTo(0)
             }
           })
         }
@@ -123,8 +130,10 @@ export default function () {
       onTouchMove(e) {
         e.preventDefault()
       },
+      onWheel: scrollY.wheelEventListener,
+      onPointerDown: scrollY.pointerEventListner,
       children(container: HTMLElement) {
-        fdom.div({
+        const content = fdom.div({
           s_transform() {
             return `translateY(${-scrollY.get()}px)`
           },
@@ -133,20 +142,6 @@ export default function () {
           s_minHeight() {
             return `calc(100% + ${getFullWidth()}px * 5 / 7)`
           },
-          plugins: [
-            pluginOnScroll({
-              container,
-              scroll: scrollY,
-              direction: 'y',
-              targetSnap: dragSnapWithList([
-                {
-                  beforeForce: 0.005,
-                  size: perSize() * 5,
-                  afterForce: 0.005
-                }
-              ])
-            })
-          ],
           children() {
             //header
             fdom.div({
@@ -325,6 +320,7 @@ export default function () {
             })
           }
         })
+        maxScrollY.hookInit(container, content)
       }
     })
     function renderCalendarView(

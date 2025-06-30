@@ -1,11 +1,9 @@
 import { renderMobileView } from "../../onlyMobile";
-import { addEffect, alignSelf, arrayCountCreateWith, batchSignalEnd, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, flexDisplayUtil, memo, scrollForEdge, ScrollFromPage } from "wy-helper";
+import { alignSelf, arrayCountCreateWith, ClampingScrollFactory, memo } from "wy-helper";
 import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap, renderCanvas } from "mve-dom-helper/canvasRender";
 
-import Scroller from 'scroller';
-import { hookTrackSignal } from "mve-helper";
 import { faker } from "@faker-js/faker";
-import { animateSignal, pointerMove } from "wy-dom-helper";
+import { OnScroll } from "mve-dom-helper";
 
 const fr = ClampingScrollFactory.get()
 const edgeFr = ClampingScrollFactory.get(100)
@@ -21,7 +19,6 @@ export default function () {
       height,
     }, () => {
 
-      const scrollY = animateSignal(0)
       const data = arrayCountCreateWith(100, (i) => {
         return i
       })
@@ -32,6 +29,12 @@ export default function () {
           totalHeight += 4 + child.axis.y.size()
         })
         return totalHeight
+      })
+
+      const scrollY = new OnScroll('y', {
+        maxScroll() {
+          return totalHeight() - container.axis.y.size()
+        }
       })
       const container = hookDrawRect({
         width,
@@ -58,27 +61,7 @@ export default function () {
           }
         },
         onPointerDown(e) {
-          scrollY.stop()
-          // moveLastPoint = e.original
-          pointerMove(ScrollFromPage.from(e.original, {
-            getPage: eventGetPageY,
-            scrollDelta(delta, velocity) {
-              scrollForEdge(scrollY, delta, container.axis.y.size(), totalHeight())
-            },
-            onFinish(velocity) {
-              return destinationWithMargin({
-                scroll: scrollY,
-                frictional: fr.getFromVelocity(velocity),
-                containerSize: container.axis.y.size(),
-                contentSize: totalHeight(),
-                edgeConfig(velocity) {
-                  return edgeFr.getFromVelocity(velocity).animationConfig()
-                },
-                edgeBackConfig: defaultSpringAnimationConfig,
-              })
-            }
-          }))
-          // scroller.doTouchStart([moveLastPoint], moveLastPoint.timeStamp);
+          scrollY.pointerEventListner(e.original)
         },
         paddingRight: 4,
         children() {
@@ -148,8 +131,10 @@ export default function () {
                   grow: 1,
                   children() {
                     hookDrawText({
-                      config: {
-                        text: faker.person.fullName()
+                      config() {
+                        return {
+                          text: faker.person.fullName() + '   ' + i
+                        }
                       },
                     })
                     // hookDrawRect({
@@ -187,6 +172,7 @@ export default function () {
           })
         },
       })
+
     })
   })
 
