@@ -1,5 +1,5 @@
 import { cns } from "wy-dom-helper";
-import { ColumnContext, TaskContext } from "./type";
+import { ColumnContext, TaskContext } from "./context";
 import { GetValue } from "wy-helper";
 import { mve } from "mve-dom-helper";
 import { fdom } from "mve-dom";
