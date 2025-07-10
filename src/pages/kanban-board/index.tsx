@@ -1,11 +1,14 @@
-import { createSignal, memo } from "wy-helper";
-import { PriorityType, Task, TaskContext, TaskType } from "./type";
+import { createSignal, storeRef } from "wy-helper";
+import { ColumnDef, Task, TaskType } from "./type";
 import { mve } from "mve-dom-helper";
-import column from "./column";
+import pointerColumn from "./pointer/column";
 import { renderStateHolder } from "mve-core";
-import { HookRender } from "./xmlRender";
+import { OneRender } from "./xmlRender";
 import { createTabList } from "daisy-mobile-helper";
 import { fdom, renderTextContent } from "mve-dom";
+import drag from "./drag";
+import pointer from "./pointer";
+import { hookDestroy } from "mve-helper";
 
 const initialTasks: Task[] = [
   {
@@ -52,36 +55,24 @@ const initialTasks: Task[] = [
   },
 ];
 
-type Column = {
-  type: TaskType;
-  title: string;
-};
-
 const dragTypes = ["拖拽API", "Pointer"] as const;
 export default function () {
   const tasks = createSignal(initialTasks);
 
-  function toColumn(title: string, type: TaskType): Column {
+  function toColumn(title: string, type: TaskType): ColumnDef {
     return {
       title,
       type,
     };
   }
-  const dragId = createSignal<string | undefined>(undefined);
-
-  const columns: Column[] = [
+  const columns: ColumnDef[] = [
     toColumn("待办事项", "todo"),
     toColumn("进行中", "inprogress"),
     toColumn("待审核", "review"),
     toColumn("已完成", "done"),
   ];
+  const dragType = createSignal<(typeof dragTypes)[number]>("Pointer"); //("拖拽API");
 
-  TaskContext.provide({
-    dragId,
-    tasks,
-  });
-
-  const dragType = createSignal<(typeof dragTypes)[number]>("拖拽API");
   fdom.div({
     className:
       "bg-base-300 p-6 pb-0 overflow-x-auto w-full flex flex-col h-full",
@@ -106,19 +97,23 @@ export default function () {
               拖拽任务卡片来更新状态，点击 + 添加新任务
             </p>
           </div>
-          <div className="flex gap-6 overflow-x-auto overflow-y-hidden pb-6 flex-1">
-            <HookRender
-              render={() => {
-                {
-                  columns.map((c) => {
-                    renderStateHolder(() => {
-                      mve.renderChild(column(c));
-                    });
-                  });
-                }
-              }}
-            />
-          </div>
+          <OneRender
+            key={dragType.get}
+            render={(type) => {
+              if (type == "拖拽API") {
+                drag({
+                  tasks,
+                  columns,
+                });
+              } else {
+                pointer({
+                  tasks,
+                  columns,
+                });
+              }
+            }}
+          />
+          <div className="h-100" />
         </>
       );
     },
