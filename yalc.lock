@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "17304a8b063b103190ebabbce3942942",
+      "signature": "9a0ff23c7a9f54afde1502e3e512cbda",
       "file": true,
       "replaced": "^0.1.12"
     },
@@ -27,12 +27,12 @@
       "replaced": "^2.0.0"
     },
     "mve-dom-helper": {
-      "signature": "f8b3b3aa5ed448aa3de84eb690cdd285",
+      "signature": "57dda51a30e0eabcf25ed67e18396d72",
       "file": true,
       "replaced": "^2.0.1"
     },
     "daisy-mobile-helper": {
-      "signature": "a79cfa8c2ad36ea8557d56846da9f01b",
+      "signature": "d6969401d1670e72a8be976002ecfd61",
       "file": true
     }
   }

@@ -22,6 +22,9 @@ export default function () {
 
     dailyRecord({
       getFullWidth,
+      didCreate(w) {
+
+      },
       renderHeaderRight() {
 
         fdom.div({
