@@ -59,6 +59,7 @@ export default function ({
         set(v) {
           list.push(dir * v * pc)
           value = v
+          return v
         },
       }))
       if (callback) {

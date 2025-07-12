@@ -10,6 +10,7 @@ import contacts from "~/pages/contacts";
 import { fdom } from "mve-dom";
 import { animate } from "motion";
 import { pluginLayoutIndex } from "daisy-mobile-helper";
+import { pointerMove } from "wy-dom-helper";
 
 export default function ({ title, type }: { title: string; type: TaskType }) {
   const {
@@ -210,39 +211,34 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
 
                 let lastE = e as unknown as PointerEvent;
                 document.body.style.userSelect = "none";
-                const move = (moveE: PointerEvent) => {
-                  markActiveColumn(moveE, {
-                    whenIntoTarget(key) {
-                      activeColumn.set(key);
-                    },
-                  });
-                  const diffX = moveE.pageX - lastE.pageX;
-                  const diffY = moveE.pageY - lastE.pageY;
-                  dragX.set(dragX.get() + diffX);
-                  dragY.set(dragY.get() + diffY);
-                  lastE = moveE;
-                };
 
-                const up = (upE: PointerEvent) => {
-                  document.body.style.userSelect = "";
-                  move(upE);
-
-                  markActiveColumn(upE, {
-                    whenIntoTarget(key) {
-                      activeColumn.set(key);
-                      d.type.set("move");
-                    },
-                    whenNotDist() {
-                      activeColumn.set(undefined);
-                      d.type.set("cancel");
-                    },
-                  });
-                  document.removeEventListener("pointermove", move);
-                  document.removeEventListener("pointerup", up);
-                };
-
-                document.addEventListener("pointermove", move);
-                document.addEventListener("pointerup", up);
+                pointerMove({
+                  onMove(moveE) {
+                    markActiveColumn(moveE, {
+                      whenIntoTarget(key) {
+                        activeColumn.set(key);
+                      },
+                    });
+                    const diffX = moveE.pageX - lastE.pageX;
+                    const diffY = moveE.pageY - lastE.pageY;
+                    dragX.set(dragX.get() + diffX);
+                    dragY.set(dragY.get() + diffY);
+                    lastE = moveE;
+                  },
+                  onEnd(e) {
+                    document.body.style.userSelect = "";
+                    markActiveColumn(e, {
+                      whenIntoTarget(key) {
+                        activeColumn.set(key);
+                        d.type.set("move");
+                      },
+                      whenNotDist() {
+                        activeColumn.set(undefined);
+                        d.type.set("cancel");
+                      },
+                    });
+                  },
+                });
               }}
             />
           );
