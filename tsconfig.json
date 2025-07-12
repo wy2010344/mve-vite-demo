@@ -21,11 +21,20 @@
     "jsx": "preserve",
     "jsxFactory": "mve.createElement",
     "jsxFragmentFactory": "mve.Fragment",
+    "baseUrl": ".", // 根目录
+    "paths": {
+      "~/*": [
+        "src/*"
+      ] // 支持 @/ 开头的路径
+    },
     /* Linting */
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
     // "noFallthroughCasesInSwitch": true
   },
+  "exclude": [
+    "./yalc"
+  ],
   "include": [
     "src"
   ]

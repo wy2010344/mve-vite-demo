@@ -1,6 +1,11 @@
 import { createContext } from "mve-core"
 import { StoreRef } from "wy-helper"
 
+export type ColumnDef = {
+  type: TaskType;
+  title: string;
+};
+
 export interface Column {
   id: string
   title: string
@@ -22,13 +27,3 @@ export interface Task {
   assignee?: string
   dueDate?: string
 }
-
-export const TaskContext = createContext<{
-  tasks: StoreRef<Task[]>
-  dragId: StoreRef<string | undefined>
-}>(undefined!)
-
-export const ColumnContext = createContext<{
-  type: TaskType,
-  getActive(): string | undefined
-}>(undefined!)

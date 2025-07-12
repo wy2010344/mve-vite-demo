@@ -1,17 +1,11 @@
 import { fdom } from "mve-dom";
 import { renderMobileView } from "../../onlyMobile";
-import { createSignal, simpleEqualsNotEqual, YearMonthDayVirtualView, batchSignalEnd, DAYMILLSECONDS, ClampingScrollFactory, dragSnapWithList } from "wy-helper";
+import { ClampingScrollFactory } from "wy-helper";
 import fixRightTop from "../../fixRightTop";
 import themeDropdown from "../../themeDropdown";
-import firstDayOfWeek from "./firstDayOfWeek";
-import renderHeader from "./renderHeader";
-import renderPageList from "./renderPageList";
-import { topContext } from "./context";
-import { animateSignal } from "wy-dom-helper";
-import renderScrollYear from "./renderYearMonthChoose";
-import { hookDestroy } from "mve-helper";
-import { defaultGetPageSnap, OnScroll } from "mve-dom-helper";
-
+import { chooseFirstDayOfWeek, dailyRecord } from 'daisy-mobile-helper'
+import demoList from "./demoList";
+import { faker } from "@faker-js/faker";
 // const fc = new FrictionalFactory()
 const bs = ClampingScrollFactory.get()
 export default function () {
@@ -21,90 +15,45 @@ export default function () {
   }, mock) {
     if (mock) {
       fixRightTop(function () {
-        firstDayOfWeek()
+        chooseFirstDayOfWeek()
         themeDropdown()
       })
     }
-    const now = YearMonthDayVirtualView.fromDate(new Date())
-    const today = createSignal(now, simpleEqualsNotEqual)
-    const interval = setInterval(() => {
-      today.set(YearMonthDayVirtualView.fromDate(new Date()))
-    }, DAYMILLSECONDS / 2)
-    hookDestroy(() => {
-      clearInterval(interval)
-    })
-    const date = createSignal(now, simpleEqualsNotEqual)
 
-    //展示日历
-    // const showCalendar = createSignal(false)
+    dailyRecord({
+      getFullWidth,
+      didCreate(w) {
 
-    function calendarOpenHeight() {
-      return 5 * getFullWidth() / 7
-      // return 6 * getFullWidth() / 7
-    }
-    function scrollYearMonthOpenHeight() {
-      return 44 * 3
-      // return 3 * getFullWidth() / 7
-    }
-    //日历滚动,只用这个表达开关
-    const calendarScrollY = new OnScroll('y', {
-      init: calendarOpenHeight(),
-      maxScroll: calendarOpenHeight,
-      targetSnap: dragSnapWithList([
-        {
-          beforeForce: 1,
-          size: calendarOpenHeight(),
-          afterForce: 1
-        }
-      ])
-    })
-
-    //年月picker的滚动,默认滚动到最大
-    const yearMonthScrollY = new OnScroll('y', {
-      init: scrollYearMonthOpenHeight(),
-      maxScroll: scrollYearMonthOpenHeight,
-      targetSnap: dragSnapWithList([
-        {
-          beforeForce: 1,
-          size: scrollYearMonthOpenHeight(),
-          afterForce: 1
-        }
-      ])
-    })
-
-    yearMonthScrollY.maxNextScroll = calendarScrollY
-    calendarScrollY.minNextScroll = yearMonthScrollY
-    // animateSignal(scrollYearMonthOpenHeight())
-
-    function showYearMonth() {
-      return yearMonthScrollY.get() != scrollYearMonthOpenHeight()
-    }
-    topContext.provide({
-      yearMonthScrollY,
-      showYearMonth,
-      scrollYearMonthOpenHeight,
-      calendarScrollY,
-      calendarOpenHeight,
-      today: today.get,
-      showCalendar() {
-        return calendarScrollY.get() != calendarOpenHeight()
       },
-      async calendarClose() {
-        if (showYearMonth()) {
-          yearMonthScrollY.animateTo(scrollYearMonthOpenHeight())
-          calendarScrollY.animateTo(calendarOpenHeight())
-        } else {
-          calendarScrollY.animateTo(calendarOpenHeight())
-        }
+      renderHeaderRight() {
+
+        fdom.div({
+          className: 'text-base-content',
+          children() {
+            fdom.span({
+              className: 'mr-[0.125em] text-2xl',
+              childrenType: 'text',
+              children: '¥'
+            })
+            fdom.span({
+              className: 'text-2xl',
+              childrenType: 'text',
+              children: '23'
+            })
+            fdom.sup({
+              className: 'opacity-50 text-[0.75em] -top-[0.75em]',
+              childrenType: 'text',
+              children: '.00'
+            })
+          }
+        })
       },
-    })
-    fdom.div({
-      className: 'absolute inset-0 flex flex-col select-none touch-none',
-      children() {
-        renderScrollYear(date)
-        renderHeader(date, getFullWidth)
-        renderPageList(date)
-      }
+      renderContent(w) {
+        demoList(faker.number.int({
+          min: 1,
+          max: 58
+        }))
+      },
     })
   })
 

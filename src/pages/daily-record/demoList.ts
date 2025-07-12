@@ -6,11 +6,6 @@ export default function (time: number) {
   fdom.ul({
     className: 'daisy-list bg-base-100 rounded-box shadow-md',
     children() {
-      // fdom.li({
-      //   className: 'p-4 pb-2 text-xs opacity-60 tracking-wide',
-      //   childrenType: 'text',
-      //   children: `Most played songs this week`,
-      // })
       for (let i = 0; i < time; i++) {
 
         fdom.li({

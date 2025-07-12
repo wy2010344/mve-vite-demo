@@ -16,11 +16,13 @@ import { hookAddResult } from "mve-core";
 export default function () {
   const initList = [
     {
+      id: Date.now(),
       time: Date.now()
     }
   ]
   const list = createSignal<{
     time: number
+    id: number
   }[]>(initList)
 
   explain(function () {
@@ -39,7 +41,7 @@ export default function () {
     `
   })
 
-  function renderRow(row: ExitModel<RowModel>, getIndex: GetValue<number>) {
+  function renderRow(row: ExitModel<RowModel, number>, getIndex: GetValue<number>) {
     const div = fdom.li({
       className: 'daisy-list-row',
       children() {
@@ -51,14 +53,16 @@ export default function () {
         fdom.span({
           className: 'list-col-grow',
           childrenType: "text",
-          children: row.value.time + ''
+          children() {
+            return row.value().time + ''
+          }
         })
         fdom.button({
           childrenType: "text",
           children: "x",
           className: 'daisy-btn',
           onClick() {
-            list.set(list.get().filter(x => x != row.value))
+            list.set(list.get().filter(x => x.id != row.key))
           }
         })
         fdom.button({
@@ -68,9 +72,10 @@ export default function () {
           onClick() {
             list.set(
               list.get().map(v => {
-                if (v == row.value) {
+                if (v.id == row.key) {
                   return {
                     ...v,
+                    id: Date.now(),
                     time: Date.now()
                   }
                 }
@@ -112,6 +117,9 @@ export default function () {
         }
       }
       const getList = getExitAnimateArray(list.get, {
+        getKey(v) {
+          return v.id
+        },
         mode,
         wait,
         enterIgnore() {
@@ -202,6 +210,7 @@ export default function () {
       fdom.button({
         onClick() {
           const row = {
+            id: Date.now(),
             time: Date.now()
           }
           const rows = list.get().slice()

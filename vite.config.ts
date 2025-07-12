@@ -20,6 +20,11 @@ export default defineConfig({
 			transformMixedEsModules: true, // 处理混合模块
 		}
 	},
+	resolve: {
+		alias: {
+			'~': path.resolve(__dirname, 'src'), // 例如 @/components → src/components
+		},
+	},
 	plugins: [
 		// viteImportMap({
 		// 	watchFolder: path.resolve(__dirname, './src/pages'),

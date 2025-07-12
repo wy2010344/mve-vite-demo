@@ -1,4 +1,4 @@
-import { renderArrayKey, renderIf } from "mve-helper";
+import { renderArrayKey, renderIf, renderOne, renderOneKey } from "mve-helper";
 import { GetValue, ReadArray } from "wy-helper";
 
 export function If({
@@ -27,4 +27,14 @@ export function ArrayRender<T>({
   render(getValue: GetValue<T>, getIndex: GetValue<number>, key: any): void;
 }) {
   renderArrayKey(getArray, getKey, render);
+}
+
+export function OneRender<K>({
+  key,
+  render,
+}: {
+  key: GetValue<K>;
+  render(v: K): void;
+}) {
+  renderOne(key, render);
 }

@@ -5,13 +5,18 @@ import { cns, animateSignal } from "wy-dom-helper";
 import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, Compare, PointKey, } from "wy-helper";
 import explain from "../../explain";
 import { renderMobileView } from "../../onlyMobile";
-import hookTrackLayout from "../daily-record/hookTrackLayout";
-import firstDayOfWeek, { firstDayOfWeekIndex, WEEKS, WEEKTIMES } from "../daily-record/firstDayOfWeek";
 import fixRightTop from "../../fixRightTop";
 import themeDropdown from "../../themeDropdown";
 import demoList from "../daily-record/demoList";
 import { faker } from "@faker-js/faker";
 import { movePage, OnScroll, pluginSimpleMovePage } from 'mve-dom-helper'
+import {
+  hookTrackLayout,
+  chooseFirstDayOfWeek,
+  firstDayOfWeekIndex,
+  WEEKTIMES,
+  WEEKS
+} from 'daisy-mobile-helper'
 
 
 const selectShadowCell = 'select-cell'
@@ -26,7 +31,7 @@ export default function () {
 
     if (mock) {
       fixRightTop(function () {
-        firstDayOfWeek()
+        chooseFirstDayOfWeek()
         themeDropdown()
       })
     }

@@ -38,7 +38,7 @@
     "linebreak": "^1.1.0",
     "lottie-web": "^5.12.2",
     "marked": "^15.0.7",
-    "motion": "^12.6.2",
+    "motion": "^12.23.0",
     "mve-core": "file:.yalc/mve-core",
     "mve-dom": "file:.yalc/mve-dom",
     "mve-dom-helper": "file:.yalc/mve-dom-helper",
