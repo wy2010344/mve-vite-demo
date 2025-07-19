@@ -2,37 +2,37 @@
   "version": "v1",
   "packages": {
     "wy-helper": {
-      "signature": "9a0ff23c7a9f54afde1502e3e512cbda",
+      "signature": "c1efec48791affa6fd4f852f88b6494f",
       "file": true,
       "replaced": "^0.1.12"
     },
     "wy-dom-helper": {
-      "signature": "369dd4cbe14f71e76b8721e75a6e37fc",
+      "signature": "fccb1ca6e7359e699f274855b6872cd2",
       "file": true,
       "replaced": "^0.1.10"
     },
     "mve-core": {
-      "signature": "2a9c482e74afec072c1e16848138bd31",
+      "signature": "2de9c0bf4a7d5260b73a7a4c449b3e3b",
       "file": true,
       "replaced": "^2.0.0"
     },
     "mve-dom": {
-      "signature": "4da4fa36734a861448eb112da7bfa726",
+      "signature": "cde86e287fd5bb1fa79073e86bb09571",
       "file": true,
       "replaced": "^2.0.0"
     },
     "mve-helper": {
-      "signature": "a914e9dd67be3759370628e3e607248f",
+      "signature": "84cfe868dbd5554a9301043823a780ac",
       "file": true,
       "replaced": "^2.0.0"
     },
     "mve-dom-helper": {
-      "signature": "57dda51a30e0eabcf25ed67e18396d72",
+      "signature": "36d10d4a9cf35aca7253f1a6df1f3239",
       "file": true,
       "replaced": "^2.0.1"
     },
     "daisy-mobile-helper": {
-      "signature": "d6969401d1670e72a8be976002ecfd61",
+      "signature": "f2cb40b239f88538be15a4e397a020e0",
       "file": true
     }
   }

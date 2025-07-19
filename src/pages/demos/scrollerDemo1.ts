@@ -72,9 +72,9 @@ export default function () {
         scrollType() == '原生' ? tw`overflow-auto` : tw`touch-none overflow-hidden`
       )
     },
-    onPointerDown: pointerMoveDir(function () {
+    onPointerDown(e) {
       scrollY.stop()
-      return {
+      pointerMoveDir(e, {
         onMove(e, dir) {
           if (scrollType() == '原生') {
             return
@@ -124,19 +124,22 @@ export default function () {
           }
           return ScrollFromPage.from(e, {
             getPage: eventGetPageY,
-            scrollDelta(delta, velocity) {
+            scrollDelta(delta, velocity, inMove) {
               // const y = scrollY.get()
               scrollForEdge(scrollY, delta, container.clientHeight, content.offsetHeight)
-            },
-            onFinish
+              if (inMove) {
+                return
+              }
+              onFinish(velocity)
+            }
           })
         },
         onCancel(e) {
           console.log("stop", e)
           scrollY.stop()
         },
-      }
-    }),
+      })
+    },
     children() {
       content = fdom.div({
         className: cs.content,
