@@ -1,20 +1,30 @@
+import { routerConsume } from "daisy-mobile-helper";
 import { fdom, renderText } from "mve-dom";
-import { EmptyFun } from "wy-helper";
+import { Branch, getBranchKey, renderOneKey } from "mve-helper";
+import { EmptyFun, GetValue } from "wy-helper";
+import { loadContext } from "../loadContext";
+import { renderMobileView } from "~/onlyMobile";
 
 export default function (
-  args: {
-
-  },
-  renderChildren: EmptyFun
+  args: any,
+  getBranch: GetValue<Branch>
 ) {
 
-  fdom.div({
-    children() {
-      renderText`Layout1`
-      fdom.input({
+  const { renderBranch } = loadContext.consume()
+  renderMobileView(function ({
+    width, height
+  }, mock) {
 
-      })
-      renderChildren()
-    }
+    fdom.div({
+      children() {
+        renderOneKey(
+          getBranch,
+          getBranchKey,
+          function (key) {
+            renderBranch(getBranch)
+          }
+        )
+      }
+    })
   })
 }
