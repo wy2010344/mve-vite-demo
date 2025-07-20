@@ -1,14 +1,10 @@
 import { fdom, renderText } from "mve-dom";
-import { Branch, getBranchKey, renderArrayKey, renderOneKey } from "mve-helper";
-import { EmptyFun, GetValue } from "wy-helper";
+import { Branch, BranchLoaderParam, getBranchKey, renderArrayKey, renderOneKey } from "mve-helper";
+import { EmptyFun, GetValue, quote } from "wy-helper";
 import { loadContext } from "~/nest-route-pages/loadContext";
 
 export default function (
-  args: {
-
-  },
-  getBranch: GetValue<Branch>,
-  load: (path: string) => Branch
+  get: GetValue<BranchLoaderParam>
 ) {
 
   const { renderBranch } = loadContext.consume()
@@ -26,9 +22,10 @@ export default function (
   ]
   fdom.div({
     children() {
-      renderText`Layout2`
+      renderText`Layout2--${() => JSON.stringify(get().query)}`
       renderArrayKey(() => {
-        const a = getBranch()
+        const v = get()
+        const a = v.next
         const key = a.nodes![1]
         const idx = tabs.findIndex(v => v.path == key)
         const before = tabs[idx - 1]
@@ -38,7 +35,7 @@ export default function (
         }[] = []
         if (before) {
           list.push({
-            branch: load('abc/' + before.path),
+            branch: v.load(before.path),
             step: 'before'
           })
         }
@@ -48,7 +45,7 @@ export default function (
         const after = tabs[idx + 1]
         if (after) {
           list.push({
-            branch: load('abc/' + after.path),
+            branch: v.load(after.path),
             step: 'after'
           })
         }
