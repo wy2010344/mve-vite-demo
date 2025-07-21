@@ -5,14 +5,9 @@ import { EmptyFun, GetValue } from "wy-helper";
 import { loadContext } from "../loadContext";
 import { renderMobileView } from "~/onlyMobile";
 
-export default function (get: GetValue<BranchLoaderParam>
+export default function (arg: BranchLoaderParam
 ) {
-
-  function getNext() {
-    return get().next
-  }
   const { renderBranch } = loadContext.consume()
-  console.log("d", get())
   renderMobileView(function ({
     width, height
   }, mock) {
@@ -20,10 +15,10 @@ export default function (get: GetValue<BranchLoaderParam>
     fdom.div({
       children() {
         renderOneKey(
-          getNext,
+          arg.getChildren,
           getBranchKey,
           function (key) {
-            renderBranch(getNext)
+            renderBranch(arg.getChildren)
           }
         )
       }

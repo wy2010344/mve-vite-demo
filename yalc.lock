@@ -22,12 +22,12 @@
       "replaced": "^2.0.0"
     },
     "mve-helper": {
-      "signature": "c1be0453d4e7fbcbcc70ee80f3cbd249",
+      "signature": "ade77e686b07f83936bac170c570db4e",
       "file": true,
       "replaced": "^2.0.0"
     },
     "mve-dom-helper": {
-      "signature": "36d10d4a9cf35aca7253f1a6df1f3239",
+      "signature": "7e2bbb7973f5a6e1ecf2bc926c87275f",
       "file": true,
       "replaced": "^2.0.1"
     },

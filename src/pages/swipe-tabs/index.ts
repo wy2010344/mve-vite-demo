@@ -1,4 +1,5 @@
 import { createTabList } from "daisy-mobile-helper";
+import { createContext } from "mve-core";
 import { fdom, renderTextContent } from "mve-dom";
 import { movePage } from "mve-dom-helper";
 import { renderArrayKey } from "mve-helper";
@@ -25,19 +26,17 @@ export default function () {
 
         renderMoveX({
           className: 'h-150 bg-white',
-          children(v, parentMove) {
+          children(v) {
             renderTextContent(v)
             renderMoveX({
               sub: v,
               className: 'h-100',
-              parentMove,
               children(v, parentMove) {
                 renderTextContent(v)
 
 
                 renderMoveX({
                   sub: v,
-                  parentMove,
                   className: 'bg-white flex items-center justify-center h-50',
                   children(v) {
                     renderTextContent(v)
@@ -52,15 +51,16 @@ export default function () {
   })
 }
 
+const parentMoveCtx = createContext<{
+  (e: PointerEvent): void
+}>(undefined!)
 function renderMoveX({
   sub = '',
   className = '',
-  parentMove,
   children
 }: {
   sub?: string,
   className?: string
-  parentMove?(e: PointerEvent): void
   children(v: string, move: SetValue<PointerEvent>): void
 }) {
   const scrollX = movePage({
@@ -109,6 +109,7 @@ function renderMoveX({
         },
         children() {
 
+          const parentMove = parentMoveCtx.consume()
           function moveCurrent(e: PointerEvent) {
             pointerMove(scrollX.getMoveEvent(e, 'x', {
               callback(direction, velocity) {
@@ -148,6 +149,36 @@ function renderMoveX({
             }
             return list
           }), v => v.key, function (getValue, getIndex, key) {
+
+            function thisMovie(e: PointerEvent) {
+              pointerMoveDir(e, {
+                onMove(e, dir, va) {
+                  if (dir == 'x') {
+                    const v = getValue()
+                    if (!parentMove) {
+                      moveCurrent(e)
+                      return
+                    }
+                    if (v.key == tabs.at(-1)?.display) {
+                      if (va.x < 0) {
+                        parentMove(e)
+                      } else {
+                        moveCurrent(e)
+                      }
+                    } else if (v.key == tabs[0].display) {
+                      if (va.x > 0) {
+                        parentMove(e)
+                      } else {
+                        moveCurrent(e)
+                      }
+                    } else {
+                      moveCurrent(e)
+                    }
+                  }
+                }
+              })
+            }
+            parentMoveCtx.provide(thisMovie)
             fdom.div({
               className() {
                 const n = getValue()
@@ -162,32 +193,7 @@ function renderMoveX({
               s_border: '1px solid gray',
               onPointerDown(e) {
                 e.stopPropagation()
-                pointerMoveDir(e, {
-                  onMove(e, dir, va) {
-                    if (dir == 'x') {
-                      const v = getValue()
-                      if (!parentMove) {
-                        moveCurrent(e)
-                        return
-                      }
-                      if (v.key == tabs.at(-1)?.display) {
-                        if (va.x < 0) {
-                          parentMove(e)
-                        } else {
-                          moveCurrent(e)
-                        }
-                      } else if (v.key == tabs[0].display) {
-                        if (va.x > 0) {
-                          parentMove(e)
-                        } else {
-                          moveCurrent(e)
-                        }
-                      } else {
-                        moveCurrent(e)
-                      }
-                    }
-                  }
-                })
+                thisMovie(e)
               },
               children() {
                 children(key, moveCurrent)
