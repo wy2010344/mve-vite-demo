@@ -1,4 +1,5 @@
 import { createRoot, fdom, fsvg, svg } from 'mve-dom'
+import { destroyGlobalHolder } from 'mve-core'
 import { routerProvide } from 'daisy-mobile-helper'
 import { argForceNumber, createTreeRoute, getBranchKey, renderOneKey, } from 'mve-helper'
 import { IconContext } from "mve-icons";
@@ -14,7 +15,7 @@ const { renderBranch, getBranch, preLoad } = createTreeRoute({
   prefix: './pages/',
   renderError
 })
-const destroy = createRoot(app, () => {
+createRoot(app, () => {
   const { getHistoryState } = routerProvide(createHashHistory())
   IconContext.provide({
     renderItem(tag, attrs, children) {
@@ -68,4 +69,4 @@ function renderError(message: string) {
   })
 }
 
-window.addEventListener("unload", destroy)
+window.addEventListener("unload", destroyGlobalHolder)
