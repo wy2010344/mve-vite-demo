@@ -4,7 +4,7 @@ import { fdom, renderTextContent } from "mve-dom";
 import { movePage } from "mve-dom-helper";
 import { renderArrayKey } from "mve-helper";
 import { pointerMove, pointerMoveDir } from "wy-dom-helper";
-import { createSignal, memo, ScrollDelta, SetValue, tw } from "wy-helper";
+import { createSignal, memo, ScrollDelta, ScrollFromPage, SetValue, tw } from "wy-helper";
 import { renderMobileView } from "~/onlyMobile";
 /**
  * 原生滚动,优先滚动内部,再滚动外部
@@ -52,7 +52,9 @@ export default function () {
 }
 
 const parentMoveCtx = createContext<{
-  (e: PointerEvent): void
+  move(e: PointerEvent): void
+  left?(e: PointerEvent): void | ScrollFromPage<PointerEvent>
+  right?(e: PointerEvent): void | ScrollFromPage<PointerEvent>
 }>(undefined!)
 function renderMoveX({
   sub = '',
@@ -111,7 +113,7 @@ function renderMoveX({
 
           const parentMove = parentMoveCtx.consume()
           function moveCurrent(e: PointerEvent) {
-            pointerMove(scrollX.getMoveEvent(e, 'x', {
+            return scrollX.getMoveEvent(e, 'x', {
               callback(direction, velocity) {
                 const newItem = tabs[currentIndex() + direction]
                 if (newItem) {
@@ -120,7 +122,7 @@ function renderMoveX({
                 }
                 return true
               },
-            }))
+            })
           }
 
           renderArrayKey(memo(() => {
@@ -150,35 +152,36 @@ function renderMoveX({
             return list
           }), v => v.key, function (getValue, getIndex, key) {
 
-            function thisMovie(e: PointerEvent) {
+            function moveLeft(e: PointerEvent) {
+              if (key == tabs[0].display) {
+                return parentMove?.left?.(e)
+              }
+              return moveCurrent(e)
+            }
+            function moveRight(e: PointerEvent) {
+              if (key == tabs.at(-1)?.display) {
+                return parentMove?.right?.(e)
+              }
+              return moveCurrent(e)
+            }
+            function move(e: PointerEvent) {
               pointerMoveDir(e, {
                 onMove(e, dir, va) {
                   if (dir == 'x') {
-                    const v = getValue()
-                    if (!parentMove) {
-                      moveCurrent(e)
-                      return
-                    }
-                    if (v.key == tabs.at(-1)?.display) {
-                      if (va.x < 0) {
-                        parentMove(e)
-                      } else {
-                        moveCurrent(e)
-                      }
-                    } else if (v.key == tabs[0].display) {
-                      if (va.x > 0) {
-                        parentMove(e)
-                      } else {
-                        moveCurrent(e)
-                      }
+                    if (va.x > 0) {
+                      return moveLeft(e)
                     } else {
-                      moveCurrent(e)
+                      return moveRight(e)
                     }
                   }
                 }
               })
             }
-            parentMoveCtx.provide(thisMovie)
+            parentMoveCtx.provide({
+              move,
+              left: moveLeft,
+              right: moveRight
+            })
             fdom.div({
               className() {
                 const n = getValue()
@@ -193,7 +196,7 @@ function renderMoveX({
               s_border: '1px solid gray',
               onPointerDown(e) {
                 e.stopPropagation()
-                thisMovie(e)
+                move(e)
               },
               children() {
                 children(key, moveCurrent)
