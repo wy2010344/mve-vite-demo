@@ -1,7 +1,7 @@
 import { fdom, mdom } from "mve-dom";
 import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
-import { cns, animateSignal } from "wy-dom-helper";
+import { cns, animateSignal, pointerMove } from "wy-dom-helper";
 import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, Compare, PointKey, } from "wy-helper";
 import explain from "../../explain";
 import { renderMobileView } from "../../onlyMobile";
@@ -9,7 +9,7 @@ import fixRightTop from "../../fixRightTop";
 import themeDropdown from "../../themeDropdown";
 import demoList from "../daily-record/demoList";
 import { faker } from "@faker-js/faker";
-import { movePage, OnScroll, pluginSimpleMovePage } from 'mve-dom-helper'
+import { createSimpleMovePage, movePage, OnScroll } from 'mve-dom-helper'
 import {
   hookTrackLayout,
   chooseFirstDayOfWeek,
@@ -35,7 +35,6 @@ export default function () {
         themeDropdown()
       })
     }
-    const directionLock = createSignal<PointKey | undefined>(undefined)
     const date = createSignal(YearMonthDayVirtualView.fromDate(new Date()), simpleEqualsNotEqual)
     const yearMonth = memo<YearMonthVirtualView>((m) => {
       const d = date.get()
@@ -66,8 +65,6 @@ export default function () {
       return getFullWidth() / 7
     }
     const showWeek = memo(() => scrollY.get() >= 5 * perSize());
-    const calendarScrollX = animateSignal(0)
-
     const interpolateY = memoFun(() => {
       const perHeight = perSize()
       const moveHeight = perHeight * 5
@@ -78,7 +75,28 @@ export default function () {
       }, extrapolationClamp)
     })
 
-    const bodyScrollX = animateSignal(0)
+    const bodyScrollX = createSimpleMovePage({
+      direction: 'x',
+      getValue: date.get,
+      // getSize: getContainerWidth,
+      compare(d, lastDate) {
+        const lastTime = dateFromYearMonthDay(lastDate).valueOf()
+        const thisTime = dateFromYearMonthDay(d).valueOf()
+        const diff = thisTime - lastTime
+        let direction = 0
+        if (diff >= DAYMILLSECONDS) {
+          direction = 1
+        } else if (diff <= -DAYMILLSECONDS) {
+          direction = -1
+        }
+        return direction
+      },
+      callback(direction) {
+        const m = dateFromYearMonthDay(date.get())
+        m.setTime(m.getTime() + direction * DAYMILLSECONDS)
+        date.set(YearMonthDayVirtualView.fromDate(m))
+      },
+    })
 
 
     let lastDate = date.get()
@@ -105,18 +123,10 @@ export default function () {
     function getContainerWidth() {
       return container.clientWidth
     }
-    const mp = movePage(calendarScrollX, getContainerWidth)
-    mp.hookCompare(week, function (a, b) {
-      if (showWeek()) {
-        return a.cells[0].toNumber() - b.cells[0].toNumber()
+    const scrollX = movePage({
+      getSize() {
+        return container.clientWidth
       }
-      return 0
-    })
-    mp.hookCompare(yearMonth, function (a, b) {
-      if (showWeek()) {
-        return 0
-      }
-      return a.toNumber() - b.toNumber()
     })
     hookTrackLayout(date.get, selectShadowCell)
 
@@ -138,6 +148,18 @@ export default function () {
       onWheel: scrollY.wheelEventListener,
       onPointerDown: scrollY.pointerEventListner,
       children(container: HTMLElement) {
+        scrollX.hookCompare(week, function (a, b) {
+          if (showWeek()) {
+            return a.cells[0].toNumber() - b.cells[0].toNumber()
+          }
+          return 0
+        })
+        scrollX.hookCompare(yearMonth, function (a, b) {
+          if (showWeek()) {
+            return 0
+          }
+          return a.toNumber() - b.toNumber()
+        })
         const content = fdom.div({
           s_transform() {
             return `translateY(${-scrollY.get()}px)`
@@ -212,33 +234,33 @@ export default function () {
                     const ty = Math.max(scrollY.get(), 0)
                     return `translateY(${ty}px)`
                   },
-                  onPointerDown: mp.getOnPointerDown({
-                    direction: 'x',
-                    callback(direction, velocity) {
-                      if (showWeek()) {
-
-                        //星期
-                        const m = dateFromYearMonthDay(date.get())
-                        m.setTime(m.getTime() + direction * WEEKTIMES)
-                        if (direction) {
-                          date.set(YearMonthDayVirtualView.fromDate(m))
-                        }
-                      } else {
-                        //月份
-                        const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth();
-                        if (date.get().day > c.days) {
-                          date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days));
+                  onPointerDown(e) {
+                    pointerMove(scrollX.getMoveEvent(e, 'x', {
+                      callback(direction, velocity) {
+                        if (showWeek()) {
+                          //星期
+                          const m = dateFromYearMonthDay(date.get())
+                          m.setTime(m.getTime() + direction * WEEKTIMES)
+                          if (direction) {
+                            date.set(YearMonthDayVirtualView.fromDate(m))
+                          }
                         } else {
-                          date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day));
+                          //月份
+                          const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth();
+                          if (date.get().day > c.days) {
+                            date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days));
+                          } else {
+                            date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day));
+                          }
                         }
-                      }
-                    },
-                  }),
+                      },
+                    }))
+                  },
                   children() {
                     fdom.div({
                       s_position: 'relative',
                       s_transform() {
-                        return `translateX(${-calendarScrollX.get()}px)`
+                        return `translateX(${-scrollX.get()}px)`
                       },
                       children() {
                         renderIf(showWeek, function () {
@@ -267,29 +289,7 @@ export default function () {
               className: ' flex-1',
               data_a: '99',
               plugins: [
-                pluginSimpleMovePage({
-                  direction: 'x',
-                  scroll: bodyScrollX,
-                  getValue: date.get,
-                  getSize: getContainerWidth,
-                  compare(d, lastDate) {
-                    const lastTime = dateFromYearMonthDay(lastDate).valueOf()
-                    const thisTime = dateFromYearMonthDay(d).valueOf()
-                    const diff = thisTime - lastTime
-                    let direction = 0
-                    if (diff >= DAYMILLSECONDS) {
-                      direction = 1
-                    } else if (diff <= -DAYMILLSECONDS) {
-                      direction = -1
-                    }
-                    return direction
-                  },
-                  callback(direction) {
-                    const m = dateFromYearMonthDay(date.get())
-                    m.setTime(m.getTime() + direction * DAYMILLSECONDS)
-                    date.set(YearMonthDayVirtualView.fromDate(m))
-                  },
-                })
+                bodyScrollX.plugin
               ],
               children() {
                 fdom.div({

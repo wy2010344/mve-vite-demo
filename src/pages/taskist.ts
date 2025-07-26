@@ -84,12 +84,12 @@ export default function () {
             callback(afterIndex, mlist[afterIndex],)
           }, renderView)
         }
-        const scrollX = animateSignal(0)
-        const mp = movePage(scrollX, () => container.clientWidth)
-
-        mp.hookCompare(selectIndex.get, function (index, oldIndex) {
-          return circleFindNearst(index - oldIndex, model.get().length)
+        const scrollX = movePage({
+          getSize() {
+            return container.clientWidth
+          }
         })
+
         hookTrackSignal(memo<number>(oldIndex => {
           const index = selectIndex.get()
           if (typeof oldIndex == 'number') {
@@ -98,15 +98,23 @@ export default function () {
         }))
         const container = fdom.div({
           className: 'relative flex-1 min-h-0',
-          onPointerDown: mp.getOnPointerDown({
-            direction: 'x',
-            callback(direction, velocity) {
-
-              const max = model.get().length
-              selectIndex.set(circleFormat(selectIndex.get() + direction, max))
-            },
-          }),
-          children() {
+          children(container: HTMLElement) {
+            scrollX.hookCompare(selectIndex.get, function (index, oldIndex) {
+              return circleFindNearst(index - oldIndex, model.get().length)
+            })
+            container.addEventListener('pointerdown', e => pointerMoveDir(e, {
+              onMove(e, dir) {
+                if (dir != 'x') {
+                  return
+                }
+                return scrollX.getMoveEvent(e, 'x', {
+                  callback(direction, velocity) {
+                    const max = model.get().length
+                    selectIndex.set(circleFormat(selectIndex.get() + direction, max))
+                  },
+                })
+              }
+            }))
             fdom.div({
               className: 'h-full',
               s_transform() {

@@ -4,6 +4,7 @@ import { createRoot, svg } from "mve-dom"
 import { renderPop } from "mve-dom-helper";
 import { argForceNumber, createTreeRoute, getBranchKey, renderOneKey } from "mve-helper";
 import { IconContext } from "mve-icons"
+import { loadContext } from "./loadContext";
 const app = document.querySelector<HTMLDivElement>('#app')!
 const pages = import.meta.glob('./pages/**')
 const { renderBranch, getBranch, preLoad } = createTreeRoute({
@@ -36,6 +37,11 @@ const destroy = createRoot(app, () => {
       }).render(children)
     }
   })
+  loadContext.provide({
+    renderBranch,
+    getBranch,
+    preLoad
+  })
   renderOneKey(
     getBranch(() => getHistoryState().pathname),
     getBranchKey,
@@ -45,4 +51,3 @@ const destroy = createRoot(app, () => {
   )
   renderPop()
 })
-window.addEventListener("unload", destroy)

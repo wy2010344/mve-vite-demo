@@ -236,6 +236,11 @@ function renderCard() {
         title: '自动高度面板',
         description: ''
       })
+      card({
+        href: '/swipe-tabs',
+        title: '嵌套侧滑',
+        description: ''
+      })
     }
   })
 }

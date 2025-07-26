@@ -5,7 +5,7 @@ import Lottie, { AnimationItem } from "lottie-web";
 import data from "./data";
 import { bgColorfromHex, circleFindNearst, circleFormat, createSignal, easeFns, easeOut, eventGetPageX, extrapolationClamp, getAbsoulteIndex, getInterpolate, getInterpolateColor, memo, memoFun, readArraySliceCircle, rgbFromBgColor, spring, tween } from "wy-helper";
 import { hookDestroy, hookTrackSignal, renderArray } from "mve-helper";
-import { animateSignal, pointerMoveDir, subscribeEventListener } from "wy-dom-helper";
+import { animateSignal, pointerMove, pointerMoveDir, subscribeEventListener } from "wy-dom-helper";
 import { movePage } from "mve-dom-helper";
 import explain from "../../explain";
 import markdown from "../../markdown";
@@ -22,16 +22,21 @@ export default function () {
       index.set(circleFormat(index.get() + diff, data.length))
     }
     const cacheList = memo(() => readArraySliceCircle(data, index.get() - 1, index.get() + 2))
-    const scrollX = animateSignal(0)
+    // const scrollX = animateSignal(0)
     const sp = spring({
       // initialVelocity: v,
       config: {
         omega0: 8
       }
     })
-    const mp = movePage(scrollX, width, (v) => sp)//tween(6000, easeFns.inOut(easeFns.circ)))
+    const scrollX = movePage({
+      getSize: width,
+      getPageSnap() {
+        return sp
+      }
+    })//tween(6000, easeFns.inOut(easeFns.circ)))
 
-    mp.hookCompare(index.get, function (i, beforeIndex) {
+    scrollX.hookCompare(index.get, function (i, beforeIndex) {
       return circleFindNearst(i - beforeIndex, data.length)
     })
 
@@ -61,10 +66,11 @@ export default function () {
       }
     })
 
-    hookDestroy(subscribeEventListener(window, 'pointerdown', mp.getOnPointerDown({
-      direction: 'x',
-      callback: updateIndex,
-    })))
+    hookDestroy(subscribeEventListener(window, 'pointerdown', e => {
+      pointerMove(scrollX.getMoveEvent(e, 'x', {
+        callback: updateIndex
+      }))
+    }))
 
     const currentRow = memo(() => data.at(index.get()))
 

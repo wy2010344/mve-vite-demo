@@ -148,7 +148,9 @@ export default function () {
               },
               // leave: true,
               // cancel: true
-            }, canvas)
+            }, {
+              element: canvas
+            })
           },
           withPath: true,
           draw(ctx, path) {

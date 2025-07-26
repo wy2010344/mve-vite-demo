@@ -24,28 +24,19 @@ export default function () {
         s_height: '240px',
         s_overflow: 'hidden',
         s_background: '#444',
-        onPointerDown: pointerMoveDir(function () {
+        onPointerDown: e => {
           scrollX.stop()
-          return {
+          pointerMoveDir(e, {
             onMove(e, dir) {
               return ScrollFromPage.from(e, {
                 getPage: eventGetPageX,
                 scrollDelta(delta, velocity) {
                   scrollForEdge(scrollX, delta, container.clientWidth, content.offsetWidth)
-                },
-                onFinish(velocity) {
-                  // const out = bs.destinationWithMarginIscroll({
-                  //   velocity,
-                  //   current: scrollX.get(),
-                  //   containerSize: container.clientWidth,
-                  //   contentSize: content.offsetWidth
-                  // })
-                  // destinationWithMarginTrans(out, scrollX)
                 }
               })
             }
-          }
-        }),
+          })
+        },
         children() {
           content = fdom.div({
             s_display: 'flex',
