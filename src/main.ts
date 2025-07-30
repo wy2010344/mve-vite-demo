@@ -1,6 +1,6 @@
 import { createRoot, fdom, fsvg, svg } from 'mve-dom'
 import { destroyGlobalHolder } from 'mve-core'
-import { routerProvide } from 'daisy-mobile-helper'
+import { routerProvide } from 'mve-dom-helper/history'
 import { argForceNumber, createTreeRoute, getBranchKey, renderOneKey, } from 'mve-helper'
 import { IconContext } from "mve-icons";
 import { renderPop } from 'mve-dom-helper'

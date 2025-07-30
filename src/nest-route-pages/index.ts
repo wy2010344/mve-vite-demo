@@ -1,4 +1,5 @@
-import { routerProvide } from "daisy-mobile-helper";
+
+import { routerProvide } from 'mve-dom-helper/history'
 import { createHashHistory } from "history";
 import { createRoot, svg } from "mve-dom"
 import { renderPop } from "mve-dom-helper";
@@ -13,7 +14,6 @@ const { renderBranch, getBranch, preLoad } = createTreeRoute({
   },
   pages,
   prefix: './pages/',
-
 })
 /**
  * 虽说是层级加载,复用layout
