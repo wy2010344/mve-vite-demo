@@ -1,7 +1,7 @@
 import { fdom } from "mve-dom";
 import { FaArrowRight } from "mve-icons/fa";
 import { renderSizeSvg } from "../mve-icon";
-import { fLink } from 'daisy-mobile-helper'
+import { fLink } from 'mve-dom-helper/history'
 import themes from "daisyui/functions/themeOrder"
 import { faker } from "@faker-js/faker";
 import fixRightTop from "../fixRightTop";
