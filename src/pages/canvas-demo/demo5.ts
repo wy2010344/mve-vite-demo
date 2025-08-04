@@ -1,5 +1,5 @@
 import { addEffect, createSignal, emptyArray } from "wy-helper";
-import { hookDrawRect, simpleFlex, hookDrawText, hookDrawTextWrap } from "mve-dom-helper/canvasRender";
+import { hookDrawRect, simpleFlex, hookDrawText, hookDrawTextWrap, hookFill } from "mve-dom-helper/canvasRender";
 import { renderArray } from "mve-helper";
 import { dom, renderPortal } from "mve-dom";
 import { hookAlterStateHolder, hookCurrentStateHolder } from "mve-core";
@@ -27,14 +27,7 @@ export default function () {
           notFlex: true
         },
         draw(ctx, n, p) {
-          return {
-            operates: [
-              {
-                type: "fill",
-                style: 'yellow'
-              }
-            ]
-          }
+          hookFill('yellow')
         },
       })
       renderArray(list.get, function (row, getIndex) {
@@ -51,18 +44,8 @@ export default function () {
             }
           },
           draw(ctx, n, draw, p) {
-            return {
-              operates: [
-                {
-                  type: 'fill',
-                  style: 'red'
-                },
-                {
-                  type: "draw",
-                  callback: draw
-                }
-              ]
-            }
+            hookFill('red')
+            draw()
           },
           onClick(e) {
             list.set(list.get().filter(v => v != row))
@@ -88,18 +71,8 @@ export default function () {
           }
         },
         draw(ctx, n, draw, p) {
-          return {
-            operates: [
-              {
-                type: "fill",
-                style: "red"
-              },
-              {
-                type: "draw",
-                callback: draw
-              }
-            ]
-          }
+          hookFill('red')
+          draw()
         },
         // drawInfo(arg) {
         //   console.log("dd", arg)
