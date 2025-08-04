@@ -1,5 +1,5 @@
 import { fdom } from "mve-dom"
-import { hookDraw, renderCanvas } from "mve-dom-helper/canvasRender";
+import { hookDraw, hookFill, hookStroke, renderCanvas } from "mve-dom-helper/canvasRender";
 import { hookDestroy, renderArray } from "mve-helper";
 import { pointerMove, subscribeMove, subscribeRequestAnimationFrame } from "wy-dom-helper";
 import { asLazy, batchSignalEnd, createSignal, emptyArray, memo, run, toProxySignal } from "wy-helper";
@@ -112,15 +112,7 @@ export default function () {
               link.target.x.d - link.source.x.d,
               link.target.y.d - link.source.y.d,
             )
-            return {
-              operates: [
-                {
-                  type: "stroke",
-                  style: "#aaa",
-                  width: 1
-                }
-              ]
-            }
+            hookStroke(1, '#aaa')
           },
         })
       })
@@ -156,20 +148,8 @@ export default function () {
           draw(ctx, path) {
             path.arc(0, 0, 6, 0, 2 * Math.PI)
 
-            return {
-              operates: [
-                {
-                  type: "fill",
-                  style: "#000"
-                },
-                {
-                  type: "draw",
-                  callback(ctx) {
-                    ctx.fillText(node.value.index + "", 3, -3)
-                  },
-                }
-              ]
-            }
+            hookFill('#000')
+            ctx.fillText(node.value.index + "", 3, -3)
           },
         })
       })

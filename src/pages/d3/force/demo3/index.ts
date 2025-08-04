@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { fdom } from "mve-dom";
-import { hookDraw, renderCanvas } from "mve-dom-helper/canvasRender";
+import { hookDraw, hookFill, renderCanvas } from "mve-dom-helper/canvasRender";
 import { hookDestroy, renderArray } from "mve-helper";
 import { subscribeRequestAnimationFrame } from "wy-dom-helper";
 import { asLazy, batchSignalEnd, createSignal, emptyArray, memo, run, toProxySignal } from "wy-helper";
@@ -97,13 +97,8 @@ export default function () {
 
           draw(ctx, path) {
             path.arc(0, 0, node.value.r, 0, 2 * Math.PI)
-            return {
-              operates: getIndex() ? [
-                {
-                  type: "fill",
-                  style: color(node.value.group + '')
-                }
-              ] : emptyArray as any[]
+            if (getIndex()) {
+              hookFill(color(node.value.group + ''))
             }
           },
         })

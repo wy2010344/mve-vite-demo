@@ -8,8 +8,8 @@ import demo1 from "./demo1";
 import demo2 from "./demo2";
 import { fdom } from "mve-dom";
 import { windowSize } from 'wy-dom-helper'
-import { hookDrawRect, renderCanvas, simpleFlex } from "mve-dom-helper/canvasRender";
-import demo4 from "../d3/force/demo4";
+import { hookDrawRect, hookFill, renderCanvas, simpleFlex } from "mve-dom-helper/canvasRender";
+
 
 export default function () {
   renderCanvas({
@@ -29,14 +29,7 @@ export default function () {
       },
       draw(ctx, n, p) {
         p.rect(0, 0, n.axis.x.size(), n.axis.y.size())
-        return {
-          operates: [
-            {
-              type: "fill",
-              style: "gray"
-            }
-          ]
-        }
+        hookFill('gray')
       },
       children() {
         // demo1()
