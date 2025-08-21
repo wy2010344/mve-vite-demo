@@ -1,5 +1,5 @@
 import { fdom, mdom } from "mve-dom";
-import { hookTrackSignal, memoArray, renderArray, renderIf } from "mve-helper";
+import { hookTrackSignal, renderArray, renderArrayKey, renderIf } from "mve-helper";
 import { LunarDay, SolarDay } from "tyme4ts";
 import { cns, animateSignal, pointerMove } from "wy-dom-helper";
 import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, Compare, PointKey, } from "wy-helper";
@@ -17,6 +17,7 @@ import {
   WEEKTIMES,
   WEEKS
 } from 'daisy-mobile-helper'
+import { renderForEach } from "mve-core";
 
 
 const selectShadowCell = 'select-cell'
@@ -265,18 +266,18 @@ export default function () {
                       children() {
                         renderIf(showWeek, function () {
 
-                          renderArray(memoArray(() => {
+                          renderArrayKey(() => {
                             const w = week()
                             return [w.beforeWeek(), w, w.nextWeek()] as const
-                          }, simpleEqualsEqual as Compare<WeekVirtualView>), function (w, i) {
-                            renderWeek(w, i)
+                          }, v => v.cells[0].toNumber(), function (w, i) {
+                            renderWeek(w(), i)
                           })
                         }, function () {
-                          renderArray(memoArray(() => {
+                          renderArrayKey(() => {
                             const ym = yearMonth()
                             return [ym.lastMonth(), ym, ym.nextMonth()] as const
-                          }, simpleEqualsEqual as Compare<YearMonthVirtualView>), function (m, i) {
-                            renderCalendarView(m, i)
+                          }, v => v.toNumber(), function (m, i) {
+                            renderCalendarView(m(), i)
                           })
                         })
                       }
@@ -298,10 +299,10 @@ export default function () {
                     return `translateX(${-bodyScrollX.get()}px)`
                   },
                   children() {
-                    renderArray(memoArray(() => {
+                    renderArrayKey(() => {
                       const d = date.get()
                       return [d.beforeDay(), d, d.nextDay()]
-                    }, simpleEqualsEqual as Compare<YearMonthDayVirtualView>), function (w, getIndex) {
+                    }, v => v.toNumber(), function (w, getIndex) {
                       mdom.div({
                         attrs(v) {
                           const i = getIndex()

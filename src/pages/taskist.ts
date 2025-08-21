@@ -1,18 +1,15 @@
-import { addEffect, arrayCountCreateWith, createSignal, DAYMILLSECONDS, FrictionalFactory, circleFindNearst, memo, tw, eventGetPageX, circleFormat, EmptyFun } from "wy-helper";
+import { arrayCountCreateWith, createSignal, DAYMILLSECONDS, FrictionalFactory, circleFindNearst, memo, tw, circleFormat, EmptyFun } from "wy-helper";
 import { renderMobileView } from "../onlyMobile";
 import { faker } from "@faker-js/faker";
-import { min } from "d3";
-import { EachTime, hookAddResult, renderForEach } from "mve-core";
+import { EachTime, renderForEach } from "mve-core";
 import { fdom } from "mve-dom";
-import { animateSignal, cns, pointerMoveDir } from "wy-dom-helper";
-import { hookDestroy, hookTrackSignal, renderArray, renderArrayKey } from "mve-helper";
+import { cns, pointerMoveDir } from "wy-dom-helper";
+import { hookTrackSignal, renderArrayKey } from "mve-helper";
 import { hookExitAnimate, movePage, renderInputBool } from "mve-dom-helper";
 import { ImPlus } from "mve-icons/im";
 import { IoMdClose } from "mve-icons/io";
-import { createPop, createTimeoutPop } from "../pop";
 import { animate } from "motion";
-import { routerConsume } from "daisy-mobile-helper";
-import { mb } from "wy-dom-helper/contentEditable";
+import { routerConsume } from 'mve-dom-helper/history'
 
 
 
