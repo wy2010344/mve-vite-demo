@@ -1,143 +1,132 @@
-import { dom } from "mve-dom";
-import { hookDraw, PathResult, renderCanvas } from "mve-dom-helper/canvasRender";
-import { renderArray } from "mve-helper";
-import { createSignal, PointKey, quote } from "wy-helper";
+import { dom } from 'mve-dom'
+import {
+  hookClip,
+  hookDraw,
+  hookFill,
+  hookStroke,
+  renderCanvas,
+} from 'mve-dom-helper/canvasRender'
+import { renderArray } from 'mve-helper'
+import { createSignal, PointKey, quote } from 'wy-helper'
 /**
- * 
+ *
  * 绘制flex,在内部的hookDraw,需要使用context来封装
- * 
+ *
  */
 export default function () {
+  dom
+    .div({
+      className: 'w-full h-[100vh] flex flex-col items-center justify-center',
+    })
+    .render(() => {
+      const list = createSignal<number[]>([])
+      const count = createSignal(0)
+      dom.button({
+        onClick() {
+          list.set(list.get().concat(Date.now()))
+          count.set(count.get() + 1)
+        },
+      }).renderText`列表数量${() => list.get().length}`
 
-
-  dom.div({
-    className: "w-full h-[100vh] flex flex-col items-center justify-center"
-  }).render(() => {
-
-    const list = createSignal<number[]>([])
-    const count = createSignal(0)
-    dom.button({
-      onClick() {
-        list.set(list.get().concat(Date.now()))
-        count.set(count.get() + 1)
-      }
-    }).renderText`列表数量${() => list.get().length}`
-
-    function colorRectPath(strokeStyle = "blue", clip?: boolean) {
-      return function rectPath(ctx: any, path: Path2D): PathResult {
-        path.rect(0, 30, 100, 100)
-        const rs: PathResult = {
-          operates: [
-            {
-              type: "stroke",
-              width: 10,
-              style: strokeStyle
-            },
-            {
-              type: "fill",
-              style: "green"
-            }
-          ],
-          afterClipOperates: []
+      function colorRectPath(strokeStyle = 'blue', clip?: boolean) {
+        return function rectPath(ctx: any, path: Path2D) {
+          path.rect(0, 30, 100, 100)
+          hookStroke(10, strokeStyle)
+          hookFill('green')
+          if (clip) {
+            hookClip()
+            hookStroke(30, 'black')
+          }
         }
-        if (clip) {
-          rs.afterClipOperates?.push({
-            type: "stroke",
-            width: 30,
-            style: "black"
-          })
-        }
-        return rs
       }
-    }
-    renderCanvas({
-      width: 500,
-      height: 500,
-      className: "border-solid border-[1px] border-red-300"
-    }, () => {
-
-      hookDraw({
-        x: 100,
-        y: 100,
-        withPath: true,
-        draw: colorRectPath(),
-        // draw(ctx, x, y) {
-        //   const p = new Path2D()
-        //   drawRoundedRect(p, {
-        //     x,
-        //     y,
-        //     width: 100,
-        //     height: 200,
-        //     tl: 20,
-        //     tr: 20,
-        //     bl: 20,
-        //     br: 20
-        //   })
-        //   ctx.strokeStyle = 'black'
-        //   ctx.lineWidth = 1
-        //   ctx.stroke(p)
-        // },
-        children() {
+      renderCanvas(
+        {
+          width: 500,
+          height: 500,
+          className: 'border-solid border-[1px] border-red-300',
+        },
+        () => {
           hookDraw({
-            x: 10,
-            y: 10,
+            x: 100,
+            y: 100,
             withPath: true,
             draw: colorRectPath(),
-          })
-          hookDraw({
-            x: 40,
-            y: 40,
-            withPath: true,
-            draw: colorRectPath("yellow", true),
+            // draw(ctx, x, y) {
+            //   const p = new Path2D()
+            //   drawRoundedRect(p, {
+            //     x,
+            //     y,
+            //     width: 100,
+            //     height: 200,
+            //     tl: 20,
+            //     tr: 20,
+            //     bl: 20,
+            //     br: 20
+            //   })
+            //   ctx.strokeStyle = 'black'
+            //   ctx.lineWidth = 1
+            //   ctx.stroke(p)
+            // },
             children() {
               hookDraw({
-                x: 0,
+                x: 10,
                 y: 10,
                 withPath: true,
-                draw: colorRectPath('orange'),
+                draw: colorRectPath(),
               })
-
-
               hookDraw({
-                x: 0,
-                y: 30,
+                x: 40,
+                y: 40,
                 withPath: true,
-                draw: colorRectPath('yellow'),
+                draw: colorRectPath('yellow', true),
+                children() {
+                  hookDraw({
+                    x: 0,
+                    y: 10,
+                    withPath: true,
+                    draw: colorRectPath('orange'),
+                  })
+
+                  hookDraw({
+                    x: 0,
+                    y: 30,
+                    withPath: true,
+                    draw: colorRectPath('yellow'),
+                  })
+                },
               })
-            }
+              renderArray(list.get, (row, getIndex) => {
+                hookDraw({
+                  withPath: true,
+                  x() {
+                    return getIndex() * 20 + 100
+                  },
+                  y() {
+                    return getIndex() * 20 + 100
+                  },
+                  draw: colorRectPath('red'),
+                  onClick(e) {
+                    console.log('a', e, row)
+                    return true
+                  },
+                })
+              })
+            },
           })
-          renderArray(list.get, (row, getIndex) => {
-            hookDraw({
-              withPath: true,
-              x() {
-                return getIndex() * 20 + 100
-              },
-              y() {
-                return getIndex() * 20 + 100
-              },
-              draw: colorRectPath('red'),
-              onClick(e) {
-                console.log("a", e, row)
-                return true
-              },
-            })
-          })
-        },
-      })
+        }
+      )
     })
-  })
 }
 
-
-type SizeKey = "width" | "height"
+type SizeKey = 'width' | 'height'
 
 type Info = SizeKey | PointKey
 
 function directionToSize(x: PointKey): SizeKey {
   if (x == 'x') {
-    return "width"
+    return 'width'
   } else {
-    return "height"
+    return 'height'
   }
 }
 function oppositeDirection(x: PointKey): PointKey {
@@ -155,7 +144,6 @@ function oppositeSize(x: SizeKey): SizeKey {
   }
 }
 
-
 type PaddingInfo = {
   paddingLeft?: number
   paddingRight?: number
@@ -164,9 +152,9 @@ type PaddingInfo = {
 }
 function getPadding(n: PointKey, x: PaddingInfo) {
   if (n == 'x') {
-    return (x.paddingLeft!) + (x.paddingRight!)
+    return x.paddingLeft! + x.paddingRight!
   } else {
-    return (x.paddingTop!) + (x.paddingBottom!)
+    return x.paddingTop! + x.paddingBottom!
   }
 }
 function gatPaddingStart(n: PointKey, x: PaddingInfo) {

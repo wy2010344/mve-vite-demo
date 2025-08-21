@@ -1,49 +1,83 @@
-import { fdom, mdom } from "mve-dom";
-import { hookTrackSignal, renderArray, renderArrayKey, renderIf } from "mve-helper";
-import { LunarDay, SolarDay } from "tyme4ts";
-import { cns, animateSignal, pointerMove } from "wy-dom-helper";
-import { createSignal, dateFromYearMonthDay, DAYMILLSECONDS, YearMonthDayVirtualView, dragSnapWithList, extrapolationClamp, getInterpolate, GetValue, getWeekOfMonth, memo, simpleEqualsEqual, tw, WeekVirtualView, yearMonthDayEqual, YearMonthVirtualView, getWeekOfYear, YearMonthDay, addEffect, simpleEqualsNotEqual, memoFun, Compare, PointKey, } from "wy-helper";
-import explain from "../../explain";
-import { renderMobileView } from "../../onlyMobile";
-import fixRightTop from "../../fixRightTop";
-import themeDropdown from "../../themeDropdown";
-import demoList from "../daily-record/demoList";
-import { faker } from "@faker-js/faker";
+import { fdom, mdom } from 'mve-dom'
+import {
+  hookTrackSignal,
+  renderArray,
+  renderArrayKey,
+  renderIf,
+} from 'mve-helper'
+import { LunarDay, SolarDay } from 'tyme4ts'
+import { cns, animateSignal, pointerMove } from 'wy-dom-helper'
+import {
+  createSignal,
+  dateFromYearMonthDay,
+  DAYMILLSECONDS,
+  YearMonthDayVirtualView,
+  dragSnapWithList,
+  extrapolationClamp,
+  getInterpolate,
+  GetValue,
+  getWeekOfMonth,
+  memo,
+  simpleEqualsEqual,
+  tw,
+  WeekVirtualView,
+  yearMonthDayEqual,
+  YearMonthVirtualView,
+  getWeekOfYear,
+  YearMonthDay,
+  addEffect,
+  simpleEqualsNotEqual,
+  memoFun,
+  Compare,
+  PointKey,
+} from 'wy-helper'
+import explain from '../../explain'
+import { renderMobileView } from '../../onlyMobile'
+import fixRightTop from '../../fixRightTop'
+import themeDropdown from '../../themeDropdown'
+import demoList from '../daily-record/demoList'
+import { faker } from '@faker-js/faker'
 import { createSimpleMovePage, movePage, OnScroll } from 'mve-dom-helper'
 import {
   hookTrackLayout,
   chooseFirstDayOfWeek,
   firstDayOfWeekIndex,
   WEEKTIMES,
-  WEEKS
+  WEEKS,
 } from 'daisy-mobile-helper'
-import { renderForEach } from "mve-core";
-
+import { renderForEach } from 'mve-core'
 
 const selectShadowCell = 'select-cell'
 
 export default function () {
-  explain(() => {
-
-  })
-  renderMobileView(function ({
-    width: getFullWidth,
-  }, mock) {
-
+  explain(() => {})
+  renderMobileView(function ({ width: getFullWidth }, mock) {
     if (mock) {
       fixRightTop(function () {
         chooseFirstDayOfWeek()
         themeDropdown()
       })
     }
-    const date = createSignal(YearMonthDayVirtualView.fromDate(new Date()), simpleEqualsNotEqual)
+    const date = createSignal(
+      YearMonthDayVirtualView.fromDate(new Date()),
+      simpleEqualsNotEqual
+    )
     const yearMonth = memo<YearMonthVirtualView>((m) => {
       const d = date.get()
-      return new YearMonthVirtualView(d.year, d.month, firstDayOfWeekIndex.get())
+      return new YearMonthVirtualView(
+        d.year,
+        d.month,
+        firstDayOfWeekIndex.get()
+      )
     })
     const week = memo(() => {
       const d = date.get()
-      return WeekVirtualView.from(d.year, d.month, d.day, firstDayOfWeekIndex.get())
+      return WeekVirtualView.from(
+        d.year,
+        d.month,
+        d.day,
+        firstDayOfWeekIndex.get()
+      )
     })
     //debug
     const w = window as any
@@ -57,23 +91,30 @@ export default function () {
         {
           beforeForce: 1,
           size: perSize() * 5,
-          afterForce: 1
-        }
-      ])
+          afterForce: 1,
+        },
+      ]),
     })
     const maxScrollY = scrollY.measureMaxScroll()
     function perSize() {
       return getFullWidth() / 7
     }
-    const showWeek = memo(() => scrollY.get() >= 5 * perSize());
+    const showWeek = memo(() => scrollY.get() >= 5 * perSize())
     const interpolateY = memoFun(() => {
       const perHeight = perSize()
       const moveHeight = perHeight * 5
-      const weekOfMonth = getWeekOfMonth(dateFromYearMonthDay(date.get()), firstDayOfWeekIndex.get()) - 1
-      return getInterpolate({
-        0: 0,
-        [moveHeight]: -perHeight * weekOfMonth
-      }, extrapolationClamp)
+      const weekOfMonth =
+        getWeekOfMonth(
+          dateFromYearMonthDay(date.get()),
+          firstDayOfWeekIndex.get()
+        ) - 1
+      return getInterpolate(
+        {
+          0: 0,
+          [moveHeight]: -perHeight * weekOfMonth,
+        },
+        extrapolationClamp
+      )
     })
 
     const bodyScrollX = createSimpleMovePage({
@@ -99,44 +140,46 @@ export default function () {
       },
     })
 
-
     let lastDate = date.get()
-    hookTrackSignal(() => bodyScrollX.onAnimation(), function (c) {
-      if (!c) {
-        if (!lastDate.equals(date.get())) {
-          addEffect(() => {
-            if (showWeek()) {
-              /** 
+    hookTrackSignal(
+      () => bodyScrollX.onAnimation(),
+      function (c) {
+        if (!c) {
+          if (!lastDate.equals(date.get())) {
+            addEffect(() => {
+              if (showWeek()) {
+                /** 
                * config: {
                   zta: 0.7,
                   omega0: 20,
                 }
                */
-              scrollY.animateTo(perSize() * 5)
-            } else {
-              scrollY.animateTo(0)
-            }
-          })
+                scrollY.animateTo(perSize() * 5)
+              } else {
+                scrollY.animateTo(0)
+              }
+            })
+          }
+          lastDate = date.get()
         }
-        lastDate = date.get()
       }
-    })
-    function getContainerWidth() {
-      return container.clientWidth
-    }
+    )
     const scrollX = movePage({
       getSize() {
         return container.clientWidth
-      }
+      },
     })
     hookTrackLayout(date.get, selectShadowCell)
 
     const interpolateH = memoFun(() => {
       const moveHeight = perSize() * 5
-      return getInterpolate({
-        0: perSize() * 7,
-        [moveHeight]: perSize() * 2
-      }, extrapolationClamp)
+      return getInterpolate(
+        {
+          0: perSize() * 7,
+          [moveHeight]: perSize() * 2,
+        },
+        extrapolationClamp
+      )
     })
 
     const container = fdom.div({
@@ -173,7 +216,7 @@ export default function () {
           children() {
             //header
             fdom.div({
-              className: "bg-base-100 relative z-10",
+              className: 'bg-base-100 relative z-10',
               s_display: 'flex',
               s_alignItems: 'stretch',
               s_transform() {
@@ -183,29 +226,29 @@ export default function () {
               children() {
                 fdom.h1({
                   className: 'text-display-large',
-                  childrenType: "text",
+                  childrenType: 'text',
                   children() {
                     return date.get().month
-                  }
+                  },
                 })
                 fdom.div({
                   className: 'flex flex-col items-start justify-center',
                   children() {
                     fdom.div({
                       className: 'text-title-large',
-                      childrenType: "text",
+                      childrenType: 'text',
                       children() {
                         return date.get().year
-                      }
+                      },
                     })
                     fdom.div({
                       className: 'text-title-medium',
-                      childrenType: "text",
+                      childrenType: 'text',
                       children() {
                         return `月 ${date.get().day}日`
-                      }
+                      },
                     })
-                  }
+                  },
                 })
                 // fdom.div({
                 //   childrenType: "text",
@@ -213,7 +256,7 @@ export default function () {
                 //     return showWeek() ? '周' : '月'
                 //   }
                 // })
-              }
+              },
             })
             fdom.div({
               s_zIndex: 1,
@@ -223,9 +266,8 @@ export default function () {
                 return perSize() * 7 + 'px'
               },
               children() {
-
                 fdom.div({
-                  className: "bg-base-300",
+                  className: 'bg-base-300',
                   s_overflow: 'hidden',
                   s_height() {
                     const y = scrollY.get()
@@ -236,26 +278,43 @@ export default function () {
                     return `translateY(${ty}px)`
                   },
                   onPointerDown(e) {
-                    pointerMove(scrollX.getMoveEvent(e, 'x', {
-                      callback(direction, velocity) {
-                        if (showWeek()) {
-                          //星期
-                          const m = dateFromYearMonthDay(date.get())
-                          m.setTime(m.getTime() + direction * WEEKTIMES)
-                          if (direction) {
-                            date.set(YearMonthDayVirtualView.fromDate(m))
-                          }
-                        } else {
-                          //月份
-                          const c = direction < 0 ? yearMonth().lastMonth() : yearMonth().nextMonth();
-                          if (date.get().day > c.days) {
-                            date.set(YearMonthDayVirtualView.from(c.year, c.month, c.days));
+                    pointerMove(
+                      scrollX.getMoveEvent(e, 'x', {
+                        callback(direction, velocity) {
+                          if (showWeek()) {
+                            //星期
+                            const m = dateFromYearMonthDay(date.get())
+                            m.setTime(m.getTime() + direction * WEEKTIMES)
+                            if (direction) {
+                              date.set(YearMonthDayVirtualView.fromDate(m))
+                            }
                           } else {
-                            date.set(YearMonthDayVirtualView.from(c.year, c.month, date.get().day));
+                            //月份
+                            const c =
+                              direction < 0
+                                ? yearMonth().lastMonth()
+                                : yearMonth().nextMonth()
+                            if (date.get().day > c.days) {
+                              date.set(
+                                YearMonthDayVirtualView.from(
+                                  c.year,
+                                  c.month,
+                                  c.days
+                                )
+                              )
+                            } else {
+                              date.set(
+                                YearMonthDayVirtualView.from(
+                                  c.year,
+                                  c.month,
+                                  date.get().day
+                                )
+                              )
+                            }
                           }
-                        }
-                      },
-                    }))
+                        },
+                      })
+                    )
                   },
                   children() {
                     fdom.div({
@@ -264,34 +323,51 @@ export default function () {
                         return `translateX(${-scrollX.get()}px)`
                       },
                       children() {
-                        renderIf(showWeek, function () {
-
-                          renderArrayKey(() => {
-                            const w = week()
-                            return [w.beforeWeek(), w, w.nextWeek()] as const
-                          }, v => v.cells[0].toNumber(), function (w, i) {
-                            renderWeek(w(), i)
-                          })
-                        }, function () {
-                          renderArrayKey(() => {
-                            const ym = yearMonth()
-                            return [ym.lastMonth(), ym, ym.nextMonth()] as const
-                          }, v => v.toNumber(), function (m, i) {
-                            renderCalendarView(m(), i)
-                          })
-                        })
-                      }
+                        renderIf(
+                          showWeek,
+                          function () {
+                            renderArrayKey(
+                              () => {
+                                const w = week()
+                                return [
+                                  w.beforeWeek(),
+                                  w,
+                                  w.nextWeek(),
+                                ] as const
+                              },
+                              (v) => v.cells[0].toNumber(),
+                              function (w, i) {
+                                renderWeek(w(), i)
+                              }
+                            )
+                          },
+                          function () {
+                            renderArrayKey(
+                              () => {
+                                const ym = yearMonth()
+                                return [
+                                  ym.lastMonth(),
+                                  ym,
+                                  ym.nextMonth(),
+                                ] as const
+                              },
+                              (v) => v.toNumber(),
+                              function (m, i) {
+                                renderCalendarView(m(), i)
+                              }
+                            )
+                          }
+                        )
+                      },
                     })
-                  }
+                  },
                 })
-              }
+              },
             })
             fdom.div({
               className: ' flex-1',
               data_a: '99',
-              plugins: [
-                bodyScrollX.plugin
-              ],
+              plugin: bodyScrollX.plugin,
               children() {
                 fdom.div({
                   className: 'relative',
@@ -299,35 +375,41 @@ export default function () {
                     return `translateX(${-bodyScrollX.get()}px)`
                   },
                   children() {
-                    renderArrayKey(() => {
-                      const d = date.get()
-                      return [d.beforeDay(), d, d.nextDay()]
-                    }, v => v.toNumber(), function (w, getIndex) {
-                      mdom.div({
-                        attrs(v) {
-                          const i = getIndex()
-                          if (i != 1) {
-                            v.s_position = 'absolute'
-                            v.s_inset = 0
-                            v.s_transform = `translateX(${(i - 1) * 100}%)`
-                          }
-                        },
-                        children() {
-                          demoList(faker.number.int({
-                            max: 17,
-                            min: 15
-                          }))
-                        }
-                      })
-                    })
-                  }
+                    renderArrayKey(
+                      () => {
+                        const d = date.get()
+                        return [d.beforeDay(), d, d.nextDay()]
+                      },
+                      (v) => v.toNumber(),
+                      function (w, getIndex) {
+                        mdom.div({
+                          attrs(v) {
+                            const i = getIndex()
+                            if (i != 1) {
+                              v.s_position = 'absolute'
+                              v.s_inset = 0
+                              v.s_transform = `translateX(${(i - 1) * 100}%)`
+                            }
+                          },
+                          children() {
+                            demoList(
+                              faker.number.int({
+                                max: 17,
+                                min: 15,
+                              })
+                            )
+                          },
+                        })
+                      }
+                    )
+                  },
                 })
-              }
+              },
             })
-          }
+          },
         })
         maxScrollY.hookInit(container, content)
-      }
+      },
     })
     function renderCalendarView(
       yearMonth: YearMonthVirtualView,
@@ -353,17 +435,15 @@ export default function () {
         children() {
           renderWeekHeader(() => {
             const y = scrollY.get()
-            const ty = - interpolateY(y)
+            const ty = -interpolateY(y)
             return `translateY(${ty}px)`
           })
           fdom.div({
             children() {
-
               for (let y = 0; y < 6; y++) {
                 fdom.div({
                   className: 'flex items-center justify-center relative',
                   children() {
-
                     for (let x = 0; x < 7; x++) {
                       const fullday = yearMonth.fullDayOf(x, y)
                       let c = yearMonth
@@ -376,20 +456,28 @@ export default function () {
                       renderFirstDayWeek(x, {
                         year: c.year,
                         month: c.month,
-                        day: fullday.day
+                        day: fullday.day,
                       })
 
                       const sd = SolarDay.fromYmd(c.year, c.month, fullday.day)
                       const lunarDay = sd.getLunarDay()
                       const selected = memo(() => {
-                        return fullday.type == 'this' && selectCurrent() && date.get().day == fullday.day
+                        return (
+                          fullday.type == 'this' &&
+                          selectCurrent() &&
+                          date.get().day == fullday.day
+                        )
                       })
 
                       renderCell({
                         day: fullday.day,
                         onClick() {
                           date.set(
-                            YearMonthDayVirtualView.from(c.year, c.month, fullday.day)
+                            YearMonthDayVirtualView.from(
+                              c.year,
+                              c.month,
+                              fullday.day
+                            )
                           )
                         },
                         lunarDay,
@@ -399,22 +487,22 @@ export default function () {
                             return false
                           }
                           return fullday.type != 'this'
-                        }
+                        },
                       })
                     }
-                  }
+                  },
                 })
               }
-            }
+            },
           })
-        }
+        },
       })
     }
 
     function renderWeekHeader(transform?: GetValue<string>) {
       //星期
       fdom.div({
-        className: "bg-base-300 relative z-10",
+        className: 'bg-base-300 relative z-10',
         s_display: 'flex',
         s_alignItems: 'center',
         s_justifyContent: 'space-between',
@@ -422,20 +510,18 @@ export default function () {
         children() {
           for (let i = 0; i < 7; i++) {
             fdom.div({
-              className: 'flex-1 aspect-square flex items-center justify-center',
-              childrenType: "text",
+              className:
+                'flex-1 aspect-square flex items-center justify-center',
+              childrenType: 'text',
               children() {
                 return WEEKS[yearMonth().weekDay(i)]
-              }
+              },
             })
           }
-        }
+        },
       })
     }
-    function renderWeek(
-      week: WeekVirtualView,
-      getIndex: GetValue<number>
-    ) {
+    function renderWeek(week: WeekVirtualView, getIndex: GetValue<number>) {
       mdom.div({
         attrs(v) {
           v.className = 'self-start'
@@ -459,7 +545,7 @@ export default function () {
                 const lunarDay = sd.getLunarDay()
                 renderCell({
                   hide() {
-                    return false;
+                    return false
                   },
                   day: md.day,
                   lunarDay,
@@ -471,9 +557,9 @@ export default function () {
                   },
                 })
               }
-            }
+            },
           })
-        }
+        },
       })
     }
   })
@@ -485,8 +571,11 @@ function renderFirstDayWeek(x: number, ym: YearMonthDay) {
       className: 'absolute left-0 text-label-small',
       childrenType: 'text',
       children() {
-        return getWeekOfYear(dateFromYearMonthDay(ym), firstDayOfWeekIndex.get())
-      }
+        return getWeekOfYear(
+          dateFromYearMonthDay(ym),
+          firstDayOfWeekIndex.get()
+        )
+      },
     })
   }
 }
@@ -496,11 +585,11 @@ function renderCell({
   lunarDay,
   hide,
   selected,
-  onClick
+  onClick,
 }: {
   day: number
   hide: GetValue<boolean>
-  lunarDay: LunarDay,
+  lunarDay: LunarDay
   selected: GetValue<boolean>
   onClick(): void
 }) {
@@ -531,7 +620,7 @@ function renderCell({
                 tw`absolute inset-0  rounded-full z-0`,
                 selected() && tw`bg-primary`
               )
-            }
+            },
           })
           fdom.span({
             s_position: 'relative',
@@ -542,19 +631,17 @@ function renderCell({
               )
             },
             childrenType: 'text',
-            children: day
+            children: day,
           })
-        }
+        },
       })
 
       fdom.div({
         s_fontSize: '10px',
         childrenType: 'text',
         className: 'text-neutral-500',
-        children: lunarDay.getName()
+        children: lunarDay.getName(),
       })
-    }
+    },
   })
 }
-
-
