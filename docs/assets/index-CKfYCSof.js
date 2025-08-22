@@ -1,0 +1,1 @@
+import{f as l,c as a,r as c}from"./index-DQyCy5E-.js";function n(){l.div({className:"w-full h-full flex items-center justify-center",children(){l.div({className:"bg-white text-black",children(){const e=a("");let t;c(e.get,i=>{e.set(i),t&&clearTimeout(t),t=setTimeout(()=>{console.log("fetch...",e.get())},500)},l.input({type:"text"}))}})}})}export{n as default};

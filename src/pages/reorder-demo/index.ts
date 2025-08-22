@@ -1,22 +1,48 @@
-import { faker } from "@faker-js/faker"
-import { fdom } from "mve-dom"
-import { hookDestroy, hookTrackSignal, renderArrayToArray } from "mve-helper"
-import { animateSignal, moveEdgeScroll, pointerMove, subscribeEventListener, subscribeScroller } from "wy-dom-helper"
-import { addEffect, AnimateSignal, AnimationTime, arrayMove, batchSignalEnd, beforeMoveOperate, createSignal, easeFns, EdgeScrollConfig, emptyFun, EmptyFun, GetValue, PointKey, reorderCheckTarget, storeRef, StoreRef, tween } from "wy-helper"
-import themeDropdown, { randomTheme } from "../../themeDropdown"
-import fixRightTop from "../../fixRightTop"
-import { renderMobileView } from "../../onlyMobile"
+import { faker } from '@faker-js/faker'
+import { fdom } from 'mve-dom'
+import { hookDestroy, hookTrackSignal, renderArrayToArray } from 'mve-helper'
+import {
+  animateSignal,
+  moveEdgeScroll,
+  pointerMove,
+  subscribeEventListener,
+  subscribeScroller,
+} from 'wy-dom-helper'
+import {
+  addEffect,
+  AnimateSignal,
+  AnimationTime,
+  arrayMove,
+  batchSignalEnd,
+  beforeMoveOperate,
+  createSignal,
+  easeFns,
+  EdgeScrollConfig,
+  emptyFun,
+  EmptyFun,
+  GetValue,
+  PointKey,
+  reorderCheckTarget,
+  storeRef,
+  StoreRef,
+  tween,
+} from 'wy-helper'
+import themeDropdown, { randomTheme } from '../../themeDropdown'
+import fixRightTop from '../../fixRightTop'
+import { renderMobileView } from '../../onlyMobile'
 import { pluginEdgeScroll } from 'mve-dom-helper'
 
-export const dataList = Array(30).fill(1).map((_, i) => {
-  return {
-    index: i,
-    name: faker.person.fullName(),
-    avatar: faker.image.avatar()
-  }
-})
+export const dataList = Array(30)
+  .fill(1)
+  .map((_, i) => {
+    return {
+      index: i,
+      name: faker.person.fullName(),
+      avatar: faker.image.avatar(),
+    }
+  })
 
-type Row = typeof dataList[0]
+type Row = (typeof dataList)[0]
 const ease1 = tween(600, easeFns.out(easeFns.circ))
 export default function () {
   fixRightTop(function () {
@@ -25,9 +51,7 @@ export default function () {
   const orderList = createSignal(dataList)
   const onDrag = createSignal<Row | undefined>(undefined)
   return renderMobileView(function ({ width, height }, mock) {
-
     const container = fdom.div({
-
       s_width: '100%',
       s_height: '100%',
       s_overflow: 'auto',
@@ -37,21 +61,19 @@ export default function () {
       s_userSelect() {
         return onDrag.get() ? 'none' : 'auto'
       },
-      plugins: [
-        pluginEdgeScroll({
-          shouldMeasure: onDrag.get,
-          direction: 'y',
-          config: {
-            padding: 10,
-            config: true
-          }
-        })
-      ],
+      plugin: pluginEdgeScroll({
+        shouldMeasure: onDrag.get,
+        direction: 'y',
+        config: {
+          padding: 10,
+          config: true,
+        },
+      }),
       children() {
         const outArray = renderArrayToArray(orderList.get, (v, getIndex) => {
           const h = Math.floor(Math.random() * 100 + 50)
           const transY = animateSignal(0)
-          const marginTop = 10//Math.floor(Math.random() * 10 + 5)
+          const marginTop = 10 //Math.floor(Math.random() * 10 + 5)
           const div = fdom.div({
             className: 'daisy-row daisy-card flex-row gap-1 pl-1 pr-1',
             data_theme: randomTheme(),
@@ -72,7 +94,7 @@ export default function () {
               if (onDrag.get()) {
                 return
               }
-              const destroyScroll = subscribeScroller(container, 'y', e => {
+              const destroyScroll = subscribeScroller(container, 'y', (e) => {
                 transY.set(transY.get() + e)
                 return true
               })
@@ -111,48 +133,45 @@ export default function () {
               fdom.img({
                 src: v.avatar,
                 s_width: '50px',
-                s_height: '50px'
+                s_height: '50px',
               })
               fdom.span({
-                childrenType: "text",
-                children: v.name
+                childrenType: 'text',
+                children: v.name,
               })
               fdom.hr({
-                s_flex: 1
+                s_flex: 1,
               })
               fdom.span({
-                childrenType: "text",
-                children: getIndex
+                childrenType: 'text',
+                children: getIndex,
               })
-            }
+            },
           })
 
           const out = {
             div,
             transY,
-            getIndex
+            getIndex,
           }
           return out
         })
-      }
+      },
     })
   })
-
 }
-
-
 
 function getOffset(v: {
   div: {
     offsetHeight: number
-  };
-  transY: AnimateSignal;
+  }
+  transY: AnimateSignal
 }) {
   return v.div.offsetHeight
 }
 
 type MoveItem = {
-  div: HTMLElement;
+  div: HTMLElement
   getIndex(): number
   transY: AnimateSignal
 }
@@ -172,15 +191,22 @@ function didMove<T>(
   )
   if (n) {
     const [fromIndex, toIndex] = n
-    const diff = beforeMoveOperate(fromIndex, toIndex, outList, getOffset, gap, (row, from) => {
-      /**
-       * 如果依margin,则元素应该有margin?
-       * 如果元素在位置1,则无margin与gap
-       * 如果不在位置1,则有margin与gap
-       */
-      row.transY.set(from)
-      row.transY.changeTo(0, ease1)
-    })
+    const diff = beforeMoveOperate(
+      fromIndex,
+      toIndex,
+      outList,
+      getOffset,
+      gap,
+      (row, from) => {
+        /**
+         * 如果依margin,则元素应该有margin?
+         * 如果元素在位置1,则无margin与gap
+         * 如果不在位置1,则有margin与gap
+         */
+        row.transY.set(from)
+        row.transY.changeTo(0, ease1)
+      }
+    )
     orderList.set(arrayMove(orderList.get(), fromIndex, toIndex, true))
     item.transY.silentDiff(diff)
   }
@@ -194,14 +220,14 @@ function didMoveMarginTop<T>(
 ) {
   const index = getIndex()
 
-  const didCenterOffsetTop = div.offsetTop + transY.get() + (div.offsetHeight / 2)
+  const didCenterOffsetTop = div.offsetTop + transY.get() + div.offsetHeight / 2
   // console.log("dd", transY.get())
   if (transY.get() < 0) {
     //向上
     let justIndex = -1
     for (let i = 0; i < index && justIndex < 0; i++) {
       const row = outList[i]
-      const rowCenter = row.div.offsetTop + (row.div.offsetHeight / 2)
+      const rowCenter = row.div.offsetTop + row.div.offsetHeight / 2
       if (didCenterOffsetTop < rowCenter) {
         //第一个超过的元素
         justIndex = i
@@ -220,7 +246,14 @@ function didMoveMarginTop<T>(
          */
         row.transY.changeTo(0, ease1)
       }
-      console.log("aa", index, justIndex, diff, transY.get(), diff + transY.get())
+      console.log(
+        'aa',
+        index,
+        justIndex,
+        diff,
+        transY.get(),
+        diff + transY.get()
+      )
       orderList.set(arrayMove(orderList.get(), index, justIndex, true))
       transY.silentDiff(diff)
     }
@@ -229,7 +262,7 @@ function didMoveMarginTop<T>(
     let justIndex = -1
     for (let i = index + 1; i < outList.length && justIndex < 0; i++) {
       const row = outList[i]
-      const rowCenter = row.div.offsetTop + (row.div.offsetHeight / 2)
+      const rowCenter = row.div.offsetTop + row.div.offsetHeight / 2
       if (didCenterOffsetTop > rowCenter) {
         justIndex = i
       }
@@ -237,7 +270,10 @@ function didMoveMarginTop<T>(
     if (justIndex > -1) {
       const flagDiv = outList[justIndex].div
       //就是受影响的间隔
-      const diff = div.offsetTop + div.offsetHeight - (flagDiv.offsetTop + flagDiv.offsetHeight)
+      const diff =
+        div.offsetTop +
+        div.offsetHeight -
+        (flagDiv.offsetTop + flagDiv.offsetHeight)
       for (let i = index + 1; i < justIndex + 1; i++) {
         //受影响的表演一次animation动画
         const row = outList[i]
@@ -250,7 +286,7 @@ function didMoveMarginTop<T>(
          */
         row.transY.changeTo(0, ease1)
       }
-      console.log("bb", index, justIndex)
+      console.log('bb', index, justIndex)
       orderList.set(arrayMove(orderList.get(), index, justIndex, true))
       transY.silentDiff(diff)
     }

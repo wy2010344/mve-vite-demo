@@ -1,6 +1,6 @@
 import { renderMobileView } from "../../onlyMobile";
 import { alignSelf, arrayCountCreateWith, ClampingScrollFactory, memo } from "wy-helper";
-import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap, renderCanvas } from "mve-dom-helper/canvasRender";
+import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap, renderCanvas, hookFill } from "mve-dom-helper/canvasRender";
 
 import { faker } from "@faker-js/faker";
 import { OnScroll } from "mve-dom-helper";
@@ -19,7 +19,7 @@ export default function () {
       height,
     }, () => {
 
-      const data = arrayCountCreateWith(100, (i) => {
+      const data = arrayCountCreateWith(3000, (i) => {
         return i
       })
 
@@ -51,14 +51,7 @@ export default function () {
           })
         },
         draw(ctx, n, path) {
-          return {
-            operates: [
-              {
-                type: "fill",
-                style: 'white'
-              }
-            ]
-          }
+          hookFill('white')
         },
         onPointerDown(e) {
           scrollY.pointerEventListner(e.original)
@@ -66,6 +59,7 @@ export default function () {
         paddingRight: 4,
         children() {
           data.forEach((row, i) => {
+
             hookDrawRect({
               layout(v) {
                 return simpleFlex({
@@ -73,15 +67,17 @@ export default function () {
                   gap: 4
                 })
               },
-              draw(ctx, n, p) {
-                return {
-                  operates: [
-                    {
-                      type: "fill",
-                      style: i % 2 ? '#A5D2EE' : '#EEEEEE'
-                    }
-                  ]
+              skipDraw(n) {
+                if (n.axis.y.position() > container.axis.y.size()) {
+                  return true
                 }
+                if (n.axis.y.position() + n.axis.y.size() < 0) {
+                  return true
+                }
+                return false
+              },
+              draw(ctx, n, p) {
+                hookFill(i % 2 ? '#A5D2EE' : '#EEEEEE')
               },
               paddingLeft: 4,
               children() {
@@ -169,6 +165,7 @@ export default function () {
                 })
               },
             })
+
           })
         },
       })

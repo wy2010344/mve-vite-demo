@@ -1,1 +1,0 @@
-import{k as o,an as f,j as a}from"./index-8-4crGqb.js";function t({condition:n,whenTrue:e,whenFalse:r}){o(n,e,r)}function i({render:n}){n()}function c({getArray:n,getKey:e,render:r}){f(n,e,r)}function u({key:n,render:e}){a(n,e)}export{c as ArrayRender,i as HookRender,t as If,u as OneRender};
