@@ -1,1 +1,0 @@
-import{q as t,ai as a,a9 as r}from"./index--sZwA4wO.js";function l(){t({x:10,y:10,onClick(e){console.log("1")},withPath:!0,draw(e,o){o.closePath(),a(o),o.roundRect(0,0,30,30,[10,20,30,40]),r("red")}}),t({x:200,y:200,onClick(e){console.log("2")},withPath:!0,draw(e,o){o.rect(40,40,20,20),r("green")}})}export{l as default};
