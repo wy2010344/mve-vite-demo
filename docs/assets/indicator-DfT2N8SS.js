@@ -1,1 +1,0 @@
-import{bd as a,B as n}from"./index-8-4crGqb.js";import{ColumnContext as c}from"./context-DaeB-73e.js";function i({getBeforeId:t=()=>""}){const{type:o,getActive:e}=c.consume();return a.createElement("div",{className:function(){return n("my-0.5 h-0.5 w-full bg-violet-400",e()==t()?"opacity-100":"opacity-0")},data_before:t,data_column:o})}export{i as default};

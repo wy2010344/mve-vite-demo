@@ -1,5 +1,5 @@
 import { memo, ValueOrGet, alignSelf } from "wy-helper"
-import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap } from "mve-dom-helper/canvasRender";
+import { hookDrawRect, simpleFlex, hookDrawText, hookDrawUrlImage, hookDrawTextWrap, hookFill, hookStroke, hookDraw, hookCurrentDraw } from "mve-dom-helper/canvasRender";
 
 
 export default function () {
@@ -27,18 +27,10 @@ export default function () {
         directionFix: "around"
       })
     },
-    draw(ctx, n) {
-      const path = new Path2D()
+
+    draw(ctx, n, path) {
       path.rect(0, 0, n.axis.x.size(), n.axis.y.size())
-      return {
-        path,
-        operates: [
-          {
-            type: "fill",
-            style: "yellow"
-          }
-        ]
-      }
+      hookFill('yellow')
     },
     children() {
       hookDrawRect({
@@ -47,15 +39,7 @@ export default function () {
         // width: 20,
         draw(ctx, n, path) {
           path.rect(0, 0, n.axis.x.size(), n.axis.y.size())
-          return {
-            path,
-            operates: [
-              {
-                type: "fill",
-                style: "red"
-              }
-            ]
-          }
+          hookFill('red')
         },
       })
       hookDrawRect({
@@ -64,15 +48,7 @@ export default function () {
         alignSelf: alignSelf('stretch'),
         draw(ctx, n, path) {
           path.rect(0, 0, n.axis.x.size(), n.axis.y.size())
-          return {
-            path,
-            operates: [
-              {
-                type: "fill",
-                style: "green"
-              }
-            ]
-          }
+          hookFill('green')
         },
       })
       hookDrawTextWrap({
@@ -83,19 +59,8 @@ export default function () {
           fontSize: '20px'
         },
         draw(ctx, n, draw) {
-          return {
-            operates: [
-              {
-                type: "stroke",
-                width: 4,
-                style: "green"
-              },
-              {
-                type: "draw",
-                callback: draw
-              }
-            ]
-          }
+          hookStroke(4, 'green')
+          hookCurrentDraw()
         },
         drawInfo: {
           style: 'red'
@@ -110,19 +75,8 @@ export default function () {
         // },
         notInLayout: true,
         draw(ctx, n, draw) {
-          return {
-            operates: [
-              {
-                type: "stroke",
-                width: 6,
-                style: "blue"
-              },
-              {
-                type: "draw",
-                callback: draw
-              }
-            ]
-          }
+          hookStroke(6, 'blue')
+          hookCurrentDraw()
         }
       })
     },

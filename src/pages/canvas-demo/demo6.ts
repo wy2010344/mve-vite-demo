@@ -1,4 +1,4 @@
-import { hookDraw } from "mve-dom-helper/canvasRender";
+import { hookDraw, hookFill } from "mve-dom-helper/canvasRender";
 import { objectFreeze } from "wy-helper";
 
 export default function () {
@@ -14,14 +14,7 @@ export default function () {
       path.closePath()
       objectFreeze(path)
       path.roundRect(0, 0, 30, 30, [10, 20, 30, 40])
-      return {
-        operates: [
-          {
-            type: "fill",
-            style: "red"
-          }
-        ]
-      }
+      hookFill('red')
     },
   })
 
@@ -36,14 +29,7 @@ export default function () {
       path.rect(40, 40, 20, 20)
       //使用了translate就不能点击了
       // ctx.translate(100, 100)
-      return {
-        operates: [
-          {
-            type: "fill",
-            style: "green"
-          }
-        ]
-      }
+      hookFill('green')
     },
   })
 }
