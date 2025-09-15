@@ -1,11 +1,10 @@
-import { EmptyFun, SetValue, ValueOrGet, valueOrGetToGet } from "wy-helper";
+import { EmptyFun, SetValue, ValueOrGet, valueOrGetToGet } from 'wy-helper'
 
-import * as THREE from 'three';
-import { hookDestroy, hookTrackSignal, } from "mve-helper";
-import { createRenderBatcher } from "motion";
+import * as THREE from 'three'
+import { hookDestroy, hookTrackSignal } from 'mve-helper'
+import { createRenderBatcher } from 'motion'
 import { createContext, createRenderChildren, hookAddResult } from 'mve-core'
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 export function getPerspectiveCamera(
   width: ValueOrGet<number>,
@@ -30,17 +29,17 @@ export function renderThreeView({
   height,
   render,
   notRender,
-  args
+  args,
 }: {
   camera: THREE.Camera
-  width: ValueOrGet<number>,
-  height: ValueOrGet<number>,
+  width: ValueOrGet<number>
+  height: ValueOrGet<number>
   render(scene: THREE.Scene): void
   args?: THREE.WebGLRendererParameters
   notRender?: boolean
 }) {
-  const renderer = new THREE.WebGLRenderer(args);
-  const scene = new THREE.Scene();
+  const renderer = new THREE.WebGLRenderer(args)
+  const scene = new THREE.Scene()
   hookDestroy(() => {
     renderer.dispose()
   })
@@ -60,7 +59,7 @@ export function renderThreeView({
         set.delete(fun)
       })
     },
-    renderer
+    renderer,
   })
   hookTrackSignal(() => {
     renderer.setSize(w(), h())
@@ -69,36 +68,32 @@ export function renderThreeView({
   renderChildren(scene, render as any)
   renderer.setAnimationLoop(function (time, frame) {
     if (!notRender) {
-      renderer.render(scene, camera);
+      renderer.render(scene, camera)
     }
-    set.forEach(fun => {
+    set.forEach((fun) => {
       fun(time, frame)
     })
   })
   return renderer
 }
 
-
-
 export function hookOrbitControls() {
   const { hookAnimationLoop, domElement, camera } = ThreeContext.consume()
   /**旋转等查看 */
-  const controls = new OrbitControls(camera, domElement);
+  const controls = new OrbitControls(camera, domElement)
   hookAnimationLoop(() => {
     controls.update()
   })
   return controls
 }
 
-
 export const ThreeContext = createContext<{
-  scene: THREE.Scene,
+  scene: THREE.Scene
   renderer: THREE.WebGLRenderer
   camera: THREE.Camera
   domElement: HTMLCanvasElement
   hookAnimationLoop(fun: XRFrameRequestCallback): void
 }>(undefined!)
-
 
 export function renderMesh() {
   const mesh = new THREE.Mesh()
@@ -107,7 +102,7 @@ export function renderMesh() {
     mesh.geometry.dispose()
     const ms = mesh.material
     if (Array.isArray(ms)) {
-      ms.forEach(m => m.dispose())
+      ms.forEach((m) => m.dispose())
     } else {
       ms.dispose()
     }
@@ -124,13 +119,15 @@ export function renderGroup(render: SetValue<THREE.Group>) {
 
 export const n = createRenderChildren<THREE.Object3D>({
   moveBefore(parent, newChild, beforeChild) {
-    newChild?.parent?.remove(newChild)
-    parent.add(newChild)
+    if (!parent.children.includes(newChild)) {
+      newChild?.parent?.remove(newChild)
+      parent.add(newChild)
+    }
     if (beforeChild) {
-      const refIndex = parent.children.indexOf(beforeChild);
-      if (refIndex === -1) return;
+      const refIndex = parent.children.indexOf(beforeChild)
+      if (refIndex === -1) return
       // 删除刚刚 add 的
-      parent.children.splice(parent.children.indexOf(newChild), 1);
+      parent.children.splice(parent.children.indexOf(newChild), 1)
       // 插入到目标前面
       parent.children.splice(refIndex, 0, newChild)
     }
@@ -141,12 +138,20 @@ export const n = createRenderChildren<THREE.Object3D>({
     }
   },
   nextSibling(child) {
-    return child.parent?.children[child.parent?.children.indexOf(child) + 1] || null
+    return (
+      child.parent?.children[child.parent?.children.indexOf(child) + 1] || null
+    )
+  },
+  firstChild(child) {
+    return child.children[0]
   },
 })
 
-export function renderChildren<N extends THREE.Object3D>(node: N, render: SetValue<N>) {
-  const getChildren = n.renderChildren(node, render as any);
-  (node as any)._children = getChildren
+export function renderChildren<N extends THREE.Object3D>(
+  node: N,
+  render: SetValue<N>
+) {
+  const getChildren = n.renderChildren(node, render as any)
+  ;(node as any)._children = getChildren
   return getChildren
 }
