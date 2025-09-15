@@ -46,6 +46,12 @@ import {
 import { createTabList } from 'daisy-mobile-helper'
 import * as THREE from 'three'
 import { hookAddResult } from 'mve-core'
+import {
+  hookDraw,
+  hookDrawRect,
+  hookFill,
+  renderCanvas,
+} from 'mve-dom-helper/canvasRender'
 
 const width = 800
 const height = 800
@@ -54,10 +60,10 @@ type NNode = (typeof data.nodes)[number]
 type NLink = (typeof data.links)[number]
 const alphaMin = 0.001
 
-const renderTypes = ['2D', '3D'] as const
+const renderTypes = ['2D-svg', '2D-canvas', '3D'] as const
 type RenderType = (typeof renderTypes)[number]
 export default function () {
-  const type = createSignal<RenderType>('2D')
+  const type = createSignal<RenderType>('2D-canvas')
 
   createTabList({
     options: renderTypes,
@@ -142,7 +148,7 @@ export default function () {
     }
   }
   renderOne(type.get, function (type) {
-    if (type == '2D') {
+    if (type == '2D-svg') {
       const { getNodesAndLinks, didTick, config } = nodesAndLink(
         2,
         (gl, alpha) => {
@@ -152,8 +158,8 @@ export default function () {
       )
 
       const svg = fsvg.svg({
-        width: width,
-        height: height,
+        width,
+        height,
         viewBox: `${-width / 2} ${-height / 2} ${width} ${height}`,
         s_maxWidth: '100%',
         s_height: 'auto',
@@ -214,6 +220,78 @@ export default function () {
           )
         },
       })
+    } else if (type == '2D-canvas') {
+      const { getNodesAndLinks, didTick, config } = nodesAndLink(
+        2,
+        (gl, alpha) => {
+          renderDirX(gl.nodes, alpha)
+          renderDirY(gl.nodes, alpha)
+        }
+      )
+      renderCanvas(
+        {
+          width,
+          height,
+        },
+        function (canvas) {
+          hookDraw({
+            x: 0,
+            y: 0,
+            draw(ctx) {
+              ctx.strokeStyle = '#999'
+              getNodesAndLinks().links.forEach((link) => {
+                ctx.beginPath()
+                ctx.moveTo(link.source.x.d, link.source.y.d)
+                ctx.lineTo(link.target.x.d, link.target.y.d)
+                ctx.lineWidth = Math.sqrt(link.value.value)
+                ctx.stroke()
+              })
+            },
+          })
+          renderArray(
+            () => getNodesAndLinks().nodes,
+            function (node) {
+              hookDrawRect({
+                x: node.x.dSignal.get,
+                y: node.y.dSignal.get,
+                width: 0,
+                height: 0,
+                draw(ctx, path) {
+                  path.ellipse(0, 0, 5, 5, 0, 0, 360)
+                  hookFill(colorOrdinal(node.value.group))
+                },
+                onPointerDown({ original: e }) {
+                  const rec = canvas.canvas.getBoundingClientRect()
+                  const halfX = rec.left + rec.width / 2
+                  const halfY = rec.top + rec.height / 2
+                  node.x.f = e.pageX - halfX
+                  node.y.f = e.pageY - halfY
+                  config.alphaTarget = 0.3
+                  didTick()
+                  const destroy = subscribeDragMove((e) => {
+                    if (e) {
+                      node.x.f = e.pageX - halfX
+                      node.y.f = e.pageY - halfY
+                    } else {
+                      node.x.f = undefined
+                      node.y.f = undefined
+                      config.alphaTarget = 0
+                      destroy()
+                    }
+                  })
+                },
+              })
+            }
+          )
+        },
+        {
+          // translateX: width / 2,
+          // translateY: height / 2,
+          beforeDraw(ctx) {
+            ctx.translate(width / 2, height / 2)
+          },
+        }
+      )
     } else if (type == '3D') {
       const hoverShpere = createSignal<
         THREE.Mesh<THREE.SphereGeometry, THREE.MeshPhongMaterial> | undefined
