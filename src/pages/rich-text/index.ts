@@ -86,7 +86,7 @@ export default function () {
               contentEditable() {
                 return readonly.get() ? false : contentEditableText
               },
-              spellCheck: false,
+              spellcheck: false,
               children() {
                 const out = extractEntities(value)
                 out.forEach((item) => {

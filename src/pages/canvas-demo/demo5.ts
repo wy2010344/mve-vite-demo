@@ -1,32 +1,34 @@
-import { addEffect, createSignal, emptyArray } from "wy-helper";
-import { hookDrawRect, simpleFlex, hookDrawText, hookDrawTextWrap, hookFill } from "mve-dom-helper/canvasRender";
-import { renderArray } from "mve-helper";
-import { dom, renderPortal } from "mve-dom";
-import { hookAlterStateHolder, hookCurrentStateHolder } from "mve-core";
+import { addEffect, createSignal, emptyArray } from 'wy-helper'
+import {
+  hookDrawRect,
+  simpleFlex,
+  hookDrawText,
+  hookDrawTextWrap,
+  hookFill,
+} from 'mve-dom-helper/canvasRender'
+import { renderArray } from 'mve-helper'
+import { dom, renderPortal } from 'mve-dom'
+import { hookAlterStateHolder, hookCurrentStateHolder } from 'mve-core'
 
 export default function () {
-
   const a = createSignal(0)
   const list = createSignal(emptyArray as readonly number[])
-
-
 
   hookDrawRect({
     layout(v) {
       return simpleFlex({
-        direction: "y",
-        gap: 4
+        direction: 'y',
+        gap: 4,
       })
     },
     children() {
-
       hookDrawRect({
         width: 200,
         height: 200,
         ext: {
-          notFlex: true
+          notFlex: true,
         },
-        draw(ctx, n, p) {
+        draw(ctx, p) {
           hookFill('yellow')
         },
       })
@@ -39,16 +41,16 @@ export default function () {
             return {
               fontFamily: 'serif',
               fontSize: '20px',
-              textBaseline: "top",
+              textBaseline: 'top',
               text: `${n.target.index()},${a.get()}:${row}--${getIndex()}中文移动硬盘XXxxYYyy`,
             }
           },
-          draw(ctx, n, draw, p) {
+          draw(ctx, draw, p) {
             hookFill('red')
             draw()
           },
           onClick(e) {
-            list.set(list.get().filter(v => v != row))
+            list.set(list.get().filter((v) => v != row))
           },
         })
 
@@ -66,11 +68,11 @@ export default function () {
           return {
             fontSize: '60px',
             fontWeight: 'bold',
-            fontFamily: "serif",
-            text: "点击",
+            fontFamily: 'serif',
+            text: '点击',
           }
         },
-        draw(ctx, n, draw, p) {
+        draw(ctx, draw, p) {
           hookFill('red')
           draw()
         },
@@ -81,10 +83,9 @@ export default function () {
         onClick() {
           a.set(a.get() + 1)
           list.set(list.get().concat(Date.now()))
-          console.log("dd", list.get())
-        }
+          console.log('dd', list.get())
+        },
       })
     },
   })
 }
-
