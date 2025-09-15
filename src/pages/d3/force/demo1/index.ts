@@ -63,7 +63,7 @@ const alphaMin = 0.001
 const renderTypes = ['2D-svg', '2D-canvas', '3D'] as const
 type RenderType = (typeof renderTypes)[number]
 export default function () {
-  const type = createSignal<RenderType>('2D-svg')
+  const type = createSignal<RenderType>('2D-canvas')
 
   createTabList({
     options: renderTypes,
@@ -256,7 +256,7 @@ export default function () {
                 y: node.y.dSignal.get,
                 width: 0,
                 height: 0,
-                draw(ctx, n, path) {
+                draw(ctx, path) {
                   path.ellipse(0, 0, 5, 5, 0, 0, 360)
                   hookFill(colorOrdinal(node.value.group))
                 },
@@ -285,8 +285,11 @@ export default function () {
           )
         },
         {
-          translateX: width / 2,
-          translateY: height / 2,
+          // translateX: width / 2,
+          // translateY: height / 2,
+          beforeDraw(ctx) {
+            ctx.translate(width / 2, height / 2)
+          },
         }
       )
     } else if (type == '3D') {
