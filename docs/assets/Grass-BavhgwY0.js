@@ -1,0 +1,1 @@
+import{tileSize as r,tilesPerRow as s}from"./constants-D9wMxaBn.js";import{ce as a,a as i,bM as n,cf as c}from"./three.core-Bu5rU7E4.js";function w(t){const e=new a;e.position.y=t*r;const o=new i(new n(s*r,r,2),new c({color:12252245}));return o.position.z=1.5,o.receiveShadow=!0,e.add(o),e}export{w as Grass};
