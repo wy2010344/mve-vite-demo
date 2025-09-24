@@ -119,11 +119,15 @@ export default function () {
       })
     )
     renderCanvas(
-      {
+      fdom.canvas({
         className: 'touch-none',
-        width,
-        height,
-      },
+        s_width() {
+          return width() + 'px'
+        },
+        s_height() {
+          return height() + 'px'
+        },
+      }),
       function ({ canvas }) {
         renderArray(
           () => getNodesAndLinks().links,
@@ -132,7 +136,7 @@ export default function () {
               x: link.source.x.dSignal.get,
               y: link.source.y.dSignal.get,
               withPath: true,
-              draw(ctx, path) {
+              draw({ ctx, path }) {
                 path.moveTo(0, 0)
                 path.lineTo(
                   link.target.x.d - link.source.x.d,
@@ -173,17 +177,19 @@ export default function () {
                 )
               },
               withPath: true,
-              draw(ctx, path) {
-                path.arc(0, 0, 6, 0, 2 * Math.PI)
+              draw(e) {
+                e.path.arc(0, 0, 6, 0, 2 * Math.PI)
 
                 hookFill('#000')
-                ctx.fillText(node.value.index + '', 3, -3)
+                e.ctx.fillText(node.value.index + '', 3, -3)
               },
             })
           }
         )
       },
       {
+        // translateX: () => width() / 2,
+        // translateY: () => height() / 2,
         beforeDraw(ctx: CanvasRenderingContext2D) {
           //这里竟然不会影响点击坐标??
           ctx.translate(width() / 2, height() / 2)

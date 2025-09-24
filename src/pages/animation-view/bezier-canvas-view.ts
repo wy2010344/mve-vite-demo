@@ -48,18 +48,22 @@ export default function () {
       })
 
       renderCanvas(
-        {
+        fdom.canvas({
           className: 'rotate-x-180',
-          width: getOuterWidth,
-          height: getOuterHeight,
-        },
+          s_width() {
+            return getOuterWidth() + 'px'
+          },
+          s_height() {
+            return getOuterHeight() + 'px'
+          },
+        }),
         () => {
           hookDraw({
             y() {
               return 5 + beforeHeight.get()
             },
             x: 5,
-            draw(ctx) {
+            draw({ ctx }) {
               const w = size.get()
               const h = w
 
@@ -197,13 +201,12 @@ function drawControl(
       return y.get() * size.get()
     },
     withPath: true,
-    draw(ctx, path) {
+    draw({ ctx, path }) {
       path.ellipse(0, 0, 10, 10, 360, 0, 360)
       hookFill('green')
     },
     onPointerDown(e) {
       let lastE = e.original
-
       function onMove(e: PointerEvent) {
         const diffX = e.pageX - lastE.pageX
         const diffY = e.pageY - lastE.pageY

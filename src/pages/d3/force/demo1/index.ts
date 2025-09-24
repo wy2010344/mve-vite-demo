@@ -229,15 +229,15 @@ export default function () {
         }
       )
       renderCanvas(
-        {
-          width,
-          height,
-        },
+        fdom.canvas({
+          s_width: width + 'px',
+          s_height: height + 'px',
+        }),
         function (canvas) {
           hookDraw({
             x: 0,
             y: 0,
-            draw(ctx) {
+            draw({ ctx }) {
               ctx.strokeStyle = '#999'
               getNodesAndLinks().links.forEach((link) => {
                 ctx.beginPath()
@@ -256,11 +256,12 @@ export default function () {
                 y: node.y.dSignal.get,
                 width: 0,
                 height: 0,
-                draw(ctx, path) {
+                draw({ ctx, path }) {
                   path.ellipse(0, 0, 5, 5, 0, 0, 360)
                   hookFill(colorOrdinal(node.value.group))
                 },
                 onPointerDown({ original: e }) {
+                  console.log('click')
                   const rec = canvas.canvas.getBoundingClientRect()
                   const halfX = rec.left + rec.width / 2
                   const halfY = rec.top + rec.height / 2
@@ -288,6 +289,7 @@ export default function () {
           // translateX: width / 2,
           // translateY: height / 2,
           beforeDraw(ctx) {
+            // ctx.restore()
             ctx.translate(width / 2, height / 2)
           },
         }
