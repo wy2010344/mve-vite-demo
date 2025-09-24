@@ -1,15 +1,15 @@
-import { hookDraw, hookFill } from "mve-dom-helper/canvasRender";
-import { objectFreeze } from "wy-helper";
+import { hookDraw, hookFill } from 'mve-dom-helper/canvasRender'
+import { objectFreeze } from 'wy-helper'
 
 export default function () {
   hookDraw({
     x: 10,
     y: 10,
     onClick(e) {
-      console.log("1")
+      console.log('1')
     },
     withPath: true,
-    draw(ctx, path) {
+    draw({ ctx, path }) {
       // path.rect(0, 0, 20, 20)
       path.closePath()
       objectFreeze(path)
@@ -22,10 +22,10 @@ export default function () {
     x: 200,
     y: 200,
     onClick(e) {
-      console.log("2")
+      console.log('2')
     },
     withPath: true,
-    draw(ctx, path) {
+    draw({ ctx, path }) {
       path.rect(40, 40, 20, 20)
       //使用了translate就不能点击了
       // ctx.translate(100, 100)

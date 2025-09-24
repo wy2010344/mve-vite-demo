@@ -8,7 +8,7 @@ import {
   hookFill,
   hookStroke,
   hookDraw,
-  hookCurrentDraw,
+  hookAddRect,
 } from 'mve-dom-helper/canvasRender'
 
 export default function () {
@@ -36,8 +36,8 @@ export default function () {
       })
     },
 
-    draw(ctx, path) {
-      path.rect(0, 0, n.axis.x.size(), n.axis.y.size())
+    draw({ ctx, path }) {
+      hookAddRect()
       hookFill('yellow')
     },
     children() {
@@ -45,8 +45,8 @@ export default function () {
         height: 30,
         grow: 1,
         // width: 20,
-        draw(ctx, path) {
-          path.rect(0, 0, n.axis.x.size(), n.axis.y.size())
+        draw({ ctx, path }) {
+          hookAddRect()
           hookFill('red')
         },
       })
@@ -54,8 +54,8 @@ export default function () {
         // height: 30,
         width: 20,
         alignSelf: alignSelf('stretch'),
-        draw(ctx, path) {
-          path.rect(0, 0, n.axis.x.size(), n.axis.y.size())
+        draw({ ctx, path }) {
+          hookAddRect()
           hookFill('green')
         },
       })
@@ -66,12 +66,11 @@ export default function () {
           fontFamily: 'serif',
           fontSize: '20px',
         },
-        draw(ctx, n, draw) {
+        draw(e) {
           hookStroke(4, 'green')
-          hookCurrentDraw()
-        },
-        drawInfo: {
-          style: 'red',
+          e.draw({
+            style: 'red',
+          })
         },
       })
       hookDrawUrlImage({
@@ -81,10 +80,12 @@ export default function () {
         // ext: {
         //   notFlex: true
         // },
-        notInLayout: true,
-        draw(ctx, draw) {
+        // notInLayout: true,
+        padding: 20,
+        draw(e) {
+          hookAddRect()
           hookStroke(6, 'blue')
-          hookCurrentDraw()
+          e.draw()
         },
       })
     },

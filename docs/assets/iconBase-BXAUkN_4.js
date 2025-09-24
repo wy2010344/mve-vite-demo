@@ -1,1 +1,0 @@
-import{ac as a}from"./index-CnmbM-dR.js";function r(n,t){n.forEach(function(o){t(o.tag,o.attr,()=>{r(o.child,t)})})}function i(n,t,o){var{renderItem:c,renderRoot:e}=a.consume();(t||e)(n.attr,()=>{r(n.child,c)},o)}export{i as G};

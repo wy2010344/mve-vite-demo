@@ -25,6 +25,7 @@ import {
   tickForce,
 } from 'wy-helper/forceLayout'
 import { renderFullScreen } from '../../../../onlyMobile'
+import { fdom } from 'mve-dom'
 
 export default function () {
   renderFullScreen(function ({ width, height }) {
@@ -93,10 +94,14 @@ export default function () {
       })
     )
     renderCanvas(
-      {
+      fdom.canvas({
         className: 'touch-none',
-        width,
-        height,
+        s_width() {
+          return width() + 'px'
+        },
+        s_height() {
+          return height() + 'px'
+        },
         onPointerMove(e) {
           const [x, y] = d3.pointer(e)
           const n0 = getNodes()[0]
@@ -104,7 +109,7 @@ export default function () {
           n0.y.f = y - height() / 2
           batchSignalEnd()
         },
-      },
+      }),
       function () {
         renderArray(getNodes, (node, getIndex) => {
           hookDraw({
@@ -116,7 +121,7 @@ export default function () {
             },
             withPath: true,
 
-            draw(ctx, path) {
+            draw({ path }) {
               path.arc(0, 0, node.value.r, 0, 2 * Math.PI)
               if (getIndex()) {
                 hookFill(color(node.value.group + ''))

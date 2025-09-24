@@ -1,9 +1,4 @@
-import {
-  createSignal,
-  addEffect,
-  arrayCountCreateWith,
-  simpleFlex,
-} from 'wy-helper'
+import { createSignal, arrayCountCreateWith, simpleFlex } from 'wy-helper'
 import {
   renderCanvas,
   hookDraw,
@@ -11,12 +6,10 @@ import {
   hookDrawText,
   hookFill,
   hookStroke,
-  hookCurrentCtx,
-  hookCurrentDraw,
-  hookDrawTextWrap,
 } from 'mve-dom-helper/canvasRender'
-import { hookDestroy, renderArray, renderArrayKey, renderIf } from 'mve-helper'
+import { hookDestroy, renderArrayKey, renderIf } from 'mve-helper'
 import { subscribeRequestAnimationFrame } from 'wy-dom-helper'
+import { fdom } from 'mve-dom'
 
 // 粒子类型定义
 interface Particle {
@@ -175,9 +168,9 @@ export default function () {
 
   // 动画循环
   renderCanvas(
-    {
-      width: 1000,
-      height: 700,
+    fdom.canvas({
+      s_width: 1000 + 'px',
+      s_height: 700 + 'px',
       className: 'border border-gray-300 rounded-lg shadow-lg',
       data_canvasContainer: true,
       onMouseMove: (e) => {
@@ -204,7 +197,7 @@ export default function () {
 
         particles.set([...particles.get(), ...newParticles])
       },
-    },
+    }),
     ({ canvas }) => {
       // 初始化粒子
 
@@ -212,7 +205,7 @@ export default function () {
       hookDraw({
         x: 0,
         y: 0,
-        draw(ctx) {
+        draw({ ctx }) {
           const gradient = ctx.createLinearGradient(0, 0, 0, 700)
           gradient.addColorStop(0, '#0f0f23')
           gradient.addColorStop(0.5, '#1a1a2e')
@@ -227,7 +220,7 @@ export default function () {
       hookDraw({
         x: 0,
         y: 0,
-        draw(ctx) {
+        draw({ ctx }) {
           const connections = calculateConnections()
 
           connections.forEach((connection) => {
@@ -249,7 +242,7 @@ export default function () {
           hookDraw({
             x: () => getParticle().x - getParticle().size,
             y: () => getParticle().y - getParticle().size,
-            draw(ctx) {
+            draw({ ctx }) {
               const particle = getParticle()
               // 粒子光晕
               const gradient = ctx.createRadialGradient(
@@ -296,7 +289,7 @@ export default function () {
         hookDraw({
           x: () => mouseX.get() - 30,
           y: () => mouseY.get() - 30,
-          draw(ctx) {
+          draw({ ctx }) {
             ctx.beginPath()
             ctx.arc(30, 30, 25, 0, Math.PI * 2)
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
@@ -318,7 +311,7 @@ export default function () {
             alignItems: 'start',
           })
         },
-        draw(ctx, path) {
+        draw() {
           hookFill('rgba(0, 0, 0, 0.7)')
           hookStroke(1, 'rgba(255, 255, 255, 0.3)')
         },
@@ -330,8 +323,10 @@ export default function () {
               fontSize: '16px',
               fontWeight: 'bold',
             },
-            drawInfo: {
-              style: 'white',
+            draw(e) {
+              e.draw({
+                style: 'white',
+              })
             },
           })
 
@@ -343,8 +338,10 @@ export default function () {
                 fontSize: '12px',
               }
             },
-            drawInfo: {
-              style: '#4ecdc4',
+            draw(e) {
+              e.draw({
+                style: '#4ecdc4',
+              })
             },
           })
 
@@ -356,8 +353,10 @@ export default function () {
                 fontSize: '12px',
               }
             },
-            drawInfo: {
-              style: '#45b7d1',
+            draw(e) {
+              e.draw({
+                style: '#45b7d1',
+              })
             },
           })
 
@@ -367,8 +366,10 @@ export default function () {
               text: '💡 移动鼠标吸引粒子',
               fontSize: '11px',
             },
-            drawInfo: {
-              style: '#feca57',
+            draw(e) {
+              e.draw({
+                style: '#feca57',
+              })
             },
           })
 
@@ -377,8 +378,10 @@ export default function () {
               text: '🎆 点击创建爆炸效果',
               fontSize: '11px',
             },
-            drawInfo: {
-              style: '#ff9ff3',
+            draw(e) {
+              e.draw({
+                style: '#ff9ff3',
+              })
             },
           })
         },
@@ -399,7 +402,7 @@ export default function () {
             alignItems: 'center',
           })
         },
-        draw(ctx, path) {
+        draw() {
           hookFill('rgba(0, 0, 0, 0.7)')
           hookStroke(1, 'rgba(255, 255, 255, 0.3)')
         },
@@ -410,13 +413,10 @@ export default function () {
               fontSize: '14px',
               fontWeight: 'bold',
             },
-            drawInfo: {
-              style: 'white',
-            },
-            draw(ctx, draw, p) {
+            draw(e) {
               // ctx.textBaseline='bottom'
               hookStroke(1, 'blue')
-              hookCurrentDraw()
+              e.draw()
             },
           })
 
@@ -426,13 +426,12 @@ export default function () {
               fontSize: '12px',
               // textBaseline: 'hanging',
             },
-            drawInfo: {
-              style: '#26de81',
-            },
-            draw(ctx, draw, p) {
+            draw({ ctx, draw }) {
               ctx.textBaseline = 'top'
               hookStroke(1, 'blue')
-              hookCurrentDraw()
+              draw({
+                style: '#26de81',
+              })
             },
           })
         },
