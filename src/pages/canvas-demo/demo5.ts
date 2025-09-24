@@ -5,6 +5,7 @@ import {
   hookDrawText,
   hookDrawTextWrap,
   hookFill,
+  hookAddRect,
 } from 'mve-dom-helper/canvasRender'
 import { renderArray } from 'mve-helper'
 import { dom, renderPortal } from 'mve-dom'
@@ -28,7 +29,7 @@ export default function () {
         ext: {
           notFlex: true,
         },
-        draw(ctx, p) {
+        draw({ ctx, path }) {
           hookFill('yellow')
         },
       })
@@ -45,11 +46,13 @@ export default function () {
               text: `${n.target.index()},${a.get()}:${row}--${getIndex()}中文移动硬盘XXxxYYyy`,
             }
           },
-          draw(ctx, draw, p) {
+          draw({ ctx, path, draw }) {
+            hookAddRect()
             hookFill('red')
             draw()
           },
           onClick(e) {
+            console.log('delete..')
             list.set(list.get().filter((v) => v != row))
           },
         })
@@ -72,7 +75,8 @@ export default function () {
             text: '点击',
           }
         },
-        draw(ctx, draw, p) {
+        draw({ draw }) {
+          hookAddRect()
           hookFill('red')
           draw()
         },
@@ -80,6 +84,9 @@ export default function () {
         //   console.log("dd", arg)
         //   return {}
         // },
+        onClickCapture(e) {
+          console.log('click-capture')
+        },
         onClick() {
           a.set(a.get() + 1)
           list.set(list.get().concat(Date.now()))

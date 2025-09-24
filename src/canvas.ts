@@ -1,4 +1,4 @@
-import { dom } from 'mve-dom'
+import { dom, fdom } from 'mve-dom'
 import {
   hookClip,
   hookDraw,
@@ -29,7 +29,7 @@ export default function () {
       }).renderText`列表数量${() => list.get().length}`
 
       function colorRectPath(strokeStyle = 'blue', clip?: boolean) {
-        return function rectPath(ctx: any, path: Path2D) {
+        return function rectPath({ ctx, path }: { ctx: any; path: Path2D }) {
           path.rect(0, 30, 100, 100)
           hookStroke(10, strokeStyle)
           hookFill('green')
@@ -40,11 +40,11 @@ export default function () {
         }
       }
       renderCanvas(
-        {
-          width: 500,
-          height: 500,
+        fdom.canvas({
+          s_width: 500 + 'px',
+          s_height: 500 + 'px',
           className: 'border-solid border-[1px] border-red-300',
-        },
+        }),
         () => {
           hookDraw({
             x: 100,
