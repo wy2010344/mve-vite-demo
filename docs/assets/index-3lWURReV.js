@@ -1,0 +1,7 @@
+import{f as l}from"./chunk-KZPPZA2C-rvBpA5M9.js";import{k as d,Q as p,f as i,c as g,av as f,Z as b,bo as x,bp as S,P as v,bq as y}from"./index-BiAKiJb6.js";import{e as k}from"./explain-CmY0fWr7.js";import{m as $}from"./markdown-DzqYc4hA.js";import H from"./hookMeasureHeight-B14NvuNX.js";import{forEachSubReverse as L}from"./dynamicHeight-C2EX-ZYa.js";import"./iconBase-CduQK-mk.js";import"./index-BcEmkcLw.js";function I(){k(()=>{$`
+# 虚拟列表,自定义滚动,自底向顶滚动
+
+这个虚拟列表,需要每条记录提供自己的高度,这个高度是预先于dom渲染存在的.
+
+自定义滚动,基于animateSignal动画,动画曲线是模仿flutter的Clamping算法,带有一定的弹性.
+    `});const u=d(1e3,r=>({id:r,color:l.color.rgb(),height:l.number.int({min:30,max:80})})),o=g(u);p(0),i.div({className:"touch-none w-[90%] h-[90%] overflow-hidden border-red-100 border-1 relative",children(r){const n=g(0);H(r,()=>{n.set(r.clientHeight),f()});const s=b.hookGet("y",r,{opposite:!0,maxScroll(){const t=o.get();let e=0;for(let a=0;a<t.length;a++)e=e+t[a].height;return e-n.get()}});function m(t){return t.height}const{paddingBegin:h,subList:c}=x(()=>y(o.get(),s.get(),n.get(),m));i.div({className:"absolute w-full",s_bottom(){return`${-s.get()}px`},s_paddingBottom(){return`${h()}px`},children(){S(L(o.get,t=>t.id,c),function(t,e){i.div({className:"flex items-center justify-center min-h-0",s_height(){return`${e.getValue().height}px`},s_maxHeight(){return`${e.getValue().height}px`},s_background(){return e.getValue().color},children(){v(()=>`${e.getValue().id}--${e.getIndex()}`),i.input({className:"daisy-input daisy-input-xs"})}})})}})}})}export{I as default};
