@@ -1,32 +1,32 @@
-import { hookAddDestroy } from 'mve-core'
-import { createSignal, flexDisplayUtil } from 'wy-helper'
-import demo3 from './demo3'
-import { hookDestroy } from 'mve-helper'
-import demo5 from './demo5'
-import demo6 from './demo6'
-import demo1 from './demo1'
-import demo2 from './demo2'
-import { fdom } from 'mve-dom'
-import { windowSize } from 'wy-dom-helper'
+import { hookAddDestroy } from 'mve-core';
+import { createSignal, flexDisplayUtil } from 'wy-helper';
+import demo3 from './demo3';
+import { hookDestroy } from 'mve-helper';
+import demo5 from './demo5';
+import demo6 from './demo6';
+import demo1 from './demo1';
+import demo2 from './demo2';
+import { fdom } from 'mve-dom';
+import { windowSize } from 'wy-dom-helper';
 import {
   hookAddRect,
   hookDrawRect,
   hookFill,
   renderCanvas,
   simpleFlex,
-} from 'mve-dom-helper/canvasRender'
-import drawText from './drawText'
-import demo7 from './demo7'
+} from 'mve-dom-helper/canvasRender';
+import drawText from './drawText';
+import demo7 from './demo7';
 
 export default function () {
   renderCanvas(
     fdom.canvas({
       className: 'touch-none',
       s_width() {
-        return windowSize.width() + 'px'
+        return `${windowSize.width()}px`;
       },
       s_height() {
-        return windowSize.height() + 'px'
+        return `${windowSize.height()}px`;
       },
     }),
     () => {
@@ -38,11 +38,11 @@ export default function () {
             direction: 'x',
             directionFix: 'center',
             alignFix: true,
-          })
+          });
         },
         draw(e) {
-          hookAddRect()
-          hookFill('gray')
+          hookAddRect();
+          hookFill('gray');
         },
         children() {
           // demo1()
@@ -51,20 +51,20 @@ export default function () {
           // demo5()
           // demo6()
           // drawText()
-          demo7()
+          demo7();
         },
-      })
+      });
     },
     {
       // translateX: 300,
       // translateY: 300,
       beforeDraw(ctx: CanvasRenderingContext2D) {
         //这里竟然不会影响点击坐标??
-        ctx.translate(200, 200)
+        ctx.translate(200, 200);
       },
       afterDraw(ctx) {
         // ctx.translate(-300, -300)
       },
     }
-  )
+  );
 }

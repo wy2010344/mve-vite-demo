@@ -1,9 +1,9 @@
-import { runG } from './generator'
-import { fdom } from 'mve-dom'
+import { runG } from './generator';
+import { fdom } from 'mve-dom';
 export default function () {
-  runG()
+  runG();
   fdom.div({
-    childrenType: "text",
-    children: 'abc'
-  })
+    childrenType: 'text',
+    children: 'abc',
+  });
 }

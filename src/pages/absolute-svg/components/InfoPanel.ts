@@ -1,7 +1,7 @@
-import { fdom, fsvg } from 'mve-dom'
-import { simpleFlex } from 'wy-helper'
-import { renderALayout } from 'mve-dom-helper'
-import type { Ball } from '../types'
+import { fdom, fsvg } from 'mve-dom';
+import { simpleFlex } from 'wy-helper';
+import { renderALayout } from 'mve-dom-helper';
+import type { Ball } from '../types';
 
 // 信息项组件 - 固定尺寸，不需要 hookMeasureSize
 function renderInfoItem(label: string, value: string) {
@@ -11,8 +11,8 @@ function renderInfoItem(label: string, value: string) {
     render(item) {
       return fdom.div({
         s_position: 'absolute',
-        s_left: () => item.axis.x.position() + 'px',
-        s_top: () => item.axis.y.position() + 'px',
+        s_left: () => `${item.axis.x.position()}px`,
+        s_top: () => `${item.axis.y.position()}px`,
         s_width: '150px',
         s_height: '80px',
         s_display: 'flex',
@@ -26,17 +26,17 @@ function renderInfoItem(label: string, value: string) {
             s_fontSize: '14px',
             s_fontWeight: 'bold',
             s_marginBottom: '4px',
-            children: label
-          })
+            children: label,
+          });
           fdom.div({
             s_fontSize: '12px',
             s_opacity: '0.8',
-            children: value
-          })
-        }
-      })
-    }
-  })
+            children: value,
+          });
+        },
+      });
+    },
+  });
 }
 
 // 信息面板组件
@@ -46,8 +46,8 @@ export function renderInfoPanel(getSelectedBall: () => Ball | undefined) {
     render(panel) {
       return fsvg.svg({
         s_position: 'absolute',
-        s_left: () => panel.axis.x.position() + 'px',
-        s_top: () => panel.axis.y.position() + 'px',
+        s_left: () => `${panel.axis.x.position()}px`,
+        s_top: () => `${panel.axis.y.position()}px`,
         width: panel.axis.x.size(),
         height: panel.axis.y.size(),
         children() {
@@ -56,11 +56,11 @@ export function renderInfoPanel(getSelectedBall: () => Ball | undefined) {
             height: panel.axis.y.size(),
             fill: 'rgba(255,255,255,0.1)',
             stroke: 'rgba(255,255,255,0.2)',
-            strokeWidth: 1
-          })
-          
-          const selectedBall = getSelectedBall()
-          
+            strokeWidth: 1,
+          });
+
+          const selectedBall = getSelectedBall();
+
           if (selectedBall) {
             // 选中小球的信息 - 使用布局系统
             renderALayout({
@@ -70,28 +70,34 @@ export function renderInfoPanel(getSelectedBall: () => Ball | undefined) {
                 return simpleFlex({
                   direction: 'x',
                   alignItems: 'center',
-                  alignFix: true,        // 辅轴(y)尺寸由父元素确定
-                  directionFix: 'around' // 主轴(x)尺寸由父元素确定，子元素间距自动计算
-                })
+                  alignFix: true, // 辅轴(y)尺寸由父元素确定
+                  directionFix: 'around', // 主轴(x)尺寸由父元素确定，子元素间距自动计算
+                });
               },
               render(infoContainer) {
                 return fsvg.g({
                   children() {
                     const infos = [
-                      { label: '位置', value: `(${Math.round(selectedBall.x)}, ${Math.round(selectedBall.y)})` },
-                      { label: '速度', value: `(${selectedBall.vx.toFixed(1)}, ${selectedBall.vy.toFixed(1)})` },
+                      {
+                        label: '位置',
+                        value: `(${Math.round(selectedBall.x)}, ${Math.round(selectedBall.y)})`,
+                      },
+                      {
+                        label: '速度',
+                        value: `(${selectedBall.vx.toFixed(1)}, ${selectedBall.vy.toFixed(1)})`,
+                      },
                       { label: '半径', value: selectedBall.radius.toFixed(1) },
-                      { label: '颜色', value: selectedBall.color }
-                    ]
-                    
+                      { label: '颜色', value: selectedBall.color },
+                    ];
+
                     // 每个信息项作为子布局节点
-                    infos.forEach((info) => {
-                      renderInfoItem(info.label, info.value)
-                    })
-                  }
-                })
-              }
-            })
+                    infos.forEach(info => {
+                      renderInfoItem(info.label, info.value);
+                    });
+                  },
+                });
+              },
+            });
           } else {
             // 提示信息
             fsvg.text({
@@ -101,11 +107,11 @@ export function renderInfoPanel(getSelectedBall: () => Ball | undefined) {
               dominantBaseline: 'middle',
               fontSize: '16px',
               fill: 'rgba(255,255,255,0.7)',
-              children: '🎯 点击小球查看详细信息 | ✨ 点击轨迹按钮切换轨迹显示'
-            })
+              children: '🎯 点击小球查看详细信息 | ✨ 点击轨迹按钮切换轨迹显示',
+            });
           }
-        }
-      })
-    }
-  })
+        },
+      });
+    },
+  });
 }

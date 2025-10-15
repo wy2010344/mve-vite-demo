@@ -1,12 +1,12 @@
-import { BatchOptimistic, GetValue, StoreRef } from "wy-helper";
-import { priorityTypes, Task, TaskType } from "./type";
-import { faker } from "@faker-js/faker";
-import { HookRender, If } from "./xmlRender";
-import { LuPlus } from "mve-icons/lu";
-import { renderSizeSvg } from "~/mve-icon";
-import { mve } from "mve-dom-helper";
-import { React } from "wy-dom-helper";
-import { FPDomAttributes } from "mve-dom";
+import { BatchOptimistic, GetValue, StoreRef } from 'wy-helper';
+import { priorityTypes, Task, TaskType } from './type';
+import { faker } from '@faker-js/faker';
+import { HookRender, If } from './xmlRender';
+import { LuPlus } from 'mve-icons/lu';
+import { renderSizeSvg } from '~/mve-icon';
+import { mve } from 'mve-dom-helper';
+import type { React } from 'wy-dom-helper';
+import { FPDomAttributes } from 'mve-dom';
 
 export default function ({
   title,
@@ -21,7 +21,7 @@ export default function ({
   title: string;
   children: mve.ChildrenElement;
   getTasks: GetValue<Task[]>;
-} & FPDomAttributes<"div">) {
+} & FPDomAttributes<'div'>) {
   //   const { dragId, tasks } = TaskContext.consume();
   //  const getTasks = memo(function () {
   //     return tasks.get().filter((x) => x.type == type);
@@ -43,7 +43,7 @@ export default function ({
               tasks.set(
                 tasks.get().concat({
                   type,
-                  id: Date.now() + "",
+                  id: `${Date.now()}`,
                   title: faker.book.title(),
                   description: faker.book.series(),
                   priority:
@@ -54,14 +54,14 @@ export default function ({
                       })
                     ],
                   assignee: faker.book.author(),
-                  dueDate: "2024-01-15",
+                  dueDate: '2024-01-15',
                 })
               );
             }}
           >
             <HookRender
               render={() => {
-                LuPlus(renderSizeSvg, "24px");
+                LuPlus(renderSizeSvg, '24px');
               }}
             />
           </button>

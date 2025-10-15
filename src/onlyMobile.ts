@@ -1,10 +1,10 @@
-import { fdom, renderText } from "mve-dom";
-import { hookDestroy, renderOne } from "mve-helper";
-import { subscribeEventListener } from "wy-dom-helper";
-import { createSignal, GetValue } from "wy-helper";
-import fixRightTop from "./fixRightTop";
-import themeDropdown from "./themeDropdown";
-
+import { fdom, renderText } from 'mve-dom';
+import { hookDestroy, renderIf, renderOne } from 'mve-helper';
+import { subscribeEventListener } from 'wy-dom-helper';
+import { createSignal, GetValue } from 'wy-helper';
+import fixRightTop from './fixRightTop';
+import themeDropdown from './themeDropdown';
+import { hookMeasureSize } from 'mve-dom-helper';
 
 /**
  * contain-mobile 可以包含手机屏幕
@@ -12,95 +12,101 @@ import themeDropdown from "./themeDropdown";
  * mobile 只能作为手机屏幕
  * not-mobile 不是手机屏幕的比例,也不能包含手机屏幕
  */
-type ShowModelType = 'fake-and-mobile' | 'also-mobile' | 'mobile' | 'not-mobile'
+type ShowModelType =
+  | 'fake-and-mobile'
+  | 'also-mobile'
+  | 'mobile'
+  | 'not-mobile';
 export function onlyMobile() {
-
-
   function judgeMobile(): ShowModelType {
-    const w = window.innerWidth
-    const h = window.innerHeight
+    const w = window.innerWidth;
+    const h = window.innerHeight;
     if (w / h > 3 / 4) {
       //非mobile形状
       if (h > 879) {
-        return 'fake-and-mobile'
+        return 'fake-and-mobile';
       } else {
-        return 'not-mobile'
+        return 'not-mobile';
       }
     } else {
       if (w > 424) {
-        return 'also-mobile'
+        return 'also-mobile';
       }
-      return 'mobile'
+      return 'mobile';
     }
   }
-  const showMobile = createSignal(judgeMobile())
-  hookDestroy(subscribeEventListener(window, 'resize', e => {
-    showMobile.set(judgeMobile())
-  }))
-  return showMobile.get
+  const showMobile = createSignal(judgeMobile());
+  hookDestroy(
+    subscribeEventListener(window, 'resize', e => {
+      showMobile.set(judgeMobile());
+    })
+  );
+  return showMobile.get;
 }
 
 export function renderFullScreen(renderDisplay: (arg: DisplayArg) => void) {
-  const width = createSignal(window.innerWidth)
-  const height = createSignal(window.innerHeight)
-  hookDestroy(subscribeEventListener(window, 'resize', e => {
-    width.set(window.innerWidth)
-    height.set(window.innerHeight)
-  }))
+  const width = createSignal(window.innerWidth);
+  const height = createSignal(window.innerHeight);
+  hookDestroy(
+    subscribeEventListener(window, 'resize', e => {
+      width.set(window.innerWidth);
+      height.set(window.innerHeight);
+    })
+  );
   fdom.div({
     className: 'w-full h-full',
     children() {
       renderDisplay({
         width: width.get,
-        height: height.get
-      })
-    }
-  })
+        height: height.get,
+      });
+    },
+  });
 }
 type DisplayArg = {
-  width: GetValue<number>,
-  height: GetValue<number>
-}
+  width: GetValue<number>;
+  height: GetValue<number>;
+};
 export function renderMobileView(
-  renderDisplay: (arg: DisplayArg, mock?: boolean) => void,
+  renderDisplay: (arg: DisplayArg, mock?: boolean) => void
 ) {
-  const isMobile = onlyMobile()
+  const isMobile = onlyMobile();
   renderOne(isMobile, function (showType) {
     if (showType == 'mobile') {
-      renderFullScreen(renderDisplay)
+      renderFullScreen(renderDisplay);
     } else if (showType == 'fake-and-mobile' || showType == 'also-mobile') {
       fdom.div({
         className: 'daisy-mockup-phone',
         children() {
           fdom.div({
-            className: 'daisy-mockup-phone-camera'
-          })
+            className: 'daisy-mockup-phone-camera',
+          });
           fdom.div({
-            className: 'daisy-mockup-phone-display bg-base-100 daisy-card flex flex-col items-stretch',
+            className:
+              'daisy-mockup-phone-display bg-base-100 daisy-card flex flex-col items-stretch',
             children() {
               fdom.div({
-                className: 'h-10'
-              })
+                className: 'h-10',
+              });
+              const size = hookMeasureSize();
               fdom.div({
                 className: 'flex-1 min-h-0 relative',
-                children() {
-                  renderDisplay({
-                    width() {
-                      return 390
-                    },
-                    height() {
-                      return 805
+                children(div: HTMLElement) {
+                  size.plugin(div);
+                  renderIf(
+                    () => size.width() && size.height(),
+                    () => {
+                      renderDisplay(size, true);
                     }
-                  }, true)
-                }
-              })
-            }
-          })
-        }
-      })
+                  );
+                },
+              });
+            },
+          });
+        },
+      });
     } else {
-      renderText`屏幕比例不支持,需要小于3/4`
+      renderText`屏幕比例不支持,需要小于3/4`;
     }
-  })
-
+  });
 }

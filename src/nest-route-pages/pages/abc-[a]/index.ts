@@ -1,9 +1,9 @@
-import { fdom, renderText } from "mve-dom";
+import { fdom, renderText } from 'mve-dom';
 
 export default function () {
   fdom.div({
     children() {
-      renderText`abc`
-    }
-  })
+      renderText`abc`;
+    },
+  });
 }

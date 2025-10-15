@@ -1,12 +1,12 @@
-import { faker } from "@faker-js/faker";
-import { renderForEach } from "mve-core";
-import { dom, fdom, renderTextContent } from "mve-dom";
-import { getSubListInfo, hookDestroy, hookTrackSignal } from "mve-helper";
+import { faker } from '@faker-js/faker';
+import { renderForEach } from 'mve-core';
+import { dom, fdom, renderTextContent } from 'mve-dom';
+import { getSubListInfo, hookDestroy, hookTrackSignal } from 'mve-helper';
 import {
   animateSignal,
   pointerMove,
   subscribeRequestAnimationFrame,
-} from "wy-dom-helper";
+} from 'wy-dom-helper';
 import {
   arrayCountCreateWith,
   batchSignalEnd,
@@ -17,23 +17,24 @@ import {
   getSubListForVirtualList,
   memo,
   ScrollFromPage,
-} from "wy-helper";
-import hookMeasureHeight from "./hookMeasureHeight";
-import explain from "../../explain";
-import markdown from "../../markdown";
+} from 'wy-helper';
+import hookMeasureHeight from './hookMeasureHeight';
+import explain from '../../explain';
+import markdown from '../../markdown';
 import {
   dynamicHeightWithId,
   forEachSub,
   forEachSubWithPadding,
-} from "./dynamicHeight";
+} from './dynamicHeight';
 
 export default function () {
   explain(function () {
     markdown`
 这个是用原生的滚动,每个 item 的高度不固定
-未出现的高度依平均高度`;
+未出现的高度依平均高度
+    `;
   });
-  const baseList = arrayCountCreateWith(1000, (i) => {
+  const baseList = arrayCountCreateWith(1000, i => {
     return {
       id: i,
       color: faker.color.rgb(),
@@ -44,7 +45,7 @@ export default function () {
   type Row = (typeof baseList)[number];
   const scrollY = createSignal(0);
   const container = fdom.div({
-    className: " w-[90%] h-[90%] overflow-y-auto border-red-100 border-1",
+    className: ' w-[90%] h-[90%] overflow-y-auto border-red-100 border-1',
     onScroll(event) {
       scrollY.set(container.scrollTop);
       // batchSignalEnd();
@@ -78,14 +79,14 @@ export default function () {
       if (show) {
         fdom.div({
           s_height() {
-            return averageHeight() * list.get().length + "px";
+            return `${averageHeight() * list.get().length}px`;
           },
           s_paddingTop() {
-            return paddingBegin() + "px";
+            return `${paddingBegin()}px`;
           },
           children() {
             renderForEach<Row, number>(
-              forEachSub(list.get, (v) => v.id, subList),
+              forEachSub(list.get, v => v.id, subList),
               function (key, et) {
                 const div = fdom.div({
                   s_background() {
@@ -93,10 +94,10 @@ export default function () {
                   },
                   children() {
                     renderTextContent(() => {
-                      return et.getValue().id + "--" + et.getIndex();
+                      return `${et.getValue().id}--${et.getIndex()}`;
                     });
                     fdom.input({
-                      className: "daisy-input daisy-input-xs",
+                      className: 'daisy-input daisy-input-xs',
                     });
                     dom.p().renderTextContent(() => et.getValue().content);
                   },
@@ -112,9 +113,9 @@ export default function () {
       } else {
         // 使用transform
         fdom.div({
-          className: "relative",
+          className: 'relative',
           s_height() {
-            return averageHeight() * list.get().length + "px";
+            return `${averageHeight() * list.get().length}px`;
           },
           // s_paddingTop() {
           //   return paddingBegin() + "px";
@@ -123,7 +124,7 @@ export default function () {
             renderForEach(
               forEachSubWithPadding(
                 list.get,
-                (v) => v.id,
+                v => v.id,
                 subList,
                 paddingBegin,
                 getHeightWithId
@@ -133,16 +134,16 @@ export default function () {
                   s_background() {
                     return et.getValue().value.color;
                   },
-                  className: "absolute w-full",
+                  className: 'absolute w-full',
                   s_transform() {
                     return `translateY(${et.getValue().top}px)`;
                   },
                   children() {
                     renderTextContent(() => {
-                      return et.getValue().value.id + "--" + et.getIndex();
+                      return `${et.getValue().value.id}--${et.getIndex()}`;
                     });
                     fdom.input({
-                      className: "daisy-input daisy-input-xs",
+                      className: 'daisy-input daisy-input-xs',
                     });
                     dom
                       .p()

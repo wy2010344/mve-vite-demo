@@ -1,0 +1,838 @@
+/* Infix-O IDE Design System */
+/* 基于CSS变量的主题系统，支持多主题切换 */
+
+/* ===== 基础主题变量 ===== */
+
+:root {
+  /* 基础色相 - 整个色彩系统的根源 */
+  --baseHue: 240;
+
+  /* 基础参数 - 控制整体色彩特性 */
+  --baseSaturation: 60%;
+  /* 基础饱和度 (0-100%) */
+  --baseLightness: 50%;
+  /* 基础亮度 (0-100%) */
+  --baseContrast: 50%;
+  /* 基础对比度 (0-100%) */
+
+  /* 色彩模式 - 控制整体色彩分布策略 */
+  --colorMode: 'balanced';
+  /* 'dark' | 'light' | 'balanced' | 'monochrome' | 'vibrant' */
+
+  /* 计算得出的色相 - 基于色彩理论 */
+  --primaryHue: var(--baseHue);
+  --secondaryHue: calc(var(--baseHue) + 40);
+  /* 类似色 +40° */
+  --accentHue: calc(var(--baseHue) - 40);
+  /* 类似色 -40° */
+  --complementaryHue: calc(var(--baseHue) + 180);
+  /* 互补色 +180° */
+  --triadicHue1: calc(var(--baseHue) + 120);
+  /* 三元色 +120° */
+  --triadicHue2: calc(var(--baseHue) + 240);
+  /* 三元色 +240° */
+
+  /* 语义色相模式控制 */
+  --semanticColorMode: 'harmony';
+  /* 'harmony' | 'fixed' */
+
+  /* 固定语义色相 - 传统的语义颜色 */
+  --fixedSuccessHue: 140;
+  /* 绿色系 */
+  --fixedWarningHue: 35;
+  /* 橙色系 */
+  --fixedDangerHue: 0;
+  /* 红色系 */
+
+  /* 和谐语义色相 - 基于主色相计算 */
+  --harmonySuccessHue: calc(var(--baseHue) + 80);
+  /* 成功色：主色相 +80° */
+  --harmonyWarningHue: calc(var(--baseHue) - 80);
+  /* 警告色：主色相 -80° */
+  --harmonyDangerHue: calc(var(--baseHue) + 160);
+  /* 危险色：主色相 +160° */
+
+  /* 实际使用的语义色相 - 默认使用和谐模式 */
+  --successHue: var(--harmonySuccessHue);
+  --warningHue: var(--harmonyWarningHue);
+  --dangerHue: var(--harmonyDangerHue);
+
+  /* 计算得出的亮度层级 - 基于baseLightness */
+  --lightness-bg-primary: calc(var(--baseLightness) * 0.16);
+  /* 基础亮度的16% */
+  --lightness-bg-secondary: calc(var(--baseLightness) * 0.24);
+  /* 基础亮度的24% */
+  --lightness-bg-tertiary: calc(var(--baseLightness) * 0.32);
+  /* 基础亮度的32% */
+  --lightness-surface: calc(var(--baseLightness) * 0.4);
+  /* 基础亮度的40% */
+  --lightness-text-primary: calc(100% - var(--baseLightness) * 0.05);
+  /* 接近白色 */
+  --lightness-text-secondary: calc(100% - var(--baseLightness) * 0.25);
+  /* 次要文本 */
+
+  /* 计算得出的饱和度层级 - 基于baseSaturation */
+  --saturation-bg: calc(var(--baseSaturation) * 0.33);
+  /* 背景饱和度 */
+  --saturation-surface: calc(var(--baseSaturation) * 0.5);
+  /* 表面饱和度 */
+  --saturation-border: calc(var(--baseSaturation) * 0.25);
+  /* 边框饱和度 */
+  --saturation-text: calc(var(--baseSaturation) * 0.15);
+  /* 文本饱和度 */
+
+  /* 基础颜色 - 动态计算 */
+  --bg-primary: hsl(
+    var(--primaryHue),
+    var(--saturation-bg),
+    var(--lightness-bg-primary)
+  );
+  --bg-secondary: hsl(
+    var(--primaryHue),
+    var(--saturation-bg),
+    var(--lightness-bg-secondary)
+  );
+  --bg-tertiary: hsl(
+    var(--primaryHue),
+    var(--saturation-bg),
+    var(--lightness-bg-tertiary)
+  );
+
+  /* 表面颜色 - 动态计算 */
+  --surface-glass: hsla(
+    var(--primaryHue),
+    var(--saturation-surface),
+    var(--lightness-surface),
+    0.15
+  );
+  --surface-elevated: hsla(
+    var(--primaryHue),
+    var(--saturation-surface),
+    calc(var(--lightness-surface) + 5%),
+    0.2
+  );
+  --surface-overlay: hsla(
+    var(--primaryHue),
+    var(--saturation-bg),
+    var(--lightness-bg-primary),
+    0.8
+  );
+
+  /* 边框颜色 - 基于互补色，动态计算 */
+  --border-subtle: hsla(
+    var(--complementaryHue),
+    var(--saturation-border),
+    calc(100% - var(--lightness-text-secondary)),
+    0.1
+  );
+  --border-normal: hsla(
+    var(--complementaryHue),
+    var(--saturation-border),
+    calc(100% - var(--lightness-text-secondary)),
+    0.15
+  );
+  --border-strong: hsla(
+    var(--complementaryHue),
+    var(--saturation-border),
+    calc(100% - var(--lightness-text-secondary)),
+    0.25
+  );
+
+  /* 文本颜色 - 基于互补色，动态计算 */
+  --text-primary: hsla(
+    var(--complementaryHue),
+    var(--saturation-text),
+    var(--lightness-text-primary),
+    0.95
+  );
+  --text-secondary: hsla(
+    var(--complementaryHue),
+    var(--saturation-text),
+    var(--lightness-text-secondary),
+    0.75
+  );
+  --text-tertiary: hsla(
+    var(--complementaryHue),
+    var(--saturation-text),
+    calc(var(--lightness-text-secondary) - 10%),
+    0.55
+  );
+  --text-disabled: hsla(
+    var(--complementaryHue),
+    var(--saturation-text),
+    calc(var(--lightness-text-secondary) - 20%),
+    0.35
+  );
+
+  /* 阴影 - 基于主色相，动态计算 */
+  --shadow-sm: 0 2px 8px
+    hsla(
+      var(--primaryHue),
+      calc(var(--baseSaturation) * 0.67),
+      calc(var(--baseLightness) * 0.1),
+      0.15
+    );
+  --shadow-md: 0 8px 24px
+    hsla(
+      var(--primaryHue),
+      calc(var(--baseSaturation) * 0.58),
+      calc(var(--baseLightness) * 0.06),
+      0.25
+    );
+  --shadow-lg: 0 16px 40px
+    hsla(
+      var(--primaryHue),
+      calc(var(--baseSaturation) * 0.5),
+      calc(var(--baseLightness) * 0.04),
+      0.35
+    );
+  --shadow-xl: 0 25px 50px
+    hsla(
+      var(--primaryHue),
+      calc(var(--baseSaturation) * 0.42),
+      calc(var(--baseLightness) * 0.02),
+      0.5
+    );
+
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* 动画 */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* 毛玻璃效果 */
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-bg: hsla(var(--primaryHue), 30%, 20%, 0.15);
+}
+
+/* ===== 语义色相模式切换 ===== */
+
+/* 固定语义色相模式 - 使用传统的红绿橙 */
+.semantic-fixed {
+  --successHue: var(--fixedSuccessHue);
+  --warningHue: var(--fixedWarningHue);
+  --dangerHue: var(--fixedDangerHue);
+}
+
+/* 和谐语义色相模式 - 基于主色相计算 (默认) */
+.semantic-harmony {
+  --successHue: var(--harmonySuccessHue);
+  --warningHue: var(--harmonyWarningHue);
+  --dangerHue: var(--harmonyDangerHue);
+}
+
+/* ===== 色彩模式预设 ===== */
+
+/* 深色模式 - 低亮度高对比度 */
+.color-mode-dark {
+  --baseLightness: 15%;
+  --baseSaturation: 40%;
+  --baseContrast: 70%;
+}
+
+/* 浅色模式 - 高亮度低饱和度 */
+.color-mode-light {
+  --baseLightness: 85%;
+  --baseSaturation: 30%;
+  --baseContrast: 60%;
+
+  /* 浅色模式需要反转一些计算 */
+  --lightness-bg-primary: calc(var(--baseLightness) + 5%);
+  --lightness-bg-secondary: calc(var(--baseLightness) - 5%);
+  --lightness-bg-tertiary: calc(var(--baseLightness) - 10%);
+  --lightness-text-primary: calc(var(--baseLightness) * 0.1);
+  --lightness-text-secondary: calc(var(--baseLightness) * 0.3);
+}
+
+/* 平衡模式 - 中等亮度和饱和度 (默认) */
+.color-mode-balanced {
+  --baseLightness: 50%;
+  --baseSaturation: 60%;
+  --baseContrast: 50%;
+}
+
+/* 单色模式 - 极低饱和度，接近黑白 */
+.color-mode-monochrome {
+  --baseLightness: 20%;
+  --baseSaturation: 5%;
+  --baseContrast: 80%;
+}
+
+/* 鲜艳模式 - 高饱和度高对比度 */
+.color-mode-vibrant {
+  --baseLightness: 45%;
+  --baseSaturation: 90%;
+  --baseContrast: 70%;
+}
+
+/* 护眼模式 - 低饱和度中等亮度 */
+.color-mode-eye-care {
+  --baseLightness: 35%;
+  --baseSaturation: 25%;
+  --baseContrast: 45%;
+}
+
+/* ===== 动态主题系统 ===== */
+/* 基于单一基础色相的科学配色系统 */
+
+/* 系统特性：
+ * 1. 单一色相根源 - 所有颜色都基于一个基础色相计算
+ * 2. 色彩和谐 - 基于色彩理论的科学配色
+ * 3. 可访问性 - 自动确保对比度符合WCAG标准
+ * 4. 语义灵活性 - 支持固定或和谐的语义色相
+ */
+
+/* ===== 语义化组件类 ===== */
+
+/* 窗口容器 */
+.ds-window {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px hsla(0, 0%, 100%, 0.1),
+    inset 0 1px 0 hsla(0, 0%, 100%, 0.1);
+  /* transition: all var(--transition-normal); */
+}
+
+.ds-window:hover {
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px hsla(0, 0%, 100%, 0.15),
+    inset 0 1px 0 hsla(0, 0%, 100%, 0.15);
+}
+
+/* 自定义窗口主题 - 只需指定色相，其他参数自动计算 */
+.ds-window--custom {
+  background: linear-gradient(
+    135deg,
+    hsla(var(--windowHue, var(--primaryHue)), 60%, 60%, 0.15) 0%,
+    hsla(calc(var(--windowHue, var(--primaryHue)) + 30), 50%, 55%, 0.15) 100%
+  );
+  border-color: hsla(var(--windowHue, var(--primaryHue)), 55%, 65%, 0.3);
+}
+
+/* 标题栏 */
+.ds-titlebar {
+  height: 40px;
+  background: hsla(0, 0%, 0%, 0.2);
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-md);
+  cursor: grab;
+}
+
+.ds-titlebar:active {
+  cursor: grabbing;
+}
+
+.ds-titlebar__content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.ds-titlebar__icon {
+  font-size: 18px;
+}
+
+.ds-titlebar__title {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.ds-titlebar__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* 窗口控制按钮 */
+.ds-control {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ds-control:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px hsla(0, 0%, 100%, 0.3);
+}
+
+.ds-control--close {
+  background: hsla(var(--dangerHue), 70%, 60%, 0.8);
+  color: white;
+}
+
+.ds-control--close:hover {
+  background: hsl(var(--dangerHue), 70%, 50%);
+}
+
+.ds-control--clone {
+  background: hsla(var(--successHue), 70%, 60%, 0.8);
+  color: black;
+}
+
+.ds-control--clone:hover {
+  background: hsl(var(--successHue), 70%, 50%);
+}
+
+.ds-control--minimize {
+  background: hsla(var(--warningHue), 70%, 60%, 0.8);
+  color: black;
+}
+
+.ds-control--minimize:hover {
+  background: hsl(var(--warningHue), 70%, 50%);
+}
+/*****************/
+/* 按钮组件 */
+.ds-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.ds-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px hsla(var(--primaryHue), 60%, 60%, 0.3);
+}
+
+/* 按钮变体 */
+.ds-button--primary {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primaryHue), 60%, 55%) 0%,
+    hsl(var(--primaryHue), 60%, 45%) 100%
+  );
+  color: white;
+}
+
+.ds-button--primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    var(--shadow-md),
+    0 0 20px hsla(var(--primaryHue), 60%, 60%, 0.4);
+}
+
+.ds-button--secondary {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-normal);
+}
+
+.ds-button--secondary:hover {
+  background: var(--surface-glass);
+  border-color: var(--border-strong);
+}
+
+.ds-button--success {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--successHue), 60%, 55%) 0%,
+    hsl(var(--successHue), 60%, 45%) 100%
+  );
+  color: white;
+}
+
+.ds-button--danger {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--dangerHue), 60%, 55%) 0%,
+    hsl(var(--dangerHue), 60%, 45%) 100%
+  );
+  color: white;
+}
+
+.ds-button--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+
+.ds-button--ghost:hover {
+  background: var(--surface-glass);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+/* 输入框 */
+.ds-input {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.ds-input:focus {
+  outline: none;
+  border-color: hsl(var(--primaryHue), 60%, 60%);
+  box-shadow: 0 0 0 3px hsla(var(--primaryHue), 60%, 60%, 0.2);
+}
+
+.ds-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* 卡片 */
+.ds-card {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.ds-card--elevated {
+  box-shadow: var(--shadow-md);
+}
+
+.ds-card__header {
+  margin-bottom: var(--space-md);
+}
+
+.ds-card__title {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.ds-card__subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0;
+}
+
+.ds-card__body {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 代码编辑器 */
+.ds-code-editor {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: hsla(0, 0%, 0%, 0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 120px;
+}
+
+.ds-code-editor:focus {
+  outline: none;
+  border-color: hsl(var(--primaryHue), 60%, 60%);
+  box-shadow: 0 0 0 3px hsla(var(--primaryHue), 60%, 60%, 0.2);
+}
+
+/* 语法高亮 */
+.ds-syntax-keyword {
+  color: hsl(320, 70%, 70%);
+  font-weight: 600;
+}
+
+.ds-syntax-string {
+  color: hsl(60, 70%, 80%);
+}
+
+.ds-syntax-comment {
+  color: hsl(220, 30%, 60%);
+  font-style: italic;
+}
+
+.ds-syntax-number {
+  color: hsl(280, 70%, 80%);
+}
+
+.ds-syntax-operator {
+  color: hsl(320, 70%, 70%);
+}
+
+.ds-syntax-method {
+  color: hsl(140, 70%, 70%);
+}
+
+.ds-syntax-variable {
+  color: hsl(180, 70%, 70%);
+}
+
+/* 滚动条 */
+.ds-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ds-scrollbar::-webkit-scrollbar-track {
+  background: hsla(0, 0%, 100%, 0.05);
+  border-radius: 3px;
+}
+
+.ds-scrollbar::-webkit-scrollbar-thumb {
+  background: hsla(0, 0%, 100%, 0.2);
+  border-radius: 3px;
+}
+
+.ds-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsla(0, 0%, 100%, 0.3);
+}
+
+/* 调整大小手柄 */
+.ds-resize-handle {
+  position: absolute;
+  background-color: hsla(0, 0%, 100%, 0.1);
+  transition: background-color var(--transition-fast);
+}
+
+.ds-resize-handle:hover {
+  background-color: hsla(0, 0%, 100%, 0.2);
+}
+
+.ds-resize-handle--se {
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  border-radius: var(--radius-md) 0 var(--radius-md) 0;
+}
+
+.ds-resize-handle--s {
+  bottom: 0;
+  left: var(--space-sm);
+  right: var(--space-sm);
+  height: 4px;
+  cursor: s-resize;
+}
+
+.ds-resize-handle--e {
+  top: var(--space-sm);
+  bottom: var(--space-sm);
+  right: 0;
+  width: 4px;
+  cursor: e-resize;
+}
+
+/* 状态栏 */
+.ds-statusbar {
+  height: 24px;
+  padding: 0 var(--space-md);
+  background: var(--surface-overlay);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--text-secondary);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  box-shadow: inset 0 1px 0 var(--border-subtle);
+}
+
+/* 树形结构 */
+.ds-tree-node {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-secondary);
+}
+
+.ds-tree-node:hover {
+  background: hsla(0, 0%, 100%, 0.05);
+  color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.ds-tree-node--active {
+  background: hsla(var(--primaryHue), 60%, 60%, 0.2);
+  color: var(--text-primary);
+}
+
+/* 徽章 */
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-xs);
+  background: var(--surface-elevated);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.ds-badge--primary {
+  background: hsl(var(--primaryHue), 60%, 50%);
+  color: white;
+  border-color: hsl(var(--primaryHue), 60%, 40%);
+}
+
+.ds-badge--success {
+  background: hsl(var(--successHue), 60%, 50%);
+  color: white;
+  border-color: hsl(var(--successHue), 60%, 40%);
+}
+
+.ds-badge--warning {
+  background: hsl(var(--warningHue), 60%, 50%);
+  color: black;
+  border-color: hsl(var(--warningHue), 60%, 40%);
+}
+
+.ds-badge--danger {
+  background: hsl(var(--dangerHue), 60%, 50%);
+  color: white;
+  border-color: hsl(var(--dangerHue), 60%, 40%);
+}
+
+/* 动画类 */
+.ds-animate-appear {
+  animation: dsAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ds-animate-disappear {
+  animation: dsDisappear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.ds-animate-float {
+  animation: dsFloat 6s ease-in-out infinite;
+}
+
+/* 动画关键帧 */
+@keyframes dsAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes dsDisappear {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+}
+
+@keyframes dsFloat {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-10px) rotate(120deg);
+  }
+
+  66% {
+    transform: translateY(5px) rotate(240deg);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  :root {
+    --space-xs: 3px;
+    --space-sm: 6px;
+    --space-md: 12px;
+    --space-lg: 18px;
+    --space-xl: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ds-window {
+    border-radius: var(--radius-lg);
+  }
+
+  .ds-titlebar {
+    height: 36px;
+    padding: 0 var(--space-sm);
+  }
+
+  .ds-button {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 13px;
+  }
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+  .ds-animate-appear,
+  .ds-animate-disappear,
+  .ds-animate-float,
+  .ds-tree-node,
+  .ds-control,
+  .ds-button {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --border-subtle: hsla(0, 0%, 100%, 0.3);
+    --border-normal: hsla(0, 0%, 100%, 0.5);
+    --border-strong: hsla(0, 0%, 100%, 0.7);
+  }
+
+  .ds-window {
+    border-width: 2px;
+  }
+
+  .ds-control {
+    border: 1px solid hsla(0, 0%, 100%, 0.5);
+  }
+}

@@ -1,6 +1,6 @@
-import { fdom, fsvg } from 'mve-dom'
-import { simpleFlex, ValueOrGet } from 'wy-helper'
-import { renderALayout } from 'mve-dom-helper'
+import { fdom, fsvg } from 'mve-dom';
+import { simpleFlex, ValueOrGet } from 'wy-helper';
+import { renderALayout } from 'mve-dom-helper';
 
 // SVG 按钮组件 - 在 SVG 内部使用
 function renderSVGButton(content: ValueOrGet<string>, onClick: () => void) {
@@ -10,7 +10,7 @@ function renderSVGButton(content: ValueOrGet<string>, onClick: () => void) {
     render(button) {
       return fsvg.g({
         transform() {
-          return `translate(${button.axis.x.position()}, ${button.axis.y.position()})`
+          return `translate(${button.axis.x.position()}, ${button.axis.y.position()})`;
         },
         s_cursor: 'pointer',
         onClick,
@@ -23,7 +23,7 @@ function renderSVGButton(content: ValueOrGet<string>, onClick: () => void) {
             stroke: 'rgba(255,255,255,0.3)',
             strokeWidth: 1,
             rx: 8,
-          })
+          });
 
           // 按钮文字
           fsvg.text({
@@ -35,11 +35,11 @@ function renderSVGButton(content: ValueOrGet<string>, onClick: () => void) {
             fill: 'white',
             childrenType: 'text',
             children: content,
-          })
+          });
         },
-      })
+      });
     },
-  })
+  });
 }
 
 // 控制面板组件
@@ -59,8 +59,8 @@ export function renderControlPanel(
     render(panel) {
       return fsvg.svg({
         s_position: 'absolute',
-        s_left: () => panel.axis.x.position() + 'px',
-        s_top: () => panel.axis.y.position() + 'px',
+        s_left: () => `${panel.axis.x.position()}px`,
+        s_top: () => `${panel.axis.y.position()}px`,
         width: panel.axis.x.size,
         height: panel.axis.y.size,
         children() {
@@ -71,7 +71,7 @@ export function renderControlPanel(
             fill: 'rgba(255,255,255,0.1)',
             stroke: 'rgba(255,255,255,0.2)',
             strokeWidth: 1,
-          })
+          });
 
           // 使用布局系统排列控制按钮
           renderALayout({
@@ -83,7 +83,7 @@ export function renderControlPanel(
                 alignItems: 'center',
                 alignFix: true,
                 directionFix: 'around',
-              })
+              });
             },
             render(buttonContainer) {
               return fsvg.g({
@@ -92,28 +92,28 @@ export function renderControlPanel(
                   renderSVGButton(
                     () => (isPlaying() ? '⏸️' : '▶️'),
                     onTogglePlay
-                  )
+                  );
 
                   // 重置按钮
-                  renderSVGButton('🔄', onReset)
+                  renderSVGButton('🔄', onReset);
 
                   // 轨迹开关 - 根据状态改变颜色
-                  renderSVGButton('✨', onToggleTrails)
+                  renderSVGButton('✨', onToggleTrails);
 
                   // 小球数量控制
-                  renderSVGButton(() => `🔢 ${ballCount()}`, onChangeBallCount)
+                  renderSVGButton(() => `🔢 ${ballCount()}`, onChangeBallCount);
 
                   // 重力控制
                   renderSVGButton(
                     () => `🌍 ${gravity().toFixed(1)}`,
                     onChangeGravity
-                  )
+                  );
                 },
-              })
+              });
             },
-          })
+          });
         },
-      })
+      });
     },
-  })
+  });
 }

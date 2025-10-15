@@ -26,16 +26,16 @@ function dijkstra(graph: Graph, start: string) {
       if (current === null || distances[node] < distances[current]) {
         //初始为第一个,然后寻找距离更小的节点
         current = node;
-        console.log("current", current);
+        console.log('current', current);
       }
     }
 
     if (current === null || distances[current] == Infinity) {
       //没有找到节点
-      console.log("break");
+      console.log('break');
       break;
     }
-    console.log("delete", current);
+    console.log('delete', current);
     nodes.delete(current);
 
     for (const neighbor in graph[current]) {
@@ -78,9 +78,9 @@ const graph: Graph = {
   F: {},
 };
 
-const { distances, previous } = dijkstra(graph, "A");
-const pathToF = getPath(previous, "F");
-const distanceToF = distances["F"];
+const { distances, previous } = dijkstra(graph, 'A');
+const pathToF = getPath(previous, 'F');
+const distanceToF = distances['F'];
 
-console.log(`最短路径:${pathToF.join(" -> ")}`);
+console.log(`最短路径:${pathToF.join(' -> ')}`);
 console.log(`总距离:${distanceToF}`);

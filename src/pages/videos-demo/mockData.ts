@@ -13,83 +13,83 @@ export interface Video {
 }
 
 const categories = [
-  "entertainment",
-  "education",
-  "technology",
-  "music",
-  "sports",
-  "gaming",
-  "news",
+  'entertainment',
+  'education',
+  'technology',
+  'music',
+  'sports',
+  'gaming',
+  'news',
 ];
 
 const authors = [
-  "科技探索者",
-  "音乐达人",
-  "游戏主播",
-  "教育频道",
-  "新闻快报",
-  "体育解说",
-  "娱乐八卦",
-  "生活博主",
-  "美食家",
-  "旅行者",
-  "摄影师",
-  "程序员",
-  "设计师",
-  "创业者",
-  "投资人",
-  "艺术家",
+  '科技探索者',
+  '音乐达人',
+  '游戏主播',
+  '教育频道',
+  '新闻快报',
+  '体育解说',
+  '娱乐八卦',
+  '生活博主',
+  '美食家',
+  '旅行者',
+  '摄影师',
+  '程序员',
+  '设计师',
+  '创业者',
+  '投资人',
+  '艺术家',
 ];
 
 const titleTemplates = [
-  "如何在30天内掌握{}技能",
-  "{}的终极指南：从入门到精通",
-  "震惊！{}竟然可以这样做",
-  "{}vs{}：哪个更好？",
-  "2024年最新{}趋势分析",
-  "{}背后的秘密你知道吗？",
-  "5分钟学会{}的核心技巧",
-  "{}改变了我的生活",
-  "为什么{}如此重要？",
-  "{}的未来发展方向",
+  '如何在30天内掌握{}技能',
+  '{}的终极指南：从入门到精通',
+  '震惊！{}竟然可以这样做',
+  '{}vs{}：哪个更好？',
+  '2024年最新{}趋势分析',
+  '{}背后的秘密你知道吗？',
+  '5分钟学会{}的核心技巧',
+  '{}改变了我的生活',
+  '为什么{}如此重要？',
+  '{}的未来发展方向',
 ];
 
 const topics = [
-  "React",
-  "Vue",
-  "JavaScript",
-  "Python",
-  "AI",
-  "Machine Learning",
-  "区块链",
-  "加密货币",
-  "投资理财",
-  "创业",
-  "设计",
-  "摄影",
-  "音乐制作",
-  "视频剪辑",
-  "游戏开发",
-  "移动开发",
-  "云计算",
-  "数据分析",
-  "产品管理",
-  "市场营销",
-  "健身",
-  "美食",
-  "旅行",
+  'React',
+  'Vue',
+  'JavaScript',
+  'Python',
+  'AI',
+  'Machine Learning',
+  '区块链',
+  '加密货币',
+  '投资理财',
+  '创业',
+  '设计',
+  '摄影',
+  '音乐制作',
+  '视频剪辑',
+  '游戏开发',
+  '移动开发',
+  '云计算',
+  '数据分析',
+  '产品管理',
+  '市场营销',
+  '健身',
+  '美食',
+  '旅行',
 ];
 
 // 生成随机缩略图URL
 const generateThumbnail = (index: number): string => {
   const colors = [
-    "FF6B6B",
-    "4ECDC4",
-    "45B7D1",
-    "FFA07A",
-    "98D8C8",
-    "F7DC6F",
-    "BB8FCE",
+    'FF6B6B',
+    '4ECDC4',
+    '45B7D1',
+    'FFA07A',
+    '98D8C8',
+    'F7DC6F',
+    'BB8FCE',
   ];
   const color = colors[index % colors.length];
   return `https://via.placeholder.com/320x180/${color}/FFFFFF?text=Video+${
@@ -103,7 +103,7 @@ const generateTitle = (index: number): string => {
   const topic1 = topics[Math.floor(Math.random() * topics.length)];
   const topic2 = topics[Math.floor(Math.random() * topics.length)];
 
-  return template.replace("{}", topic1).replace("{}", topic2);
+  return template.replace('{}', topic1).replace('{}', topic2);
 };
 
 // 生成随机时间
@@ -112,8 +112,8 @@ const generateUploadTime = (): string => {
   const daysAgo = Math.floor(Math.random() * 365);
   const uploadDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
 
-  if (daysAgo === 0) return "今天";
-  if (daysAgo === 1) return "昨天";
+  if (daysAgo === 0) return '今天';
+  if (daysAgo === 1) return '昨天';
   if (daysAgo < 7) return `${daysAgo}天前`;
   if (daysAgo < 30) return `${Math.floor(daysAgo / 7)}周前`;
   if (daysAgo < 365) return `${Math.floor(daysAgo / 30)}个月前`;
@@ -153,7 +153,7 @@ export const generateMockVideos = (page: number, count: number): Video[] => {
       category: categories[Math.floor(Math.random() * categories.length)],
       quality:
         Math.random() > 0.7
-          ? ["HD", "4K", "1080P"][Math.floor(Math.random() * 3)]
+          ? ['HD', '4K', '1080P'][Math.floor(Math.random() * 3)]
           : undefined,
       verified: Math.random() > 0.8, // 20% 的作者是认证用户
     };

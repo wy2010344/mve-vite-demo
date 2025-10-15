@@ -1,4 +1,4 @@
-import { hookClip, hookDraw, hookStroke } from 'mve-dom-helper/canvasRender'
+import { hookClip, hookDraw, hookStroke } from 'mve-dom-helper/canvasRender';
 
 export default function () {
   hookDraw({
@@ -6,9 +6,9 @@ export default function () {
     y: 100,
     withPath: true,
     draw({ ctx, path }) {
-      path.rect(0, 0, 300, 300)
-      hookStroke(10, 'green')
-      hookClip('nonzero')
+      path.rect(0, 0, 300, 300);
+      hookStroke(10, 'green');
+      hookClip('nonzero');
     },
     beforeChildren() {
       hookDraw({
@@ -16,27 +16,27 @@ export default function () {
         y: -30,
         withPath: true,
         onPointerDown(e) {
-          console.log('before-click', e)
+          console.log('before-click', e);
         },
         draw({ ctx, path }) {
-          path.rect(0, 0, 300, 300)
-          hookStroke(10, 'yellow')
+          path.rect(0, 0, 300, 300);
+          hookStroke(10, 'yellow');
         },
-      })
+      });
     },
     children() {
       hookDraw({
         x: -30,
         y: -30,
         onPointerDown(e) {
-          console.log('click', e)
+          console.log('click', e);
         },
         withPath: true,
         draw({ ctx, path }) {
-          path.rect(0, 0, 300, 300)
-          hookStroke(10, 'blue')
+          path.rect(0, 0, 300, 300);
+          hookStroke(10, 'blue');
         },
-      })
+      });
     },
-  })
+  });
 }

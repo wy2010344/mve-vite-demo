@@ -1,6 +1,6 @@
-import { marked } from "marked";
-import { dom, fdom } from "mve-dom";
-import { mve } from "mve-dom-helper";
+import { marked } from 'marked';
+import { dom, fdom } from 'mve-dom';
+import { mve } from 'mve-dom-helper';
 
 export default function () {
   dom.div({}).renderText`markdown-parse`;

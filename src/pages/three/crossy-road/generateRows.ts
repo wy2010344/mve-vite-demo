@@ -1,7 +1,7 @@
-import * as THREE from "three";
-import { minTileIndex, maxTileIndex } from "./constants";
-import { type Row, type RowType } from "./Map";
-import { storeRef } from "wy-helper";
+import * as THREE from 'three';
+import { minTileIndex, maxTileIndex } from './constants';
+import { type Row, type RowType } from './Map';
+import { storeRef } from 'wy-helper';
 
 export function generateRows(amount: number): Row[] {
   const rows: Row[] = [];
@@ -13,16 +13,15 @@ export function generateRows(amount: number): Row[] {
 }
 
 function generateRow(): Row {
-  const type: RowType = randomElement(["car", "truck", "forest"]);
-  if (type === "car") return generateCarLaneMetadata();
-  if (type === "truck") return generateTruckLaneMetadata();
+  const type: RowType = randomElement(['car', 'truck', 'forest']);
+  if (type === 'car') return generateCarLaneMetadata();
+  if (type === 'truck') return generateTruckLaneMetadata();
   return generateForesMetadata();
 }
 
 function randomElement<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
-
 
 function generateForesMetadata(): Row {
   const occupiedTiles = new Set<number>();
@@ -38,7 +37,7 @@ function generateForesMetadata(): Row {
     return { tileIndex, height };
   });
 
-  return { type: "forest", trees };
+  return { type: 'forest', trees };
 }
 
 function generateCarLaneMetadata(): Row {
@@ -50,10 +49,7 @@ function generateCarLaneMetadata(): Row {
   const vehicles = Array.from({ length: 3 }, () => {
     let initialTileIndex;
     do {
-      initialTileIndex = THREE.MathUtils.randInt(
-        minTileIndex,
-        maxTileIndex
-      );
+      initialTileIndex = THREE.MathUtils.randInt(minTileIndex, maxTileIndex);
     } while (occupiedTiles.has(initialTileIndex));
     occupiedTiles.add(initialTileIndex - 1);
     occupiedTiles.add(initialTileIndex);
@@ -66,7 +62,7 @@ function generateCarLaneMetadata(): Row {
     return { initialTileIndex, color, ref: storeRef(undefined!) };
   });
 
-  return { type: "car", direction, speed, vehicles };
+  return { type: 'car', direction, speed, vehicles };
 }
 
 function generateTruckLaneMetadata(): Row {
@@ -78,10 +74,7 @@ function generateTruckLaneMetadata(): Row {
   const vehicles = Array.from({ length: 2 }, () => {
     let initialTileIndex;
     do {
-      initialTileIndex = THREE.MathUtils.randInt(
-        minTileIndex,
-        maxTileIndex
-      );
+      initialTileIndex = THREE.MathUtils.randInt(minTileIndex, maxTileIndex);
     } while (occupiedTiles.has(initialTileIndex));
     occupiedTiles.add(initialTileIndex - 2);
     occupiedTiles.add(initialTileIndex - 1);
@@ -96,5 +89,5 @@ function generateTruckLaneMetadata(): Row {
     return { initialTileIndex, color, ref: storeRef(undefined!) };
   });
 
-  return { type: "truck", direction, speed, vehicles };
+  return { type: 'truck', direction, speed, vehicles };
 }

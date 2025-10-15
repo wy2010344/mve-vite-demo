@@ -1,4 +1,3 @@
-
 export interface OnboardingData {
   id: number;
   animation: Promise<any>;
@@ -11,7 +10,7 @@ export interface OnboardingData {
 const data: OnboardingData[] = [
   {
     id: 1,
-    animation: import("./a1.json"),
+    animation: import('./a1.json'),
     text: 'Lorem Ipsum dolor sit amet',
     textColor: '#ffffff',
     backgroundColor: '#fcb7d7',
@@ -20,7 +19,7 @@ const data: OnboardingData[] = [
   },
   {
     id: 2,
-    animation: import("./a2.json"),
+    animation: import('./a2.json'),
     text: 'Lorem Ipsum dolor sit amet',
     textColor: '#000000',
     backgroundColor: '#ffffff',
@@ -29,7 +28,7 @@ const data: OnboardingData[] = [
   },
   {
     id: 3,
-    animation: import("./a3.json"),
+    animation: import('./a3.json'),
     text: 'Lorem Ipsum dolor sit amet',
     textColor: '#ffffff',
     backgroundColor: '#003cc9',
@@ -38,4 +37,4 @@ const data: OnboardingData[] = [
   },
 ];
 
-export default data;  
+export default data;

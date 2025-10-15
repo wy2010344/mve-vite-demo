@@ -1,96 +1,96 @@
-import { fdom } from 'mve-dom'
-import { hookDraw, renderCanvas } from 'mve-dom-helper/canvasRender'
-import { createSignal, emptyFun, GetValue, memo, StoreRef } from 'wy-helper'
-import { getBaseContentColor, render偏移 } from './util'
+import { fdom } from 'mve-dom';
+import { hookDraw, renderCanvas } from 'mve-dom-helper/canvasRender';
+import { createSignal, emptyFun, GetValue, memo, StoreRef } from 'wy-helper';
+import { getBaseContentColor, render偏移 } from './util';
 
 export default function drawCanvasCurve({
   getDotList,
   renderEnd = emptyFun,
 }: {
-  getDotList(height: number): number[]
-  renderEnd?: (size: StoreRef<number>, dotList: GetValue<number[]>) => void
+  getDotList(height: number): number[];
+  renderEnd?: (size: StoreRef<number>, dotList: GetValue<number[]>) => void;
 }) {
-  const transY = createSignal(0)
-  const size = createSignal(500)
+  const transY = createSignal(0);
+  const size = createSignal(500);
   function getOuterSize() {
-    return size.get() + 10
+    return size.get() + 10;
   }
   const dotList = memo(() => {
-    const list = getDotList(size.get())
+    const list = getDotList(size.get());
 
     return {
       list,
       minEdge: Math.min(0, ...list),
       maxEdge: Math.max(size.get(), ...list),
-    }
-  })
+    };
+  });
   function getOutterHeight() {
-    return 10 - dotList().minEdge + dotList().maxEdge
+    return 10 - dotList().minEdge + dotList().maxEdge;
   }
   fdom.div({
     className: 'relative select-none ',
     s_transform() {
-      return `translateY(${transY.get()}px)`
+      return `translateY(${transY.get()}px)`;
     },
     s_width() {
-      return getOuterSize() + 'px'
+      return `${getOuterSize()}px`;
     },
     s_height() {
-      return getOutterHeight() + 'px'
+      return `${getOutterHeight()}px`;
     },
     children() {
-      render偏移(transY)
+      render偏移(transY);
       renderCanvas(
         fdom.canvas({
           className: 'rotate-x-180',
           s_width() {
-            return getOuterSize() + 'px'
+            return `${getOuterSize()}px`;
           },
           s_height() {
-            return getOutterHeight() + 'px'
+            return `${getOutterHeight()}px`;
           },
         }),
         () => {
           hookDraw({
             x: 5,
             y() {
-              return 5 - dotList().minEdge
+              return 5 - dotList().minEdge;
             },
             draw({ ctx }) {
-              const w = size.get()
-              const h = w
-              const list = dotList().list
-              const perWidth = w / (list.length - 1)
-              ctx.strokeStyle = getBaseContentColor()
+              const w = size.get();
+              const h = w;
+              const list = dotList().list;
+              const perWidth = w / (list.length - 1);
+              ctx.strokeStyle = getBaseContentColor();
 
-              ctx.beginPath()
+              ctx.beginPath();
               //y轴
-              ctx.moveTo(0, 0)
-              ctx.lineTo(0, h)
-              ctx.stroke()
+              ctx.moveTo(0, 0);
+              ctx.lineTo(0, h);
+              ctx.stroke();
 
               //y-right轴
-              ctx.moveTo(w, 0)
-              ctx.lineTo(w, h)
-              ctx.stroke()
+              ctx.moveTo(w, 0);
+              ctx.lineTo(w, h);
+              ctx.stroke();
 
               //x轴
-              ctx.moveTo(0, 0)
-              ctx.lineTo(w, 0)
-              ctx.stroke()
+              ctx.moveTo(0, 0);
+              ctx.lineTo(w, 0);
+              ctx.stroke();
 
-              ctx.beginPath()
-              ctx.moveTo(0, 0)
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
               for (let i = 0; i < list.length; i++) {
-                const cell = list[i]
-                ctx.lineTo(perWidth * i, cell)
+                const cell = list[i];
+                ctx.lineTo(perWidth * i, cell);
               }
-              ctx.stroke()
+              ctx.stroke();
             },
-          })
+          });
         }
-      )
-      renderEnd(size, () => dotList().list)
+      );
+      renderEnd(size, () => dotList().list);
     },
-  })
+  });
 }

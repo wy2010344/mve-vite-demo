@@ -1,14 +1,26 @@
-import { dom, fdom } from "mve-dom";
-import { createSignal, emptyObject, GetValue, numberStoreTranfrom, SetValue, StoreRef } from "wy-helper";
-import { renderContentEditable, renderContentEditableTrans, renderInput, renderInputTrans } from "mve-dom-helper";
-import { contentEditableText } from "wy-dom-helper/contentEditable";
-import { cns, DomElementType } from "wy-dom-helper";
+import { dom, fdom } from 'mve-dom';
+import {
+  createSignal,
+  emptyObject,
+  GetValue,
+  numberStoreTranfrom,
+  SetValue,
+  StoreRef,
+} from 'wy-helper';
+import {
+  renderContentEditable,
+  renderContentEditableTrans,
+  renderInput,
+  renderInputTrans,
+} from 'mve-dom-helper';
+import { contentEditableText } from 'wy-dom-helper/contentEditable';
+import { cns, DomElementType } from 'wy-dom-helper';
 
 export class NumberRange {
-  readonly value: StoreRef<number>
-  readonly min: StoreRef<number>
-  readonly max: StoreRef<number>
-  readonly step: StoreRef<number>
+  readonly value: StoreRef<number>;
+  readonly min: StoreRef<number>;
+  readonly max: StoreRef<number>;
+  readonly step: StoreRef<number>;
 
   constructor(
     value: number,
@@ -16,28 +28,29 @@ export class NumberRange {
       min = 0,
       max = 100,
       /**从min到max之间的间隔 */
-      step = 100
+      step = 100,
     }: {
-      min?: number
-      max?: number
-      step?: number
+      min?: number;
+      max?: number;
+      step?: number;
     } = emptyObject
   ) {
-    this.value = createSignal(value)
-    this.min = createSignal(min)
-    this.max = createSignal(max)
-    this.step = createSignal(step)
+    this.value = createSignal(value);
+    this.min = createSignal(min);
+    this.max = createSignal(max);
+    this.step = createSignal(step);
   }
 }
 export function renderDivNumber({
-  type = "div",
+  type = 'div',
   className = 'daisy-input-xs daisy-input-ghost',
   value,
-  setValue
+  setValue,
 }: {
-  type?: DomElementType
-  className?: string
-  value: GetValue<number>, setValue: SetValue<number>
+  type?: DomElementType;
+  className?: string;
+  value: GetValue<number>;
+  setValue: SetValue<number>;
 }) {
   // renderInput("input", {
   //   value,
@@ -54,89 +67,96 @@ export function renderDivNumber({
     value,
     setValue,
     fdom.div({
-      className: cns("flex-0 daisy-input", className),
+      className: cns('flex-0 daisy-input', className),
       contentEditable: contentEditableText,
-    }))
+    })
+  );
 }
 
 export function renderNumberRange(label: string, range: NumberRange) {
-
   fdom.div({
     children() {
       dom.label({
-        className: "block",
-      }).renderText`${label}: `
+        className: 'block',
+      }).renderText`${label}: `;
 
       fdom.div({
         className: 'flex items-start justify-center gap-1',
         children() {
           renderDivNumber({
-            value: range.min.get, setValue(v) {
+            value: range.min.get,
+            setValue(v) {
               if (v >= range.max.get()) {
-                return
+                return;
               }
-              range.min.set(v)
-            }
-          })
+              range.min.set(v);
+            },
+          });
           fdom.div({
             children() {
-              renderInputTrans(numberStoreTranfrom, range.value.get, range.value.set, fdom.input({
-                type: "range",
-                className: "daisy-range range-xs",
-                min: range.min.get,
-                max: range.max.get,
-                step() {
-                  return (range.max.get() - range.min.get()) / range.step.get()
-                },
-              }))
+              renderInputTrans(
+                numberStoreTranfrom,
+                range.value.get,
+                range.value.set,
+                fdom.input({
+                  type: 'range',
+                  className: 'daisy-range range-xs',
+                  min: range.min.get,
+                  max: range.max.get,
+                  step() {
+                    return (
+                      (range.max.get() - range.min.get()) / range.step.get()
+                    );
+                  },
+                })
+              );
 
               fdom.div({
-                className: "flex-1 flex items-center justify-between relative",
+                className: 'flex-1 flex items-center justify-between relative',
                 children() {
-                  dom.label().renderText`value:`
+                  dom.label().renderText`value:`;
                   renderDivNumber({
-                    type: "span",
-                    className: "daisy-input-md",
+                    type: 'span',
+                    className: 'daisy-input-md',
                     value: range.value.get,
                     setValue(v) {
                       if (v < range.min.get()) {
-                        return
+                        return;
                       }
                       if (v > range.max.get()) {
-                        return
+                        return;
                       }
-                      range.value.set(v)
-                    }
-                  })
+                      range.value.set(v);
+                    },
+                  });
 
-                  dom.label().renderText`step:`
+                  dom.label().renderText`step:`;
                   renderDivNumber({
-                    type: "span",
+                    type: 'span',
                     value: range.step.get,
                     setValue(v) {
                       if (v <= 0) {
-                        return
+                        return;
                       }
-                      v = Math.round(v)
-                      range.step.set(v)
-                    }
-                  })
-                }
-              })
-
-            }
-          })
+                      v = Math.round(v);
+                      range.step.set(v);
+                    },
+                  });
+                },
+              });
+            },
+          });
           renderDivNumber({
             value: range.max.get,
             setValue(v) {
               if (v <= range.min.get()) {
-                return
+                return;
               }
-              range.max.set(v)
-            }
-          })
-        }
-      })
-    }
-  })
+              range.max.set(v);
+            },
+          });
+        },
+      });
+    },
+  });
 }

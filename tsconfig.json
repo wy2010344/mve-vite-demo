@@ -3,10 +3,7 @@
     "module": "ESNext", // 使用 ESNext 模块系统
     "moduleResolution": "bundler", // 使用 Node.js 的模块解析策略
     "target": "ESNext", // 编译目标为 ESNext
-    "lib": [
-      "DOM",
-      "ESNext"
-    ], // 包含 DOM 和 ESNext 库
+    "lib": ["DOM", "ESNext"], // 包含 DOM 和 ESNext 库
     // "experimentalDecorators": true,
     "useDefineForClassFields": true,
     "esModuleInterop": true, // 允许兼容 CommonJS 模块
@@ -23,19 +20,12 @@
     "jsxFragmentFactory": "mve.Fragment",
     "baseUrl": ".", // 根目录
     "paths": {
-      "~/*": [
-        "src/*"
-      ] // 支持 @/ 开头的路径
-    },
+      "~/*": ["src/*"] // 支持 @/ 开头的路径
+    }
     /* Linting */
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
     // "noFallthroughCasesInSwitch": true
   },
-  "exclude": [
-    "./yalc"
-  ],
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

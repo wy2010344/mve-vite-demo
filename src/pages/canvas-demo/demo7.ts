@@ -3,7 +3,7 @@ import {
   hookDrawRect,
   hookFill,
   simpleFlex,
-} from 'mve-dom-helper/canvasRender'
+} from 'mve-dom-helper/canvasRender';
 
 export default function () {
   hookDrawRect({
@@ -11,7 +11,7 @@ export default function () {
     layout(v) {
       return simpleFlex({
         gap: 20,
-      })
+      });
     },
     children() {
       hookDrawRect({
@@ -19,96 +19,96 @@ export default function () {
         layout(v) {
           return simpleFlex({
             gap: 20,
-          })
+          });
         },
         draw(arg) {
-          hookAddRect()
-          hookFill('green')
+          hookAddRect();
+          hookFill('green');
         },
         children() {
           hookDrawRect({
             width: 20,
             height: 20,
             onClick(e) {
-              console.log('click-1')
+              console.log('click-1');
             },
             draw(arg) {
-              hookAddRect()
-              hookFill('red')
+              hookAddRect();
+              hookFill('red');
             },
-          })
+          });
           hookDrawRect({
             width: 20,
             height: 20,
             onClick(e) {
-              console.log('click-111')
+              console.log('click-111');
             },
             draw(arg) {
-              hookAddRect()
-              hookFill('blue')
+              hookAddRect();
+              hookFill('blue');
             },
-          })
+          });
         },
-      })
+      });
       hookDrawRect({
         width: 20,
         height: 20,
         onClick(e) {
-          console.log('click-2')
+          console.log('click-2');
         },
         draw(arg) {
-          hookAddRect()
-          hookFill('green')
+          hookAddRect();
+          hookFill('green');
         },
-      })
+      });
 
       hookDrawRect({
         padding: 30,
         layout(v) {
           return simpleFlex({
             gap: 20,
-          })
+          });
         },
         draw(arg) {
-          hookAddRect()
-          hookFill('green')
+          hookAddRect();
+          hookFill('green');
         },
         children() {
           hookDrawRect({
             width: 20,
             height: 20,
             onClick(e) {
-              console.log('click-22')
+              console.log('click-22');
             },
             draw(arg) {
-              hookAddRect()
-              hookFill('red')
+              hookAddRect();
+              hookFill('red');
             },
-          })
+          });
           hookDrawRect({
             width: 20,
             height: 20,
             onClick(e) {
-              console.log('click-222')
+              console.log('click-222');
             },
             draw(arg) {
-              hookAddRect()
-              hookFill('blue')
+              hookAddRect();
+              hookFill('blue');
             },
-          })
+          });
         },
-      })
+      });
       hookDrawRect({
         width: 80,
         height: 80,
         onClick(e) {
-          console.log('click-3')
+          console.log('click-3');
         },
         draw(arg) {
-          hookAddRect()
-          hookFill('green')
+          hookAddRect();
+          hookFill('green');
         },
-      })
+      });
     },
-  })
+  });
 }

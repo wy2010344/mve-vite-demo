@@ -1,12 +1,12 @@
-import { fdom, renderText, renderTextContent } from "mve-dom";
-import { GetValue } from "wy-helper";
+import { fdom, renderText, renderTextContent } from 'mve-dom';
+import { GetValue } from 'wy-helper';
 
 export default function (arg: GetValue<{}>) {
   fdom.div({
     children() {
       renderTextContent(() => {
-        return ` -- `
-      })
-    }
-  })
+        return ` -- `;
+      });
+    },
+  });
 }
