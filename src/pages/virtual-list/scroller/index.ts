@@ -1,23 +1,22 @@
 /*
-* Scroller
-* http://github.com/zynga/scroller
-*
-* Copyright 2011, Zynga Inc.
-* Licensed under the MIT License.
-* https://raw.github.com/zynga/scroller/master/MIT-LICENSE.txt
-*
-* Based on the work of: Unify Project (unify-project.org)
-* http://unify-project.org
-* Copyright 2011, Deutsche Telekom AG
-* License: MIT + Apache (V2)
-*/
+ * Scroller
+ * http://github.com/zynga/scroller
+ *
+ * Copyright 2011, Zynga Inc.
+ * Licensed under the MIT License.
+ * https://raw.github.com/zynga/scroller/master/MIT-LICENSE.txt
+ *
+ * Based on the work of: Unify Project (unify-project.org)
+ * http://unify-project.org
+ * Copyright 2011, Deutsche Telekom AG
+ * License: MIT + Apache (V2)
+ */
 
-import { emptyFun, EmptyFun, ReadArray } from "wy-helper";
-import * as Animate from './Animate'
+import { emptyFun, EmptyFun, ReadArray } from 'wy-helper';
+import * as Animate from './Animate';
 
 function createOption() {
   return {
-
     /** Enable scrolling on x-axis */
     scrollingX: true,
 
@@ -54,20 +53,19 @@ function createOption() {
     /** 配置到达边界时减速的变化量 **/
     penetrationDeceleration: 0.03,
     /** 配置到达边界时加速度的变化量 **/
-    penetrationAcceleration: 0.08
-
-  }
+    penetrationAcceleration: 0.08,
+  };
 }
 
-export type Option = ReturnType<typeof createOption>
+export type Option = ReturnType<typeof createOption>;
 
 export interface PagePoint {
-  pageX: number
-  pageY: number
+  pageX: number;
+  pageY: number;
 }
 
 export class Scroller {
-  public readonly options: Option
+  public readonly options: Option;
   private __zoomComplete: EmptyFun | null = null;
   private __interruptedAnimation = false;
 
@@ -77,13 +75,15 @@ export class Scroller {
   private __enableScrollX = false;
   private __enableScrollY = false;
   constructor(
-    public readonly __callback: (left: number, top: number, zoom: number) => void,
+    public readonly __callback: (
+      left: number,
+      top: number,
+      zoom: number
+    ) => void,
     options: Partial<Option>
   ) {
-    this.options = Object.assign(createOption(), options)
+    this.options = Object.assign(createOption(), options);
   }
-
-
 
   /*
   ---------------------------------------------------------------------------
@@ -92,39 +92,37 @@ export class Scroller {
   */
 
   /** {Boolean} Whether only a single finger is used in touch handling */
-  __isSingleTouch = false
+  __isSingleTouch = false;
 
   /** {Boolean} Whether a touch event sequence is in progress */
-  __isTracking = false
+  __isTracking = false;
 
   /** {Boolean} Whether a deceleration animation went to completion. */
-  __didDecelerationComplete = false
+  __didDecelerationComplete = false;
 
   /**
-  * {Boolean} 手势缩放/旋转事件是否正在进行中。当发生
-  * 手势启动事件时激活。这比拖动具有更高的优先级。
-  */
-  __isGesturing = false
+   * {Boolean} 手势缩放/旋转事件是否正在进行中。当发生
+   * 手势启动事件时激活。这比拖动具有更高的优先级。
+   */
+  __isGesturing = false;
 
   /**
-  * {Boolean} 用户是否移动了一定距离以致于我们启用了
-  * 拖动模式。提示 = 仅在移动了一定像素后才启用，以
-  * 不会因点击等而中断。
-  */
-  __isDragging = false
+   * {Boolean} 用户是否移动了一定距离以致于我们启用了
+   * 拖动模式。提示 = 仅在移动了一定像素后才启用，以
+   * 不会因点击等而中断。
+   */
+  __isDragging = false;
 
   /**
    * {Boolean} Not touching and dragging anymore  and smoothly animating the
    * touch sequence using deceleration.
    */
-  __isDecelerating: false | number = false
+  __isDecelerating: false | number = false;
 
   /**
    * {Boolean} Smoothly animating the currently configured change
    */
-  __isAnimating: false | number = false
-
-
+  __isAnimating: false | number = false;
 
   /*
   ---------------------------------------------------------------------------
@@ -133,69 +131,67 @@ export class Scroller {
   */
 
   /** {Integer} Available outer left position (from document perspective) */
-  __clientLeft = 0
+  __clientLeft = 0;
 
   /** {Integer} Available outer top position (from document perspective) */
-  __clientTop = 0
+  __clientTop = 0;
 
   /** {Integer} Available outer width */
-  __clientWidth = 0
+  __clientWidth = 0;
 
   /** {Integer} Available outer height */
-  __clientHeight = 0
+  __clientHeight = 0;
 
   /** {Integer} Outer width of content */
-  __contentWidth = 0
+  __contentWidth = 0;
 
   /** {Integer} Outer height of content */
-  __contentHeight = 0
+  __contentHeight = 0;
 
   /** {Integer} Snapping width for content */
-  __snapWidth = 100
+  __snapWidth = 100;
 
   /** {Integer} Snapping height for content */
-  __snapHeight = 100
+  __snapHeight = 100;
 
   /** {Integer} Height to assign to refresh area */
-  __refreshHeight: number | null = null
+  __refreshHeight: number | null = null;
 
   /** {Boolean} Whether the refresh process is enabled when the event is released now */
-  __refreshActive = false
+  __refreshActive = false;
 
   /** {Function} Callback to execute on activation. This is for signalling the user about a refresh is about to happen when he release */
-  __refreshActivate: (EmptyFun) | null = null
+  __refreshActivate: EmptyFun | null = null;
 
   /** {Function} Callback to execute on deactivation. This is for signalling the user about the refresh being cancelled */
-  __refreshDeactivate: (EmptyFun) | null = null
+  __refreshDeactivate: EmptyFun | null = null;
 
   /** {Function} Callback to execute to start the actual refresh. Call {@link #refreshFinish} when done */
-  __refreshStart: (EmptyFun) | null = null
+  __refreshStart: EmptyFun | null = null;
 
   /** {Number} Zoom level */
-  __zoomLevel = 1
+  __zoomLevel = 1;
 
   /** {Number} Scroll position on x-axis */
-  __scrollLeft = 0
+  __scrollLeft = 0;
 
   /** {Number} Scroll position on y-axis */
-  __scrollTop = 0
+  __scrollTop = 0;
 
   /** {Integer} Maximum allowed scroll position on x-axis */
-  __maxScrollLeft = 0
+  __maxScrollLeft = 0;
 
   /** {Integer} Maximum allowed scroll position on y-axis */
-  __maxScrollTop = 0
+  __maxScrollTop = 0;
 
   /* {Number} Scheduled left position (final position when animating) */
-  __scheduledLeft = 0
+  __scheduledLeft = 0;
 
   /* {Number} Scheduled top position (final position when animating) */
-  __scheduledTop = 0
+  __scheduledTop = 0;
 
   /* {Number} Scheduled zoom level (final scale when animating) */
-  __scheduledZoom = 0
-
-
+  __scheduledZoom = 0;
 
   /*
   ---------------------------------------------------------------------------
@@ -204,18 +200,16 @@ export class Scroller {
   */
 
   /** {Number} Left position of finger at start */
-  __lastTouchLeft = 0
+  __lastTouchLeft = 0;
 
   /** {Number} Top position of finger at start */
-  __lastTouchTop = 0
+  __lastTouchTop = 0;
 
   /** {Date} Timestamp of last move of finger. Used to limit tracking range for deceleration speed. */
-  __lastTouchMove = 0
+  __lastTouchMove = 0;
 
   /** {Array} List of positions  uses three indexes for each state = left  top  timestamp */
-  __positions: number[] = []
-
-
+  __positions: number[] = [];
 
   /*
   ---------------------------------------------------------------------------
@@ -227,9 +221,13 @@ export class Scroller {
    * All values which are falsy (null or zero etc.) are ignored and the old value is kept.
    *
    */
-  setDimensions(clientWidth: number, clientHeight: number, contentWidth: number, contentHeight: number) {
-
-    var self = this;
+  setDimensions(
+    clientWidth: number,
+    clientHeight: number,
+    contentWidth: number,
+    contentHeight: number
+  ) {
+    const self = this;
 
     // Only update values which are defined
     if (clientWidth === +clientWidth) {
@@ -253,9 +251,7 @@ export class Scroller {
 
     // Refresh scroll position
     self.scrollTo(self.__scrollLeft, self.__scrollTop, true);
-
   }
-
 
   /**
    * Sets the client coordinates in relation to the document.
@@ -264,21 +260,19 @@ export class Scroller {
    * @param top {Integer ? 0} Top position of outer element
    */
   setPosition(left: number, top: number) {
-    var self = this;
+    const self = this;
     self.__clientLeft = left || 0;
     self.__clientTop = top || 0;
   }
-
 
   /**
    * 配置捕捉（当捕捉处于活动状态时）
    */
   setSnapSize(width: number, height: number) {
-    var self = this;
+    const self = this;
     self.__snapWidth = width;
     self.__snapHeight = height;
   }
-
 
   /**
    * * 激活下拉刷新。列表顶部有一个特殊区域，每当
@@ -286,18 +280,22 @@ export class Scroller {
    * * 官方 Twitter 客户端。
    * *
    * @param height {Integer} 渲染列表顶部下拉刷新区域的高度
-* @param activateCallback {Function} 激活时执行的回调。这是为了向用户发出信号，告知用户在他释放时即将发生刷新。
-* @param deactivateCallback {Function} 停用时执行的回调。这是为了向用户发出信号，告知刷新已取消。
-* @param startCallback {Function} 执行回调以启动真正的异步刷新操作。刷新完成后调用 {@link #finishPullToRefresh}。
-    */
-  activatePullToRefresh(height: number, activateCallback: EmptyFun, deactivateCallback: EmptyFun, startCallback: EmptyFun) {
-    var self = this;
+   * @param activateCallback {Function} 激活时执行的回调。这是为了向用户发出信号，告知用户在他释放时即将发生刷新。
+   * @param deactivateCallback {Function} 停用时执行的回调。这是为了向用户发出信号，告知刷新已取消。
+   * @param startCallback {Function} 执行回调以启动真正的异步刷新操作。刷新完成后调用 {@link #finishPullToRefresh}。
+   */
+  activatePullToRefresh(
+    height: number,
+    activateCallback: EmptyFun,
+    deactivateCallback: EmptyFun,
+    startCallback: EmptyFun
+  ) {
+    const self = this;
     self.__refreshHeight = height;
     self.__refreshActivate = activateCallback;
     self.__refreshDeactivate = deactivateCallback;
     self.__refreshStart = startCallback;
   }
-
 
   /**
    * 手动开始下拉刷新。
@@ -306,71 +304,74 @@ export class Scroller {
     // 使用 publish 而不是 scrollTo 来允许滚动到边界位置之外
     // 我们不需要在这里规范化 scrollLeft、zoomLevel 等，因为我们只在启用下拉刷新时进行 y 滚动
     if (this.__refreshHeight !== null) {
-      this.__publish(this.__scrollLeft, -this.__refreshHeight, this.__zoomLevel, true);
+      this.__publish(
+        this.__scrollLeft,
+        -this.__refreshHeight,
+        this.__zoomLevel,
+        true
+      );
     }
 
-    this.__refreshStart?.()
+    this.__refreshStart?.();
   }
-
 
   /**
    * 表示下拉刷新已完成。
    */
   finishPullToRefresh() {
-    var self = this;
+    const self = this;
     self.__refreshActive = false;
     self.__refreshDeactivate?.();
     self.scrollTo(self.__scrollLeft, self.__scrollTop, true);
   }
-
 
   /**
    * 返回滚动位置和缩放值
    * @return {Map} `left` and `top` scroll position and `zoom` level
    */
   getValues() {
-
-    var self = this;
+    const self = this;
 
     return {
       left: self.__scrollLeft,
       top: self.__scrollTop,
-      zoom: self.__zoomLevel
+      zoom: self.__zoomLevel,
     };
-
   }
-
 
   /**
    * 返回最大滚动值
    * @return {Map} `left` and `top` maximum scroll values
    */
   getScrollMax() {
-
-    var self = this;
+    const self = this;
 
     return {
       left: self.__maxScrollLeft,
-      top: self.__maxScrollTop
+      top: self.__maxScrollTop,
     };
-
   }
 
-
   /**
-  * 缩放至指定级别。支持可选动画。缩放
-  * 未指定坐标时缩放至中心。
-  *
-  * @param level {Number} 缩放至的级别
-  * @param animate {Boolean ? false} 是否使用动画
-  * @param originLeft {Number ? null} 在指定的左侧坐标处放大
-  * @param originTop {Number ? null} 在指定的顶部坐标处放大
-  * @param callback {Function ? null} 缩放完成时触发的回调。
-  */
-  zoomTo(level: number, animate?: boolean, originLeft?: number, originTop?: number, callback?: EmptyFun) {
-    var self = this;
+   * 缩放至指定级别。支持可选动画。缩放
+   * 未指定坐标时缩放至中心。
+   *
+   * @param level {Number} 缩放至的级别
+   * @param animate {Boolean ? false} 是否使用动画
+   * @param originLeft {Number ? null} 在指定的左侧坐标处放大
+   * @param originTop {Number ? null} 在指定的顶部坐标处放大
+   * @param callback {Function ? null} 缩放完成时触发的回调。
+   */
+  zoomTo(
+    level: number,
+    animate?: boolean,
+    originLeft?: number,
+    originTop?: number,
+    callback?: EmptyFun
+  ) {
+    const self = this;
     if (!self.options.zooming) {
-      throw new Error("Zooming is not enabled!");
+      throw new Error('Zooming is not enabled!');
     }
     // Add callback if exists
     if (callback) {
@@ -381,7 +382,7 @@ export class Scroller {
       Animate.stop(self.__isDecelerating);
       self.__isDecelerating = false;
     }
-    var oldLevel = self.__zoomLevel;
+    const oldLevel = self.__zoomLevel;
     // Normalize input origin to center of viewport if not defined
     if (originLeft == null) {
       originLeft = self.__clientWidth / 2;
@@ -390,12 +391,16 @@ export class Scroller {
       originTop = self.__clientHeight / 2;
     }
     // Limit level according to configuration
-    level = Math.max(Math.min(level, self.options.maxZoom), self.options.minZoom);
+    level = Math.max(
+      Math.min(level, self.options.maxZoom),
+      self.options.minZoom
+    );
     // Recompute maximum values while temporary tweaking maximum scroll ranges
     self.__computeScrollMax(level);
     // Recompute left and top coordinates based on new zoom level
-    var left = ((originLeft + self.__scrollLeft) * level / oldLevel) - originLeft;
-    var top = ((originTop + self.__scrollTop) * level / oldLevel) - originTop;
+    let left =
+      ((originLeft + self.__scrollLeft) * level) / oldLevel - originLeft;
+    let top = ((originTop + self.__scrollTop) * level) / oldLevel - originTop;
     // Limit x-axis
     if (left > self.__maxScrollLeft) {
       left = self.__maxScrollLeft;
@@ -412,32 +417,41 @@ export class Scroller {
     self.__publish(left, top, level, animate);
   }
 
-
-  /*** 
+  /***
    * 按给定的倍数缩放内容。
-*
-* @param factor {Number} 按给定的倍数缩放
-* @param animate {Boolean ? false} 是否使用动画
-* @param originLeft {Number ? 0} 在给定的左侧坐标处放大
-* @param originTop {Number ? 0} 在给定的顶部坐标处放大
-* @param callback {Function ? null} 缩放完成时触发的回调。
+   *
+   * @param factor {Number} 按给定的倍数缩放
+   * @param animate {Boolean ? false} 是否使用动画
+   * @param originLeft {Number ? 0} 在给定的左侧坐标处放大
+   * @param originTop {Number ? 0} 在给定的顶部坐标处放大
+   * @param callback {Function ? null} 缩放完成时触发的回调。
    */
-  zoomBy(factor: number, animate?: boolean, originLeft = 0, originTop = 0, callback?: EmptyFun) {
-    var self = this;
-    self.zoomTo(self.__zoomLevel * factor, animate, originLeft, originTop, callback);
+  zoomBy(
+    factor: number,
+    animate?: boolean,
+    originLeft = 0,
+    originTop = 0,
+    callback?: EmptyFun
+  ) {
+    const self = this;
+    self.zoomTo(
+      self.__zoomLevel * factor,
+      animate,
+      originLeft,
+      originTop,
+      callback
+    );
   }
 
-
   /*** 滚动到指定位置。遵守限制并自动捕捉。
-*
-* @param left {Number?null} 水平滚动位置，如果值为 <code>null</code>，则保持当前位置
-* @param top {Number?null} 垂直滚动位置，如果值为 <code>null</code>，则保持当前位置
-* @param animate {Boolean?false} 是否应使用动画进行滚动
-* @param zoom {Number?null} 要达到的缩放级别
+   *
+   * @param left {Number?null} 水平滚动位置，如果值为 <code>null</code>，则保持当前位置
+   * @param top {Number?null} 垂直滚动位置，如果值为 <code>null</code>，则保持当前位置
+   * @param animate {Boolean?false} 是否应使用动画进行滚动
+   * @param zoom {Number?null} 要达到的缩放级别
    */
   scrollTo(left: number, top: number, animate?: boolean, zoom?: number) {
-
-    var self = this;
+    const self = this;
     // 停止减速
     if (self.__isDecelerating) {
       Animate.stop(self.__isDecelerating);
@@ -445,9 +459,8 @@ export class Scroller {
     }
     // 根据新的缩放级别更正坐标
     if (zoom != null && zoom !== self.__zoomLevel) {
-
       if (!self.options.zooming) {
-        throw new Error("Zooming is not enabled!");
+        throw new Error('Zooming is not enabled!');
       }
 
       left *= zoom;
@@ -495,19 +508,20 @@ export class Scroller {
     self.__publish(left, top, zoom, animate);
   }
 
-
   /**
    * 按给定的偏移量滚动
    * Scroll by the given offset
    */
   scrollBy(left: number, top: number, animate?: boolean) {
-    var self = this;
-    var startLeft = self.__isAnimating ? self.__scheduledLeft : self.__scrollLeft;
-    var startTop = self.__isAnimating ? self.__scheduledTop : self.__scrollTop;
+    const self = this;
+    const startLeft = self.__isAnimating
+      ? self.__scheduledLeft
+      : self.__scrollLeft;
+    const startTop = self.__isAnimating
+      ? self.__scheduledTop
+      : self.__scrollTop;
     self.scrollTo(startLeft + (left || 0), startTop + (top || 0), animate);
   }
-
-
 
   /*
   ---------------------------------------------------------------------------
@@ -515,18 +529,20 @@ export class Scroller {
   ---------------------------------------------------------------------------
   */
 
-  /*** 
+  /***
    * 鼠标滚轮处理程序用于缩放支持
    */
   doMouseZoom(wheelDelta: number, pageX: number, pageY: number) {
+    const self = this;
+    const change = wheelDelta > 0 ? 0.97 : 1.03;
 
-    var self = this;
-    var change = wheelDelta > 0 ? 0.97 : 1.03;
-
-    return self.zoomTo(self.__zoomLevel * change, false, pageX - self.__clientLeft, pageY - self.__clientTop);
-
+    return self.zoomTo(
+      self.__zoomLevel * change,
+      false,
+      pageX - self.__clientLeft,
+      pageY - self.__clientTop
+    );
   }
-
 
   /**
    * Touch start handler for scrolling support
@@ -534,17 +550,17 @@ export class Scroller {
   doTouchStart(touches: ReadArray<PagePoint>, timeStamp: number | Date) {
     // Array-like check is enough here
     if (touches.length == null) {
-      throw new Error("Invalid touch list: " + touches);
+      throw new Error(`Invalid touch list: ${touches}`);
     }
 
     if (timeStamp instanceof Date) {
       timeStamp = timeStamp.valueOf();
     }
-    if (typeof timeStamp !== "number") {
-      throw new Error("Invalid timestamp value: " + timeStamp);
+    if (typeof timeStamp !== 'number') {
+      throw new Error(`Invalid timestamp value: ${timeStamp}`);
     }
 
-    var self = this;
+    const self = this;
 
     // Reset interruptedAnimation flag
     self.__interruptedAnimation = true;
@@ -564,8 +580,8 @@ export class Scroller {
     }
 
     // Use center point when dealing with two fingers
-    var currentTouchLeft, currentTouchTop;
-    var isSingleTouch = touches.length === 1;
+    let currentTouchLeft, currentTouchTop;
+    const isSingleTouch = touches.length === 1;
     if (isSingleTouch) {
       currentTouchLeft = touches[0].pageX;
       currentTouchTop = touches[0].pageY;
@@ -606,36 +622,36 @@ export class Scroller {
 
     // Clearing data structure
     self.__positions = [];
-
   }
-
 
   /**
    * Touch move handler for scrolling support
    */
-  doTouchMove(touches: ReadArray<PagePoint>, timeStamp: number | Date, scale?: number) {
-
+  doTouchMove(
+    touches: ReadArray<PagePoint>,
+    timeStamp: number | Date,
+    scale?: number
+  ) {
     // Array-like check is enough here
     if (touches.length == null) {
-      throw new Error("Invalid touch list: " + touches);
+      throw new Error(`Invalid touch list: ${touches}`);
     }
 
     if (timeStamp instanceof Date) {
       timeStamp = timeStamp.valueOf();
     }
-    if (typeof timeStamp !== "number") {
-      throw new Error("Invalid timestamp value: " + timeStamp);
+    if (typeof timeStamp !== 'number') {
+      throw new Error(`Invalid timestamp value: ${timeStamp}`);
     }
 
-    var self = this;
+    const self = this;
 
     // Ignore event when tracking is not enabled (event might be outside of element)
     if (!self.__isTracking) {
       return;
     }
 
-
-    var currentTouchLeft, currentTouchTop;
+    let currentTouchLeft, currentTouchTop;
 
     // Compute move based around of center of fingers
     if (touches.length === 2) {
@@ -646,105 +662,94 @@ export class Scroller {
       currentTouchTop = touches[0].pageY;
     }
 
-    var positions = self.__positions;
+    const positions = self.__positions;
 
     // Are we already is dragging mode?
     if (self.__isDragging) {
-
       // Compute move distance
-      var moveX = currentTouchLeft - self.__lastTouchLeft;
-      var moveY = currentTouchTop - self.__lastTouchTop;
+      const moveX = currentTouchLeft - self.__lastTouchLeft;
+      const moveY = currentTouchTop - self.__lastTouchTop;
 
       // Read previous scroll position and zooming
-      var scrollLeft = self.__scrollLeft;
-      var scrollTop = self.__scrollTop;
-      var level = self.__zoomLevel;
+      let scrollLeft = self.__scrollLeft;
+      let scrollTop = self.__scrollTop;
+      let level = self.__zoomLevel;
 
       // Work with scaling
       if (scale != null && self.options.zooming) {
-
-        var oldLevel = level;
+        const oldLevel = level;
 
         // Recompute level based on previous scale and new scale
-        level = level / self.__lastScale * scale;
+        level = (level / self.__lastScale) * scale;
 
         // Limit level according to configuration
-        level = Math.max(Math.min(level, self.options.maxZoom), self.options.minZoom);
+        level = Math.max(
+          Math.min(level, self.options.maxZoom),
+          self.options.minZoom
+        );
 
         // Only do further compution when change happened
         if (oldLevel !== level) {
-
           // Compute relative event position to container
-          var currentTouchLeftRel = currentTouchLeft - self.__clientLeft;
-          var currentTouchTopRel = currentTouchTop - self.__clientTop;
+          const currentTouchLeftRel = currentTouchLeft - self.__clientLeft;
+          const currentTouchTopRel = currentTouchTop - self.__clientTop;
 
           // Recompute left and top coordinates based on new zoom level
-          scrollLeft = ((currentTouchLeftRel + scrollLeft) * level / oldLevel) - currentTouchLeftRel;
-          scrollTop = ((currentTouchTopRel + scrollTop) * level / oldLevel) - currentTouchTopRel;
+          scrollLeft =
+            ((currentTouchLeftRel + scrollLeft) * level) / oldLevel -
+            currentTouchLeftRel;
+          scrollTop =
+            ((currentTouchTopRel + scrollTop) * level) / oldLevel -
+            currentTouchTopRel;
 
           // Recompute max scroll values
           self.__computeScrollMax(level);
-
         }
       }
 
       if (self.__enableScrollX) {
-
         scrollLeft -= moveX * this.options.speedMultiplier;
-        var maxScrollLeft = self.__maxScrollLeft;
+        const maxScrollLeft = self.__maxScrollLeft;
 
         if (scrollLeft > maxScrollLeft || scrollLeft < 0) {
-
           // Slow down on the edges
           if (self.options.bouncing) {
-
-            scrollLeft += (moveX / 2 * this.options.speedMultiplier);
-
+            scrollLeft += (moveX / 2) * this.options.speedMultiplier;
           } else if (scrollLeft > maxScrollLeft) {
-
             scrollLeft = maxScrollLeft;
-
           } else {
-
             scrollLeft = 0;
-
           }
         }
       }
 
       // Compute new vertical scroll position
       if (self.__enableScrollY) {
-
         scrollTop -= moveY * this.options.speedMultiplier;
-        var maxScrollTop = self.__maxScrollTop;
+        const maxScrollTop = self.__maxScrollTop;
 
         if (scrollTop > maxScrollTop || scrollTop < 0) {
-
           // Slow down on the edges
           if (self.options.bouncing) {
-
-            scrollTop += (moveY / 2 * this.options.speedMultiplier);
+            scrollTop += (moveY / 2) * this.options.speedMultiplier;
 
             // Support pull-to-refresh (only when only y is scrollable)
             if (!self.__enableScrollX && self.__refreshHeight != null) {
-
               if (!self.__refreshActive && scrollTop <= -self.__refreshHeight) {
                 self.__refreshActive = true;
                 self.__refreshActivate?.();
-              } else if (self.__refreshActive && scrollTop > -self.__refreshHeight) {
+              } else if (
+                self.__refreshActive &&
+                scrollTop > -self.__refreshHeight
+              ) {
                 self.__refreshActive = false;
                 self.__refreshDeactivate?.();
               }
             }
-
           } else if (scrollTop > maxScrollTop) {
-
             scrollTop = maxScrollTop;
-
           } else {
-
             scrollTop = 0;
-
           }
         }
       }
@@ -762,23 +767,26 @@ export class Scroller {
 
       // Otherwise figure out whether we are switching into dragging mode now.
     } else {
+      const minimumTrackingForScroll = self.options.locking ? 3 : 0;
+      const minimumTrackingForDrag = 5;
 
-      var minimumTrackingForScroll = self.options.locking ? 3 : 0;
-      var minimumTrackingForDrag = 5;
+      const distanceX = Math.abs(currentTouchLeft - self.__initialTouchLeft);
+      const distanceY = Math.abs(currentTouchTop - self.__initialTouchTop);
 
-      var distanceX = Math.abs(currentTouchLeft - self.__initialTouchLeft);
-      var distanceY = Math.abs(currentTouchTop - self.__initialTouchTop);
-
-      self.__enableScrollX = self.options.scrollingX && distanceX >= minimumTrackingForScroll;
-      self.__enableScrollY = self.options.scrollingY && distanceY >= minimumTrackingForScroll;
+      self.__enableScrollX =
+        self.options.scrollingX && distanceX >= minimumTrackingForScroll;
+      self.__enableScrollY =
+        self.options.scrollingY && distanceY >= minimumTrackingForScroll;
 
       positions.push(self.__scrollLeft, self.__scrollTop, timeStamp);
 
-      self.__isDragging = (self.__enableScrollX || self.__enableScrollY) && (distanceX >= minimumTrackingForDrag || distanceY >= minimumTrackingForDrag);
+      self.__isDragging =
+        (self.__enableScrollX || self.__enableScrollY) &&
+        (distanceX >= minimumTrackingForDrag ||
+          distanceY >= minimumTrackingForDrag);
       if (self.__isDragging) {
         self.__interruptedAnimation = false;
       }
-
     }
 
     // Update last touch positions and time stamp for next event
@@ -786,23 +794,20 @@ export class Scroller {
     self.__lastTouchTop = currentTouchTop;
     self.__lastTouchMove = timeStamp;
     self.__lastScale = scale || 1;
-
   }
-
 
   /**
    * Touch end handler for scrolling support
    */
   doTouchEnd(timeStamp: number | Date) {
-
     if (timeStamp instanceof Date) {
       timeStamp = timeStamp.valueOf();
     }
-    if (typeof timeStamp !== "number") {
-      throw new Error("Invalid timestamp value: " + timeStamp);
+    if (typeof timeStamp !== 'number') {
+      throw new Error(`Invalid timestamp value: ${timeStamp}`);
     }
 
-    var self = this;
+    const self = this;
     // 当未启用跟踪时忽略事件（元素上没有 touchstart 事件）
     // 这是必需的，因为此监听器（“touchmove”）位于文档上，而不是元素本身上。
     if (!self.__isTracking) {
@@ -816,13 +821,21 @@ export class Scroller {
       self.__isDragging = false;
       // 开始减速
       // 验证检测到的最后移动是否在某个相关的时间范围内
-      if (self.__isSingleTouch && self.options.animating && (timeStamp - self.__lastTouchMove) <= 100) {
+      if (
+        self.__isSingleTouch &&
+        self.options.animating &&
+        timeStamp - self.__lastTouchMove <= 100
+      ) {
         // 然后找出大约 100 毫秒前的滚动位置
-        var positions = self.__positions;
-        var endPos = positions.length - 1;
-        var startPos = endPos;
+        const positions = self.__positions;
+        const endPos = positions.length - 1;
+        let startPos = endPos;
         // 将指针移动到 100 毫秒前测量的位置
-        for (var i = endPos; i > 0 && positions[i] > (self.__lastTouchMove - 100); i -= 3) {
+        for (
+          let i = endPos;
+          i > 0 && positions[i] > self.__lastTouchMove - 100;
+          i -= 3
+        ) {
           startPos = i;
         }
 
@@ -841,40 +854,55 @@ export class Scroller {
           */
         if (startPos !== endPos) {
           // 计算这两点之间的相对运动
-          var timeOffset = positions[endPos] - positions[startPos];
-          var movedLeft = self.__scrollLeft - positions[startPos - 2];
-          var movedTop = self.__scrollTop - positions[startPos - 1];
+          const timeOffset = positions[endPos] - positions[startPos];
+          const movedLeft = self.__scrollLeft - positions[startPos - 2];
+          const movedTop = self.__scrollTop - positions[startPos - 1];
           // 基于 50ms 计算每个渲染步骤所需的移动量
-          var __decelerationVelocityX = movedLeft / timeOffset * (1000 / 60);
-          var __decelerationVelocityY = movedTop / timeOffset * (1000 / 60);
+          let __decelerationVelocityX = (movedLeft / timeOffset) * (1000 / 60);
+          let __decelerationVelocityY = (movedTop / timeOffset) * (1000 / 60);
           // 需要多少速度来开始减速
-          var minVelocityToStartDeceleration = self.options.paging || self.options.snapping ? 4 : 1;
+          const minVelocityToStartDeceleration =
+            self.options.paging || self.options.snapping ? 4 : 1;
           // 验证我们是否有足够的速度来开始减速
-          if (Math.abs(__decelerationVelocityX) > minVelocityToStartDeceleration || Math.abs(__decelerationVelocityY) > minVelocityToStartDeceleration) {
+          if (
+            Math.abs(__decelerationVelocityX) >
+              minVelocityToStartDeceleration ||
+            Math.abs(__decelerationVelocityY) > minVelocityToStartDeceleration
+          ) {
             // 减速时停用下拉刷新
             if (!self.__refreshActive) {
               /*** 当触摸序列结束且手指速度足够高时调用
-            * 切换到减速模式。
+               * 切换到减速模式。
                */
               /** {Integer} Minimum left scroll position during deceleration */
-              let __minDecelerationScrollLeft = 0
+              let __minDecelerationScrollLeft = 0;
               /** {Integer} Minimum top scroll position during deceleration */
-              let __minDecelerationScrollTop = 0
+              let __minDecelerationScrollTop = 0;
               /** {Integer} Maximum left scroll position during deceleration */
-              let __maxDecelerationScrollLeft = 0
+              let __maxDecelerationScrollLeft = 0;
               /** {Integer} Maximum top scroll position during deceleration */
-              let __maxDecelerationScrollTop = 0
+              let __maxDecelerationScrollTop = 0;
               if (self.options.paging) {
-                var scrollLeft = Math.max(Math.min(self.__scrollLeft, self.__maxScrollLeft), 0);
-                var scrollTop = Math.max(Math.min(self.__scrollTop, self.__maxScrollTop), 0);
-                var clientWidth = self.__clientWidth;
-                var clientHeight = self.__clientHeight;
+                const scrollLeft = Math.max(
+                  Math.min(self.__scrollLeft, self.__maxScrollLeft),
+                  0
+                );
+                const scrollTop = Math.max(
+                  Math.min(self.__scrollTop, self.__maxScrollTop),
+                  0
+                );
+                const clientWidth = self.__clientWidth;
+                const clientHeight = self.__clientHeight;
                 // 我们将减速限制在允许范围的最小/最大值，而不是可见客户区的大小。
                 // 每个页面应具有与客户区完全相同的大小。
-                __minDecelerationScrollLeft = Math.floor(scrollLeft / clientWidth) * clientWidth;
-                __minDecelerationScrollTop = Math.floor(scrollTop / clientHeight) * clientHeight;
-                __maxDecelerationScrollLeft = Math.ceil(scrollLeft / clientWidth) * clientWidth;
-                __maxDecelerationScrollTop = Math.ceil(scrollTop / clientHeight) * clientHeight;
+                __minDecelerationScrollLeft =
+                  Math.floor(scrollLeft / clientWidth) * clientWidth;
+                __minDecelerationScrollTop =
+                  Math.floor(scrollTop / clientHeight) * clientHeight;
+                __maxDecelerationScrollLeft =
+                  Math.ceil(scrollLeft / clientWidth) * clientWidth;
+                __maxDecelerationScrollTop =
+                  Math.ceil(scrollTop / clientHeight) * clientHeight;
               } else {
                 __minDecelerationScrollLeft = 0;
                 __minDecelerationScrollTop = 0;
@@ -882,25 +910,33 @@ export class Scroller {
                 __maxDecelerationScrollTop = self.__maxScrollTop;
               }
               // 需要多少速度才能保持减速运行
-              var minVelocityToKeepDecelerating = self.options.snapping ? 4 : 0.1;
+              const minVelocityToKeepDecelerating = self.options.snapping
+                ? 4
+                : 0.1;
               // 开始动画并打开标志
               self.__isDecelerating = Animate.start(
                 function (percent: number, now: number, render: boolean) {
                   // 计算下一个滚动位置
                   // 为滚动位置添加减速
                   //在动画的每个步骤上调用
-                  var scrollLeft = self.__scrollLeft + __decelerationVelocityX;
-                  var scrollTop = self.__scrollTop + __decelerationVelocityY;
+                  let scrollLeft = self.__scrollLeft + __decelerationVelocityX;
+                  let scrollTop = self.__scrollTop + __decelerationVelocityY;
                   //
                   // 非弹跳模式的硬限制滚动位置
                   //
                   if (!self.options.bouncing) {
-                    var scrollLeftFixed = Math.max(Math.min(__maxDecelerationScrollLeft, scrollLeft), __minDecelerationScrollLeft);
+                    const scrollLeftFixed = Math.max(
+                      Math.min(__maxDecelerationScrollLeft, scrollLeft),
+                      __minDecelerationScrollLeft
+                    );
                     if (scrollLeftFixed !== scrollLeft) {
                       scrollLeft = scrollLeftFixed;
                       __decelerationVelocityX = 0;
                     }
-                    var scrollTopFixed = Math.max(Math.min(__maxDecelerationScrollTop, scrollTop), __minDecelerationScrollTop);
+                    const scrollTopFixed = Math.max(
+                      Math.min(__maxDecelerationScrollTop, scrollTop),
+                      __minDecelerationScrollTop
+                    );
                     if (scrollTopFixed !== scrollTop) {
                       scrollTop = scrollTopFixed;
                       __decelerationVelocityY = 0;
@@ -923,7 +959,7 @@ export class Scroller {
                     // 这是应用于动画每次迭代的因素
                     // 以减慢进程。这应该模拟自然行为，其中
                     // 当移动发起者被移除时，物体会减速
-                    var frictionFactor = self.options.decelerationRate;
+                    const frictionFactor = self.options.decelerationRate;
 
                     __decelerationVelocityX *= frictionFactor;
                     __decelerationVelocityY *= frictionFactor;
@@ -932,11 +968,13 @@ export class Scroller {
                   // BOUNCING SUPPORT
                   //
                   if (self.options.bouncing) {
-                    var scrollOutsideX = 0;
-                    var scrollOutsideY = 0;
+                    let scrollOutsideX = 0;
+                    let scrollOutsideY = 0;
                     // 这配置了到达边界时减速/加速的变化量
-                    var penetrationDeceleration = self.options.penetrationDeceleration;
-                    var penetrationAcceleration = self.options.penetrationAcceleration;
+                    const penetrationDeceleration =
+                      self.options.penetrationDeceleration;
+                    const penetrationAcceleration =
+                      self.options.penetrationAcceleration;
 
                     // Check limits
                     if (scrollLeft < __minDecelerationScrollLeft) {
@@ -953,17 +991,21 @@ export class Scroller {
                     // 减速直到足够慢，然后翻转回捕捉位置
                     if (scrollOutsideX !== 0) {
                       if (scrollOutsideX * __decelerationVelocityX <= 0) {
-                        __decelerationVelocityX += scrollOutsideX * penetrationDeceleration;
+                        __decelerationVelocityX +=
+                          scrollOutsideX * penetrationDeceleration;
                       } else {
-                        __decelerationVelocityX = scrollOutsideX * penetrationAcceleration;
+                        __decelerationVelocityX =
+                          scrollOutsideX * penetrationAcceleration;
                       }
                     }
 
                     if (scrollOutsideY !== 0) {
                       if (scrollOutsideY * __decelerationVelocityY <= 0) {
-                        __decelerationVelocityY += scrollOutsideY * penetrationDeceleration;
+                        __decelerationVelocityY +=
+                          scrollOutsideY * penetrationDeceleration;
                       } else {
-                        __decelerationVelocityY = scrollOutsideY * penetrationAcceleration;
+                        __decelerationVelocityY =
+                          scrollOutsideY * penetrationAcceleration;
                       }
                     }
                   }
@@ -971,7 +1013,11 @@ export class Scroller {
                 // 检测是否仍然值得继续动画步骤
                 // 如果我们已经慢到用户无法察觉的程度，我们就在这里停止整个过程。
                 function () {
-                  var shouldContinue = Math.abs(__decelerationVelocityX) >= minVelocityToKeepDecelerating || Math.abs(__decelerationVelocityY) >= minVelocityToKeepDecelerating;
+                  const shouldContinue =
+                    Math.abs(__decelerationVelocityX) >=
+                      minVelocityToKeepDecelerating ||
+                    Math.abs(__decelerationVelocityY) >=
+                      minVelocityToKeepDecelerating;
                   if (!shouldContinue) {
                     self.__didDecelerationComplete = true;
                   }
@@ -983,14 +1029,19 @@ export class Scroller {
                     self.options.scrollingComplete();
                   }
                   // 当捕捉处于活动状态时，动画到网格，否则只需修复边界外的位置
-                  self.scrollTo(self.__scrollLeft, self.__scrollTop, self.options.snapping);
-                });
+                  self.scrollTo(
+                    self.__scrollLeft,
+                    self.__scrollTop,
+                    self.options.snapping
+                  );
+                }
+              );
             }
           }
         } else {
           self.options.scrollingComplete();
         }
-      } else if ((timeStamp - self.__lastTouchMove) > 100) {
+      } else if (timeStamp - self.__lastTouchMove > 100) {
         self.options.scrollingComplete();
       }
     }
@@ -1005,14 +1056,24 @@ export class Scroller {
         // 使用 publish 而不是 scrollTo 来允许滚动到边界位置之外
         // 我们不需要在这里规范化 scrollLeft、zoomLevel 等，因为我们只在启用下拉刷新时进行 y 滚动
         if (self.__refreshHeight !== null) {
-          self.__publish(self.__scrollLeft, -self.__refreshHeight, self.__zoomLevel, true);
+          self.__publish(
+            self.__scrollLeft,
+            -self.__refreshHeight,
+            self.__zoomLevel,
+            true
+          );
         }
         self.__refreshStart!();
       } else {
         if (self.__interruptedAnimation || self.__isDragging) {
           self.options.scrollingComplete();
         }
-        self.scrollTo(self.__scrollLeft, self.__scrollTop, true, self.__zoomLevel);
+        self.scrollTo(
+          self.__scrollLeft,
+          self.__scrollTop,
+          true,
+          self.__zoomLevel
+        );
         // 直接发出停用信号（刷新时无需执行任何操作？）
         if (self.__refreshActive) {
           self.__refreshActive = false;
@@ -1024,24 +1085,22 @@ export class Scroller {
     self.__positions.length = 0;
   }
 
-
-
   /*
   ---------------------------------------------------------------------------
     PRIVATE API
   ---------------------------------------------------------------------------
   */
   /**
-  * 将滚动位置应用于内容元素
-  *
-  * @param left {Number} 左侧滚动位置
-  * @param top {Number} 顶部滚动位置
-  * @param animate {Boolean?false} 是否应使用动画移动到新坐标
-  */
+   * 将滚动位置应用于内容元素
+   *
+   * @param left {Number} 左侧滚动位置
+   * @param top {Number} 顶部滚动位置
+   * @param animate {Boolean?false} 是否应使用动画移动到新坐标
+   */
   __publish(left: number, top: number, zoom: number, animate?: boolean) {
-    var self = this;
+    const self = this;
     // 记住我们是否有动画，然后我们尝试根据动画的当前“驱动”继续
-    var wasAnimating = self.__isAnimating;
+    const wasAnimating = self.__isAnimating;
     if (wasAnimating) {
       Animate.stop(wasAnimating);
       self.__isAnimating = false;
@@ -1053,23 +1112,27 @@ export class Scroller {
       self.__scheduledTop = top;
       self.__scheduledZoom = zoom;
 
-      var oldLeft = self.__scrollLeft;
-      var oldTop = self.__scrollTop;
-      var oldZoom = self.__zoomLevel;
+      const oldLeft = self.__scrollLeft;
+      const oldTop = self.__scrollTop;
+      const oldZoom = self.__zoomLevel;
 
-      var diffLeft = left - oldLeft;
-      var diffTop = top - oldTop;
-      var diffZoom = zoom - oldZoom;
+      const diffLeft = left - oldLeft;
+      const diffTop = top - oldTop;
+      const diffZoom = zoom - oldZoom;
 
       // 当基于上一个动画继续时，我们选择缓出动画而不是缓入缓出动画
       self.__isAnimating = Animate.start(
         function (percent, _, render) {
           if (render) {
-            self.__scrollLeft = oldLeft + (diffLeft * percent);
-            self.__scrollTop = oldTop + (diffTop * percent);
-            self.__zoomLevel = oldZoom + (diffZoom * percent);
+            self.__scrollLeft = oldLeft + diffLeft * percent;
+            self.__scrollTop = oldTop + diffTop * percent;
+            self.__zoomLevel = oldZoom + diffZoom * percent;
             // Push values out
-            self.__callback?.(self.__scrollLeft, self.__scrollTop, self.__zoomLevel);
+            self.__callback?.(
+              self.__scrollLeft,
+              self.__scrollTop,
+              self.__zoomLevel
+            );
           }
         },
         function (id) {
@@ -1092,9 +1155,9 @@ export class Scroller {
           }
         },
         self.options.animationDuration,
-        wasAnimating ? easeOutCubic : easeInOutCubic);
+        wasAnimating ? easeOutCubic : easeInOutCubic
+      );
     } else {
-
       self.__scheduledLeft = self.__scrollLeft = left;
       self.__scheduledTop = self.__scrollTop = top;
       self.__scheduledZoom = self.__zoomLevel = zoom;
@@ -1113,42 +1176,44 @@ export class Scroller {
     }
   }
 
-
   /**
    * 根据客户端尺寸和内容尺寸重新计算滚动最小值。
    */
   __computeScrollMax(zoomLevel?: number) {
-
-    var self = this;
+    const self = this;
 
     if (zoomLevel == null) {
       zoomLevel = self.__zoomLevel;
     }
 
-    self.__maxScrollLeft = Math.max((self.__contentWidth * zoomLevel) - self.__clientWidth, 0);
-    self.__maxScrollTop = Math.max((self.__contentHeight * zoomLevel) - self.__clientHeight, 0);
-
+    self.__maxScrollLeft = Math.max(
+      self.__contentWidth * zoomLevel - self.__clientWidth,
+      0
+    );
+    self.__maxScrollTop = Math.max(
+      self.__contentHeight * zoomLevel - self.__clientHeight,
+      0
+    );
   }
 }
-
 
 // Easing Equations (c) 2003 Robert Penner, all rights reserved.
 // Open source under the BSD License.
 
 /**
  * @param pos {Number} position between 0 (start of effect) and 1 (end of effect)
-**/
+ **/
 export function easeOutCubic(pos: number) {
-  return (Math.pow((pos - 1), 3) + 1);
-};
+  return Math.pow(pos - 1, 3) + 1;
+}
 
 /**
  * @param pos {Number} position between 0 (start of effect) and 1 (end of effect)
-**/
+ **/
 export function easeInOutCubic(pos: number) {
   if ((pos /= 0.5) < 1) {
     return 0.5 * Math.pow(pos, 3);
   }
 
-  return 0.5 * (Math.pow((pos - 2), 3) + 2);
-};
+  return 0.5 * (Math.pow(pos - 2, 3) + 2);
+}

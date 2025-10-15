@@ -1,0 +1,1 @@
+import{i as e,f as o}from"./index-BNMIKCZr.js";/* empty css              */import{createWindow as i,renderWindows as m}from"./window-Bgna2OmD.js";import{advancedThemeDemo as r}from"./advanced-theme-demo-50F27dTF.js";import"./advanced-theme-system-DiRXkFpm.js";function s(){e(()=>{i(r.panel)}),o.div({className:"absolute inset-0 flex-1 min-h-0",children:m})}export{s as default};

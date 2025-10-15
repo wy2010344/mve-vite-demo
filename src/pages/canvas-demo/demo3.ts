@@ -1,4 +1,4 @@
-import { memo, ValueOrGet, alignSelf } from 'wy-helper'
+import { memo, ValueOrGet, alignSelf } from 'wy-helper';
 import {
   hookDrawRect,
   simpleFlex,
@@ -9,7 +9,7 @@ import {
   hookStroke,
   hookDraw,
   hookAddRect,
-} from 'mve-dom-helper/canvasRender'
+} from 'mve-dom-helper/canvasRender';
 
 export default function () {
   const n = hookDrawRect({
@@ -33,12 +33,12 @@ export default function () {
         alignItems: 'center',
         alignFix: true,
         directionFix: 'around',
-      })
+      });
     },
 
     draw({ ctx, path }) {
-      hookAddRect()
-      hookFill('yellow')
+      hookAddRect();
+      hookFill('yellow');
     },
     children() {
       hookDrawRect({
@@ -46,19 +46,19 @@ export default function () {
         grow: 1,
         // width: 20,
         draw({ ctx, path }) {
-          hookAddRect()
-          hookFill('red')
+          hookAddRect();
+          hookFill('red');
         },
-      })
+      });
       hookDrawRect({
         // height: 30,
         width: 20,
         alignSelf: alignSelf('stretch'),
         draw({ ctx, path }) {
-          hookAddRect()
-          hookFill('green')
+          hookAddRect();
+          hookFill('green');
         },
-      })
+      });
       hookDrawTextWrap({
         width: 100,
         config: {
@@ -67,12 +67,12 @@ export default function () {
           fontSize: '20px',
         },
         draw(e) {
-          hookStroke(4, 'green')
+          hookStroke(4, 'green');
           e.draw({
             style: 'red',
-          })
+          });
         },
-      })
+      });
       hookDrawUrlImage({
         width: 100,
         relay: 'width',
@@ -83,11 +83,11 @@ export default function () {
         // notInLayout: true,
         padding: 20,
         draw(e) {
-          hookAddRect()
-          hookStroke(6, 'blue')
-          e.draw()
+          hookAddRect();
+          hookStroke(6, 'blue');
+          e.draw();
         },
-      })
+      });
     },
-  })
+  });
 }

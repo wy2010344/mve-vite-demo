@@ -1,22 +1,22 @@
-import { mve } from "mve-dom-helper";
-import { cns, FDomAttribute, React } from "wy-dom-helper";
-import { HookRender, If } from "./xmlRender";
-import { FPDomAttributes } from "mve-dom";
-import { renderSizeSvg } from "~/mve-icon";
-import { LuCalendar, LuUser, LuX } from "mve-icons/lu";
-import { GetValue, getValueOrGet } from "wy-helper";
-import { Task } from "./type";
+import { mve } from 'mve-dom-helper';
+import { cns } from 'wy-dom-helper';
+import { HookRender, If } from './xmlRender';
+import { FPDomAttributes } from 'mve-dom';
+import { renderSizeSvg } from '~/mve-icon';
+import { LuCalendar, LuUser, LuX } from 'mve-icons/lu';
+import { GetValue, getValueOrGet } from 'wy-helper';
+import { Task } from './type';
 
 const priorityColors = {
-  low: "daisy-badge-success",
-  medium: "daisy-badge-warning",
-  high: "daisy-badge-error",
+  low: 'daisy-badge-success',
+  medium: 'daisy-badge-warning',
+  high: 'daisy-badge-error',
 };
 
 const priorityText = {
-  low: "低",
-  medium: "中",
-  high: "高",
+  low: '低',
+  medium: '中',
+  high: '高',
 };
 
 export default function ({
@@ -28,14 +28,14 @@ export default function ({
   onDelete(id: string): void;
   getTask: GetValue<Task>;
   selected(): any;
-} & FPDomAttributes<"div">) {
+} & FPDomAttributes<'div'>) {
   return (
     <div
       {...props}
       className={function () {
         return cns(
-          "daisy-card bg-base-100 shadow-md hover:shadow-lg cursor-move transition-shadow group",
-          selected() && "bg-gray-400",
+          'daisy-card bg-base-100 shadow-md hover:shadow-lg cursor-move transition-shadow group',
+          selected() && 'bg-gray-400',
           getValueOrGet(props.className)
         );
       }}
@@ -47,12 +47,12 @@ export default function ({
           </h4>
           <button
             className="daisy-btn daisy-btn-ghost daisy-btn-xs opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => onDelete(getTask().id)}
-            onPointerDown={(e) => e.stopPropagation()}
+            onClick={e => onDelete(getTask().id)}
+            onPointerDown={e => e.stopPropagation()}
           >
             <HookRender
               render={() => {
-                LuX(renderSizeSvg, "12px");
+                LuX(renderSizeSvg, '12px');
               }}
             />
           </button>
@@ -86,7 +86,7 @@ export default function ({
                   <div className="flex items-center gap-1">
                     <HookRender
                       render={() => {
-                        LuUser(renderSizeSvg, "12px");
+                        LuUser(renderSizeSvg, '12px');
                       }}
                     />
                     <span>{() => getTask().assignee}</span>
@@ -101,7 +101,7 @@ export default function ({
                   <div className="flex items-center gap-1">
                     <HookRender
                       render={() => {
-                        LuCalendar(renderSizeSvg, "12px");
+                        LuCalendar(renderSizeSvg, '12px');
                       }}
                     />
                     <span>{() => getTask().dueDate}</span>

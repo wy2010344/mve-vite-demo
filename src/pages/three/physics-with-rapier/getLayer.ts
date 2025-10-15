@@ -1,14 +1,21 @@
-import * as THREE from "three";
-import radGrad from './rad-grad.png'
+import * as THREE from 'three';
+import radGrad from './rad-grad.png';
 const loader = new THREE.TextureLoader();
 
-function getSprite({ hasFog, color, opacity, path, pos, size }: {
-  hasFog: boolean,
-  color: THREE.Color
-  opacity: number
-  path: string
-  pos: THREE.Vector3,
-  size: number
+function getSprite({
+  hasFog,
+  color,
+  opacity,
+  path,
+  pos,
+  size,
+}: {
+  hasFog: boolean;
+  color: THREE.Color;
+  opacity: number;
+  path: string;
+  pos: THREE.Vector3;
+  size: number;
 }) {
   const spriteMat = new THREE.SpriteMaterial({
     color,
@@ -39,7 +46,7 @@ function getLayer({
 } = {}) {
   const layerGroup = new THREE.Group();
   for (let i = 0; i < numSprites; i += 1) {
-    let angle = (i / numSprites) * Math.PI * 2;
+    const angle = (i / numSprites) * Math.PI * 2;
     const pos = new THREE.Vector3(
       Math.cos(angle) * Math.random() * radius,
       Math.sin(angle) * Math.random() * radius,

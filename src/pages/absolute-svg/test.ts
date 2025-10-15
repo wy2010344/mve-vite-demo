@@ -1,12 +1,12 @@
-import { createSignal } from 'wy-helper'
-import { fdom, fsvg } from 'mve-dom'
-import { renderALayout } from 'mve-dom-helper'
+import { createSignal } from 'wy-helper';
+import { fdom, fsvg } from 'mve-dom';
+import { renderALayout } from 'mve-dom-helper';
 
 // 简单测试版本 - 确保基本功能工作
 export default function () {
-  const ballX = createSignal(100)
-  const ballY = createSignal(100)
-  
+  const ballX = createSignal(100);
+  const ballY = createSignal(100);
+
   return renderALayout({
     width: 400,
     height: 300,
@@ -29,9 +29,9 @@ export default function () {
               fsvg.rect({
                 width: 400,
                 height: 300,
-                fill: 'rgba(0,0,0,0.2)'
-              })
-              
+                fill: 'rgba(0,0,0,0.2)',
+              });
+
               // 测试小球
               fsvg.circle({
                 cx: ballX.get(),
@@ -42,11 +42,11 @@ export default function () {
                 strokeWidth: 2,
                 s_cursor: 'pointer',
                 onClick() {
-                  ballX.set(Math.random() * 360 + 20)
-                  ballY.set(Math.random() * 260 + 20)
-                }
-              })
-              
+                  ballX.set(Math.random() * 360 + 20);
+                  ballY.set(Math.random() * 260 + 20);
+                },
+              });
+
               // 说明文字
               fsvg.text({
                 x: 200,
@@ -54,12 +54,12 @@ export default function () {
                 textAnchor: 'middle',
                 fill: 'white',
                 fontSize: '16px',
-                children: '点击小球移动位置'
-              })
-            }
-          })
-        }
-      })
-    }
-  })
+                children: '点击小球移动位置',
+              });
+            },
+          });
+        },
+      });
+    },
+  });
 }

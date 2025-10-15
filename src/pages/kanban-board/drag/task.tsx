@@ -1,13 +1,13 @@
-import { GetValue } from "wy-helper";
-import { Task } from "../type";
-import { HookRender, If } from "../xmlRender";
-import { LuCalendar, LuUser, LuX } from "mve-icons/lu";
-import { renderSizeSvg } from "../../../mve-icon";
-import { mve } from "mve-dom-helper";
-import Indicator from "./indicator";
-import { cns } from "wy-dom-helper";
-import { TaskContext } from "./context";
-import CardBase from "../cardBase";
+import { GetValue } from 'wy-helper';
+import { Task } from '../type';
+import { HookRender, If } from '../xmlRender';
+import { LuCalendar, LuUser, LuX } from 'mve-icons/lu';
+import { renderSizeSvg } from '../../../mve-icon';
+import { mve } from 'mve-dom-helper';
+import Indicator from './indicator';
+import { cns } from 'wy-dom-helper';
+import { TaskContext } from './context';
+import CardBase from '../cardBase';
 export default function ({
   getTask,
   onDelete,
@@ -25,7 +25,7 @@ export default function ({
         selected={() => dragId.get() == getTask().id}
         draggable
         onDragStart={onDragStart}
-        onDragEnd={(e) => {
+        onDragEnd={e => {
           dragId.set(undefined);
         }}
         onDelete={onDelete}

@@ -1,9 +1,5 @@
-import { renderMobileView } from "../../onlyMobile";
-
-
+import { renderMobileView } from '../../onlyMobile';
 
 export default function () {
-  renderMobileView(function () {
-
-  })
+  renderMobileView(function () {});
 }

@@ -1,187 +1,200 @@
-import { faker } from "@faker-js/faker";
-import { dom, fdom, renderPortal } from "mve-dom";
-import { hookDestroy, hookTrackSignal, renderIf, renderOne } from "mve-helper";
-import { IoCloseOutline } from "mve-icons/io5";
-import { pointerMove, subscribeEventListener } from "wy-dom-helper";
-import { addEffect, createSignal, movePanelResizeAutoHeight, doMoveAcc, DragMoveStep } from "wy-helper";
-import Typed from "typed.js";
-import { hookAddDestroy } from "mve-core";
+import { faker } from '@faker-js/faker';
+import { dom, fdom, renderPortal } from 'mve-dom';
+import { hookDestroy, hookTrackSignal, renderIf, renderOne } from 'mve-helper';
+import { IoCloseOutline } from 'mve-icons/io5';
+import { pointerMove, subscribeEventListener } from 'wy-dom-helper';
+import {
+  addEffect,
+  createSignal,
+  doMoveAcc,
+  DragMoveStep,
+  movePanelResizeAuto,
+} from 'wy-helper';
+import Typed from 'typed.js';
+import { hookAddDestroy } from 'mve-core';
+import { createSign } from 'crypto';
 export default function () {
-
-
-
-  const show = createSignal<MouseEvent | undefined>(undefined)
+  const show = createSignal<MouseEvent | undefined>(undefined);
   dom.button({
     onClick(e) {
-      show.set(e)
-    }
-  }).renderText`提示`
+      show.set(e);
+    },
+  }).renderText`提示`;
 
   renderOne(show.get, function (p) {
     if (p) {
-
-      const width = createSignal(400)
-      const height = createSignal(100)
-      const x = movePanelResizeAutoHeight(width, {
-        direction: "x",
-        init: p.pageX,
+      const onAutoHeight = createSignal(true);
+      const onComplete = createSignal(false);
+      const x = movePanelResizeAuto({
+        size: 400,
+        direction: 'x',
+        position: p.pageX,
         margin: 10,
-        minSize: width.get(),
+        minSize: 400,
         getMaxSize() {
-          return window.innerWidth
+          return window.innerWidth;
         },
-      })
-      const onAutoHeight = createSignal(true)
-      const y = movePanelResizeAutoHeight(height, {
+      });
+      const y = movePanelResizeAuto({
+        size: 100,
         direction: 'y',
-        init: p.pageY,
+        position: p.pageY,
         margin: 10,
-        minSize: height.get(),
+        minSize: 100,
         getMaxSize() {
-          return window.innerHeight
+          return window.innerHeight;
         },
-      })
-      const left = createSignal(x.init)
-      const top = createSignal(y.init)
-      x.setPosition(left)
-      y.setPosition(top)
-
-      function beginStep(e: DragMoveStep & {
-        point: PointerEvent
-      }) {
-        const moveX = doMoveAcc(x.onMove(e))
-        const moveY = doMoveAcc(y.onMove(e))
-        let lastE = e.point
-        document.body.style.userSelect = 'none'
+      });
+      function beginStep(
+        e: DragMoveStep & {
+          point: PointerEvent;
+        }
+      ) {
+        const moveX = doMoveAcc(x.onMove(e));
+        const moveY = doMoveAcc(y.onMove(e));
+        let lastE = e.point;
+        document.body.style.userSelect = 'none';
         function didMove(e: PointerEvent) {
           moveX(e.pageX - lastE.pageX);
           moveY(e.pageY - lastE.pageY);
-          lastE = e
+          lastE = e;
         }
         pointerMove({
           onMove(e) {
-            didMove(e)
+            didMove(e);
           },
           onEnd(e) {
-            didMove(e)
-            document.body.style.userSelect = ''
+            didMove(e);
+            document.body.style.userSelect = '';
           },
-        })
+        });
       }
       fdom.div({
         s_left() {
-          return left.get() + 'px'
+          return `${x.position()}px`;
         },
         s_top() {
-          return top.get() + 'px'
+          return `${y.position()}px`;
         },
         s_width() {
-          return width.get() + "px"
+          return `${x.size()}px`;
         },
         s_height() {
-          return height.get() + 'px'
+          return `${y.size()}px`;
         },
         className() {
-          return `fixed bg-amber-500 ${!onAutoHeight.get() && `overflow-y-auto`}`
+          return `fixed bg-amber-500 ${
+            !onAutoHeight.get() && `overflow-y-auto`
+          }`;
         },
         children() {
-
-          let span: HTMLSpanElement
-          const body = fdom.div({
+          let typed: Typed | undefined = undefined;
+          // let span: HTMLSpanElement
+          const panel = fdom.div({
             children() {
               //header
               fdom.div({
-                className: 'h-10 cursor-move bg-amber-100 flex justify-between items-center sticky top-0',
+                className:
+                  'h-10 cursor-move bg-amber-100 flex justify-between items-center sticky top-0',
                 onPointerDown(e) {
                   beginStep({
-                    action: "move",
+                    action: 'move',
                     point: e,
-                  })
+                  });
                 },
                 children() {
-                  dom.h1().renderText`标题`
+                  dom.h1().renderText`标题`;
                   fdom.button({
                     className: 'daisy-btn daisy-btn-circle',
                     onClick() {
-                      show.set(undefined)
+                      show.set(undefined);
                     },
                     children() {
-                      IoCloseOutline()
-                    }
-                  })
-                }
-              })
+                      IoCloseOutline();
+                    },
+                  });
+                },
+              });
               //body
               fdom.div({
                 children() {
-                  const text = createSignal('')
+                  const text = createSignal('');
                   setTimeout(() => {
-                    text.set(faker.lorem.paragraphs(6))
-                  }, 3000)
-                  let typed: Typed | undefined = undefined
+                    text.set(faker.lorem.paragraphs(6));
+                  }, 3000);
                   renderOne(text.get, function (text) {
                     if (text) {
-                      span = fdom.span()
+                      const span = fdom.span();
                       addEffect(() => {
-                        typed?.destroy()
+                        typed?.destroy();
                         typed = new Typed(span, {
                           strings: [text],
                           typeSpeed: 1,
                           // loop: tre,
                           // loopCount: Infinity,
-                          cursorChar: "|",
+                          cursorChar: '|',
                           onComplete() {
-                            onAutoHeight.set(false)
+                            onComplete.set(true);
+                            typed?.cursor.remove();
                           },
                         });
-                      })
+                      });
                     } else {
                       fdom.div({
-                        className: 'daisy-loading daisy-loading-dots'
-                      })
+                        className: 'daisy-loading daisy-loading-dots',
+                      });
                     }
-                  })
-                  renderOne(onAutoHeight.get, function (autoHeight) {
-                    if (!autoHeight) {
-                      fdom.button({
-                        className: 'daisy-btn daisy-btn-link',
+                  });
+                  renderOne(onComplete.get, function (complete) {
+                    if (complete) {
+                      addEffect(() => {
+                        setTimeout(() => {
+                          onAutoHeight.set(false);
+                          link.scrollIntoView();
+                        }, 100);
+                      });
+                      const link = fdom.a({
+                        className: 'daisy-link daisy-link-primary',
                         childrenType: 'text',
                         children: '重新生成',
                         onClick() {
-                          onAutoHeight.set(true)
-                          text.set('')
+                          onComplete.set(false);
+                          onAutoHeight.set(true);
+                          text.set('');
                           setTimeout(() => {
-                            text.set(faker.lorem.paragraphs(6))
-                          }, 3000)
-                        }
-                      })
+                            text.set(faker.lorem.paragraphs(6));
+                          }, 3000);
+                        },
+                      });
                     }
-                  })
-                }
-              })
-            }
-          })
-
+                  });
+                },
+              });
+            },
+          });
 
           function wResize() {
+            console.log('resize...');
+            typed?.cursor.scrollIntoView();
             if (onAutoHeight.get()) {
-
-              y.resizeScroll(body.offsetHeight, () => {
-                span?.nextElementSibling?.scrollIntoView()
+              y.resizeScroll(panel.offsetHeight, finish => {
+                if (finish) {
+                  onAutoHeight.set(false);
+                }
               });
             } else {
-              x.fixResize()
-              y.fixResize()
+              x.fixResize();
+              y.fixResize();
             }
           }
-          hookDestroy(subscribeEventListener(window, 'resize', wResize))
-          const ob = new ResizeObserver(wResize)
+          hookDestroy(subscribeEventListener(window, 'resize', wResize));
+          const ob = new ResizeObserver(wResize);
           addEffect(() => {
-            ob.observe(body)
-          })
+            ob.observe(panel);
+          });
           hookDestroy(() => {
-            ob.disconnect()
-          })
+            ob.disconnect();
+          });
 
           //top
           fdom.div({
@@ -190,10 +203,10 @@ export default function () {
               beginStep({
                 point: e,
                 action: 'drag',
-                top: true
-              })
-            }
-          })
+                top: true,
+              });
+            },
+          });
 
           //bottom
           fdom.div({
@@ -202,10 +215,10 @@ export default function () {
               beginStep({
                 point: e,
                 action: 'drag',
-                bottom: true
-              })
-            }
-          })
+                bottom: true,
+              });
+            },
+          });
 
           //left
           fdom.div({
@@ -214,10 +227,10 @@ export default function () {
               beginStep({
                 point: e,
                 action: 'drag',
-                left: true
-              })
-            }
-          })
+                left: true,
+              });
+            },
+          });
 
           //right
           fdom.div({
@@ -226,10 +239,10 @@ export default function () {
               beginStep({
                 point: e,
                 action: 'drag',
-                right: true
-              })
-            }
-          })
+                right: true,
+              });
+            },
+          });
 
           //top-left
           fdom.div({
@@ -239,10 +252,10 @@ export default function () {
                 point: e,
                 action: 'drag',
                 top: true,
-                left: true
-              })
-            }
-          })
+                left: true,
+              });
+            },
+          });
 
           //top-right
           fdom.div({
@@ -252,10 +265,10 @@ export default function () {
                 point: e,
                 action: 'drag',
                 top: true,
-                right: true
-              })
-            }
-          })
+                right: true,
+              });
+            },
+          });
 
           //bottom-right
           fdom.div({
@@ -265,10 +278,10 @@ export default function () {
                 point: e,
                 action: 'drag',
                 bottom: true,
-                right: true
-              })
-            }
-          })
+                right: true,
+              });
+            },
+          });
           //bottom-left
           fdom.div({
             className: 'absolute cursor-nesw-resize bottom-0 left-0  w-1 h-1',
@@ -277,13 +290,12 @@ export default function () {
                 point: e,
                 action: 'drag',
                 bottom: true,
-                left: true
-              })
-            }
-          })
-        }
-      })
+                left: true,
+              });
+            },
+          });
+        },
+      });
     }
-  })
+  });
 }
-

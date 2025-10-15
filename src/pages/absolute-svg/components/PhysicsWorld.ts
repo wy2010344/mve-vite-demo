@@ -1,7 +1,7 @@
-import { fsvg } from 'mve-dom'
-import { renderALayout } from 'mve-dom-helper'
-import type { Ball } from '../types'
-import { renderArray } from 'mve-helper'
+import { fsvg } from 'mve-dom';
+import { renderALayout } from 'mve-dom-helper';
+import type { Ball } from '../types';
+import { renderArray } from 'mve-helper';
 
 // 物理世界组件
 export function renderPhysicsWorld(
@@ -14,8 +14,8 @@ export function renderPhysicsWorld(
     render(world) {
       return fsvg.svg({
         s_position: 'absolute',
-        s_left: () => world.axis.x.position() + 'px',
-        s_top: () => world.axis.y.position() + 'px',
+        s_left: () => `${world.axis.x.position()}px`,
+        s_top: () => `${world.axis.y.position()}px`,
         width: world.axis.x.size,
         height: world.axis.y.size,
         children() {
@@ -25,7 +25,7 @@ export function renderPhysicsWorld(
             height: world.axis.y.size,
             fill: 'rgba(0,0,0,0.2)',
             data_physicsContainer: 'true',
-          })
+          });
 
           // 渲染小球和轨迹
           renderArray(balls, function (ball) {
@@ -37,8 +37,8 @@ export function renderPhysicsWorld(
                   (index === 0
                     ? `M ${point.x} ${point.y}`
                     : ` L ${point.x} ${point.y}`)
-                )
-              }, '')
+                );
+              }, '');
 
               fsvg.path({
                 d: pathData,
@@ -47,7 +47,7 @@ export function renderPhysicsWorld(
                 fill: 'none',
                 opacity: 0.6,
                 strokeLinecap: 'round',
-              })
+              });
             }
 
             // 小球阴影
@@ -56,7 +56,7 @@ export function renderPhysicsWorld(
               cy: ball.y + 2,
               r: ball.radius,
               fill: 'rgba(0,0,0,0.3)',
-            })
+            });
 
             // 小球主体
             fsvg.circle({
@@ -70,7 +70,7 @@ export function renderPhysicsWorld(
               transform: ball.selected ? 'scale(1.1)' : 'scale(1)',
               s_transformOrigin: `${ball.x} ${ball.y}`,
               onClick: () => onBallClick(ball.id),
-            })
+            });
 
             // 小球高光
             fsvg.circle({
@@ -78,11 +78,11 @@ export function renderPhysicsWorld(
               cy: ball.y - ball.radius * 0.3,
               r: ball.radius * 0.3,
               fill: 'rgba(255,255,255,0.4)',
-            })
+            });
 
             // 速度向量（仅选中时显示）
             if (ball.selected) {
-              const vectorScale = 5
+              const vectorScale = 5;
               fsvg.line({
                 x1: ball.x,
                 y1: ball.y,
@@ -91,9 +91,9 @@ export function renderPhysicsWorld(
                 stroke: 'yellow',
                 strokeWidth: 2,
                 markerEnd: 'url(#arrowhead)',
-              })
+              });
             }
-          })
+          });
 
           // 箭头标记定义
           fsvg.defs({
@@ -109,13 +109,13 @@ export function renderPhysicsWorld(
                   fsvg.polygon({
                     points: '0 0, 10 3.5, 0 7',
                     fill: 'yellow',
-                  })
+                  });
                 },
-              })
+              });
             },
-          })
+          });
         },
-      })
+      });
     },
-  })
+  });
 }
