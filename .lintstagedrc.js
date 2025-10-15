@@ -1,5 +1,4 @@
 export default {
-  '**/*.{ts,tsx,js,jsx}': ['prettier --write', 'eslint --fix'],
-  '**/*.{json,md,css,scss}': ['prettier --write'],
-  '!docs/**': 'echo "Skipping docs directory"',
+  '!(docs)/**/*.{ts,tsx,js,jsx}': ['prettier --write', 'eslint --fix'],
+  '!(docs)/**/*.{json,md,css,scss}': ['prettier --write'],
 };
