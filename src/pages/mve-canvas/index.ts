@@ -1,4 +1,4 @@
-import { renderMobileView } from '../../onlyMobile'
+import { renderMobileView } from '../../onlyMobile';
 import {
   alignSelf,
   arrayCountCreateWith,
@@ -8,7 +8,7 @@ import {
   memo,
   numberBetween,
   Point,
-} from 'wy-helper'
+} from 'wy-helper';
 import {
   hookDrawRect,
   simpleFlex,
@@ -20,35 +20,32 @@ import {
   hookAddRect,
   hookClip,
   CMNode,
-} from 'mve-dom-helper/canvasRender'
+} from 'mve-dom-helper/canvasRender';
 
-import { faker } from '@faker-js/faker'
-import { OnScroll } from 'mve-dom-helper'
-import explain from '~/explain'
-import markdown from '~/markdown'
-import { pointerMoveDir } from 'wy-dom-helper'
-import { renderArray } from 'mve-helper'
-import { fdom } from 'mve-dom'
-
-const fr = ClampingScrollFactory.get()
-const edgeFr = ClampingScrollFactory.get(100)
+import { faker } from '@faker-js/faker';
+import { OnScroll } from 'mve-dom-helper';
+import explain from '~/explain';
+import markdown from '~/markdown';
+import { pointerMoveDir } from 'wy-dom-helper';
+import { renderArray } from 'mve-helper';
+import { fdom } from 'mve-dom';
 export default function () {
   explain(() => {
     markdown`
 #mve-canvas
 
 类似 react-canvas
-    `
-  })
+    `;
+  });
   renderMobileView(function ({ width, height }, mock) {
     renderCanvas(
       fdom.canvas({
         className: 'touch-none',
         s_width() {
-          return width() + 'px'
+          return `${width()}px`;
         },
         s_height() {
-          return height() + 'px'
+          return `${height()}px`;
         },
       }),
       () => {
@@ -61,15 +58,15 @@ export default function () {
               gap: 10,
               alignFix: true,
               alignItems: 'stretch',
-            })
+            });
           },
           children() {
-            const x = createSignal(10)
+            const x = createSignal(10);
             const data = memo(() =>
-              arrayCountCreateWith(x.get() * 5, (i) => {
-                return i
+              arrayCountCreateWith(x.get() * 5, i => {
+                return i;
               })
-            )
+            );
 
             const rect = hookDrawRect({
               paddingInline: 20,
@@ -82,76 +79,76 @@ export default function () {
                 hookDrawRect({
                   y: 20,
                   x(n) {
-                    return n.parent!.axis.x.paddingStart() + x.get()
+                    return n.parent!.axis.x.paddingStart() + x.get();
                   },
                   onPointerDown(e) {
                     pointerMoveDir(e.original, {
                       onMove(initE, dir) {
                         if (dir == 'x') {
-                          const initX = x.get()
+                          const initX = x.get();
                           return {
                             onMove(e) {
-                              const diff = e.pageX - initE.pageX
+                              const diff = e.pageX - initE.pageX;
                               x.set(
                                 numberBetween(
                                   0,
                                   diff + initX,
                                   rect.axis.x.innerSize()
                                 )
-                              )
+                              );
                             },
                             onEnd(e) {},
-                          }
+                          };
                         }
                       },
-                    })
+                    });
                   },
-                  draw({ path }) {
-                    hookAddRect()
-                    path.ellipse(0, 0, 10, 10, 360, 0, 360)
-                    hookFill('green')
+                  draw({ path, rect }) {
+                    hookAddRect();
+                    path.ellipse(0, 0, 10, 10, 360, 0, 360);
+                    hookFill('green');
                   },
-                })
+                });
               },
-            })
+            });
             hookDrawText({
               paddingInline: 10,
               config() {
                 return {
-                  text: data().length + ' 条记录',
-                }
+                  text: `${data().length} 条记录`,
+                };
               },
-            })
+            });
 
-            let container!: LayoutNode<CMNode, keyof Point<number>>
+            let container!: LayoutNode<CMNode, keyof Point<number>>;
             const scrollY = new OnScroll('y', {
               maxScroll() {
-                return container.axis.y.size() - content.axis.y.size()
+                return container.axis.y.size() - content.axis.y.size();
               },
-            })
+            });
             const content = hookDrawRect({
               grow: 1,
               draw() {
-                hookAddRect()
-                hookFill('yellow')
-                hookClip()
+                hookAddRect();
+                hookFill('yellow');
+                hookClip();
               },
               onPointerDown(e) {
-                scrollY.pointerEventListner(e.original)
+                scrollY.pointerEventListner(e.original);
               },
               paddingRight: 4,
               children() {
                 container = hookDrawRect({
                   grow: 1,
                   width(n) {
-                    return n.parent!.axis.x.innerSize()
+                    return n.parent!.axis.x.innerSize();
                   },
                   y(n) {
-                    return -scrollY.get()
+                    return -scrollY.get();
                   },
                   draw() {
-                    hookAddRect()
-                    hookFill('white')
+                    hookAddRect();
+                    hookFill('white');
                   },
                   layout() {
                     return simpleFlex({
@@ -159,33 +156,35 @@ export default function () {
                       alignFix: true,
                       alignItems: 'stretch',
                       gap: 4,
-                    })
+                    });
                   },
                   children() {
+                    console.log('render');
+                    // return
                     renderArray(data, function (row, getIndex) {
                       const r = hookDrawRect({
                         layout(v) {
                           return simpleFlex({
                             direction: 'x',
                             gap: 4,
-                          })
+                          });
                         },
                         skipDraw(n) {
-                          const s = scrollY.get()
+                          const s = scrollY.get();
                           if (
                             n.axis.y.position() - s >
                             content.axis.y.innerSize()
                           ) {
-                            return true
+                            return true;
                           }
                           if (n.axis.y.position() - s + n.axis.y.size() < 0) {
-                            return true
+                            return true;
                           }
-                          return false
+                          return false;
                         },
                         draw() {
-                          hookAddRect()
-                          hookFill(getIndex() % 2 ? '#A5D2EE' : '#EEEEEE')
+                          hookAddRect();
+                          hookFill(getIndex() % 2 ? '#A5D2EE' : '#EEEEEE');
                         },
                         paddingLeft: 4,
                         children() {
@@ -197,16 +196,16 @@ export default function () {
                             layout(v) {
                               return simpleFlex({
                                 direction: 'y',
-                              })
+                              });
                             },
                             children() {
                               hookDrawUrlImage({
                                 grow: 1,
                                 relay: 'height',
                                 src: faker.image.avatarGitHub(),
-                              })
+                              });
                             },
-                          })
+                          });
                           hookDrawRect({
                             /**
                              * 这里
@@ -222,39 +221,27 @@ export default function () {
                                 alignFix: true,
                                 alignItems: 'start',
                                 gap: 12,
-                              })
+                              });
                             },
-                            // draw(ctx, n, path) {
-                            //   return {
-                            //     operates: [
-                            //       { type: "fill", style: "yellow" }
-                            //     ]
-                            //   }
-                            // },
                             alignSelf: alignSelf('stretch'),
                             grow: 1,
                             children() {
                               hookDrawText({
                                 config() {
                                   return {
-                                    text:
-                                      faker.person.fullName() +
-                                      '   ' +
-                                      getIndex(),
-                                  }
+                                    text: `${faker.person.fullName()}   ${getIndex()}`,
+                                  };
                                 },
-                              })
+                              });
                               // hookDrawRect({
-                              //   grow: 1,
                               //   alignSelf: alignSelf('stretch'),
-                              //   draw(ctx, n, path) {
-                              //     return {
-                              //       operates: [
-                              //         { type: "fill", style: "blue" }
-                              //       ]
-                              //     }
+                              //   grow: 1,
+                              //   draw(e) {
+                              //     hookAddRect()
+                              //     hookFill('blue')
                               //   },
                               // })
+                              // return
                               hookDrawTextWrap({
                                 config: {
                                   maxLines: 3,
@@ -262,28 +249,19 @@ export default function () {
                                   fontSize: '12px',
                                 },
                                 alignSelf: alignSelf('stretch'),
-                                // grow: 1,
-                                // draw(ctx, n, draw, p) {
-                                //   return {
-                                //     operates: [
-                                //       { type: "fill", style: "red" },
-                                //       { type: "draw", callback: draw }
-                                //     ]
-                                //   }
-                                // },
-                              })
+                              });
                             },
-                          })
+                          });
                         },
-                      })
-                    })
+                      });
+                    });
                   },
-                })
+                });
               },
-            })
+            });
           },
-        })
+        });
       }
-    )
-  })
+    );
+  });
 }

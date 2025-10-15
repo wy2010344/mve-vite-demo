@@ -1,89 +1,113 @@
-import { fdom, renderText } from "mve-dom";
-import { renderContentEditableTrans } from "mve-dom-helper";
-import { renderArray } from "mve-helper";
-import { animateSignal, cns, cssMap, pointerMoveDir, } from "wy-dom-helper";
-import { contentEditableText } from "wy-dom-helper/contentEditable";
-import { AnimateSignal, arrayCountCreateWith, ClampingScrollFactory, createSignal, defaultSpringAnimationConfig, destinationWithMargin, eventGetPageY, FrictionalFactory, numberStoreTranfrom, overScrollSlow, quote, scrollEdgeIteration, scrollForEdge, ScrollFromPage, scrollInfinityIteration, spring, tw } from "wy-helper";
+import { fdom, renderText } from 'mve-dom';
+import { renderContentEditableTrans } from 'mve-dom-helper';
+import { renderArray } from 'mve-helper';
+import { animateSignal, cns, cssMap, pointerMoveDir } from 'wy-dom-helper';
+import { contentEditableText } from 'wy-dom-helper/contentEditable';
+import {
+  AnimateSignal,
+  arrayCountCreateWith,
+  ClampingScrollFactory,
+  createSignal,
+  defaultSpringAnimationConfig,
+  destinationWithMargin,
+  eventGetPageY,
+  FrictionalFactory,
+  numberStoreTranfrom,
+  overScrollSlow,
+  quote,
+  scrollEdgeIteration,
+  scrollForEdge,
+  ScrollFromPage,
+  scrollInfinityIteration,
+  spring,
+  tw,
+} from 'wy-helper';
 
 //保持有限的位移
 // const fr = FrictionalFactory.get(0.004)//0.0006
-const fr2 = FrictionalFactory.get(0.08)
+const fr2 = FrictionalFactory.get(0.08);
 
-const fr = ClampingScrollFactory.get()
-const fb2 = ClampingScrollFactory.get(100)
+const fr = ClampingScrollFactory.get();
+const fb2 = ClampingScrollFactory.get(100);
 /**
  * 原生一次滚动200 * 44 左右
  */
 export default function () {
-
-  const maxCount = createSignal(1000)
-  const version = createSignal(0)
+  const maxCount = createSignal(1000);
+  const version = createSignal(0);
   function scrollType() {
-    const i = version.get() % 2
+    const i = version.get() % 2;
     if (i == 0) {
-      return '原生'
+      return '原生';
     } else {
-      return '惯性'
+      return '惯性';
     }
   }
-  const initV = createSignal(0)
+  const initV = createSignal(0);
   fdom.div({
     className: cs.title,
     children() {
-      renderText`iScroll`
+      renderText`iScroll`;
       fdom.button({
         childrenType: 'text',
         onClick() {
-          container.scrollTop = 0
-          scrollY.set(0)
-          version.set(version.get() + 1)
+          container.scrollTop = 0;
+          scrollY.set(0);
+          version.set(version.get() + 1);
         },
         children() {
-          return scrollType()
-        }
-      })
-      renderContentEditableTrans(numberStoreTranfrom, maxCount.get, v => {
-        if (v < 0) {
-          return
-        }
-        maxCount.set(Math.round(v))
-      }, fdom.span({
-        contentEditable: contentEditableText,
-        className: 'min-w-1'
-      }))
+          return scrollType();
+        },
+      });
+      renderContentEditableTrans(
+        numberStoreTranfrom,
+        maxCount.get,
+        v => {
+          if (v < 0) {
+            return;
+          }
+          maxCount.set(Math.round(v));
+        },
+        fdom.span({
+          contentEditable: contentEditableText,
+          className: 'min-w-1',
+        })
+      );
       fdom.span({
         childrenType: 'text',
-        children: '--'
-      })
+        children: '--',
+      });
       fdom.span({
         childrenType: 'text',
         children() {
-          return initV.get().toFixed(2)
-        }
-      })
-    }
-  })
+          return initV.get().toFixed(2);
+        },
+      });
+    },
+  });
 
-  const scrollY = animateSignal(0)
-  let content: HTMLElement
+  const scrollY = animateSignal(0);
+  let content: HTMLElement;
   const container = fdom.div({
     className() {
-      return cns(cs.container,
-        scrollType() == '原生' ? tw`overflow-auto` : tw`touch-none overflow-hidden`
-      )
+      return cns(
+        cs.container,
+        scrollType() == '原生'
+          ? tw`overflow-auto`
+          : tw`touch-none overflow-hidden`
+      );
     },
     onPointerDown(e) {
-      scrollY.stop()
+      scrollY.stop();
       pointerMoveDir(e, {
         onMove(e, dir) {
           if (scrollType() == '原生') {
-            return
+            return;
           }
 
-
           function onFinish(velocity: number) {
-            initV.set(velocity)
-            console.log("v1", velocity)
+            initV.set(velocity);
+            console.log('v1', velocity);
             //使用惯性
             // return destinationWithMargin({
             //   scroll: scrollY,
@@ -116,54 +140,65 @@ export default function () {
               // }
             }).then(value => {
               if (value) {
-                scrollY.changeTo(value.target, spring({
-                  initialVelocity: value.velocity
-                }))
+                scrollY.changeTo(
+                  value.target,
+                  spring({
+                    initialVelocity: value.velocity,
+                  })
+                );
               }
-            })
+            });
           }
           return ScrollFromPage.from(e, {
             getPage: eventGetPageY,
             scrollDelta(delta, velocity, inMove) {
               // const y = scrollY.get()
-              scrollForEdge(scrollY, delta, container.clientHeight, content.offsetHeight)
+              scrollForEdge(
+                scrollY,
+                delta,
+                container.clientHeight,
+                content.offsetHeight
+              );
               if (inMove) {
-                return
+                return;
               }
-              onFinish(velocity)
-            }
-          })
+              onFinish(velocity);
+            },
+          });
         },
         onCancel(e) {
-          console.log("stop", e)
-          scrollY.stop()
+          console.log('stop', e);
+          scrollY.stop();
         },
-      })
+      });
     },
     children() {
       content = fdom.div({
         className: cs.content,
         s_transform() {
-          return `translateY(${-scrollY.get()}px)`
+          return `translateY(${-scrollY.get()}px)`;
         },
         children() {
-          renderArray(() => arrayCountCreateWith(maxCount.get(), quote), (row, getIndex) => {
-            fdom.div({
-              className: cs.row,
-              childrenType: "text",
-              children() {
-                return `${row}---${getIndex()}`
-              }
-            })
-          })
-        }
-      })
-    }
-  })
+          renderArray(
+            () => arrayCountCreateWith(maxCount.get(), quote),
+            (row, getIndex) => {
+              fdom.div({
+                className: cs.row,
+                childrenType: 'text',
+                children() {
+                  return `${row}---${getIndex()}`;
+                },
+              });
+            }
+          );
+        },
+      });
+    },
+  });
 
   fdom.div({
-    className: cs.footer
-  })
+    className: cs.footer,
+  });
 }
 const cs = cssMap({
   title: `
@@ -217,5 +252,5 @@ const cs = cssMap({
 		background: #444;
 		padding: 0;
 		border-top: 1px solid #444;
-    `
-})
+    `,
+});

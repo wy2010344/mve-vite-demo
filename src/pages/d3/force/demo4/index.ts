@@ -1,16 +1,16 @@
-import { fdom } from 'mve-dom'
+import { fdom } from 'mve-dom';
 import {
   hookDraw,
   hookFill,
   hookStroke,
   renderCanvas,
-} from 'mve-dom-helper/canvasRender'
-import { hookDestroy, renderArray } from 'mve-helper'
+} from 'mve-dom-helper/canvasRender';
+import { hookDestroy, renderArray } from 'mve-helper';
 import {
   pointerMove,
   subscribeMove,
   subscribeRequestAnimationFrame,
-} from 'wy-dom-helper'
+} from 'wy-dom-helper';
 import {
   asLazy,
   batchSignalEnd,
@@ -19,7 +19,7 @@ import {
   memo,
   run,
   toProxySignal,
-} from 'wy-helper'
+} from 'wy-helper';
 import {
   createSignalForceDir,
   emptySignalForceDir,
@@ -32,141 +32,141 @@ import {
   mergeNodesAndLinks,
   SignalForceDir,
   tickForce,
-} from 'wy-helper/forceLayout'
-import { renderFullScreen } from '../../../../onlyMobile'
+} from 'wy-helper/forceLayout';
+import { renderFullScreen } from '../../../../onlyMobile';
 
 export default function () {
   renderFullScreen(function ({ width, height }) {
     const data = run(() => {
-      const n = 20
+      const n = 20;
       const nodes: {
-        index: number
-      }[] = Array.from({ length: n * n }, (_, i) => ({ index: i }))
+        index: number;
+      }[] = Array.from({ length: n * n }, (_, i) => ({ index: i }));
       const links: {
-        source: number
-        target: number
-      }[] = []
+        source: number;
+        target: number;
+      }[] = [];
       for (let y = 0; y < n; ++y) {
         for (let x = 0; x < n; ++x) {
-          if (y > 0) links.push({ source: (y - 1) * n + x, target: y * n + x })
-          if (x > 0) links.push({ source: y * n + (x - 1), target: y * n + x })
+          if (y > 0) links.push({ source: (y - 1) * n + x, target: y * n + x });
+          if (x > 0) links.push({ source: y * n + (x - 1), target: y * n + x });
         }
       }
-      return { nodes, links }
-    })
+      return { nodes, links };
+    });
 
     type Row = {
-      index: number
-    }
+      index: number;
+    };
     type Link = {
-      source: number
-      target: number
-    }
+      source: number;
+      target: number;
+    };
 
-    const nodes = createSignal<readonly Row[]>(data.nodes)
-    const links = createSignal<readonly Link[]>(data.links)
-    const currentNode = createSignal<ForceNode<Row> | undefined>(undefined)
+    const nodes = createSignal<readonly Row[]>(data.nodes);
+    const links = createSignal<readonly Link[]>(data.links);
+    const currentNode = createSignal<ForceNode<Row> | undefined>(undefined);
     const getNodesAndLinks = memo<{
-      nodes: readonly ForceNode<Row, SignalForceDir>[]
-      links: readonly ForceLink<Link, Row, SignalForceDir>[]
-    }>((old) => {
+      nodes: readonly ForceNode<Row, SignalForceDir>[];
+      links: readonly ForceLink<Link, Row, SignalForceDir>[];
+    }>(old => {
       return mergeNodesAndLinks({
         nodes: old?.nodes || emptyArray,
         links: old?.links || emptyArray,
         fromLinks: links.get(),
         fromNodes: nodes.get(),
         createForceNode(n, i, befores) {
-          return initToNode(n, 2, i, createSignalForceDir, emptySignalForceDir)
+          return initToNode(n, 2, i, createSignalForceDir, emptySignalForceDir);
         },
         getNodeKey(n) {
-          return n.index
+          return n.index;
         },
         getSorceKey(n) {
-          return n.source
+          return n.source;
         },
         getTargetKey(n) {
-          return n.target
+          return n.target;
         },
         createFromKey(k) {
           return {
             index: k,
-          }
+          };
         },
-      })
-    })
+      });
+    });
 
-    const config = toProxySignal(initForceConfig())
+    const config = toProxySignal(initForceConfig());
     const renderLink = forceLink({
       getStrength: asLazy(1),
       getDistance: asLazy(20),
       iterations: 10,
-    })
+    });
     const renderManyBody = forceManybody({
       getStrenth: asLazy(-30),
-    })
-    const nDim = 2
+    });
+    const nDim = 2;
     function didTick() {
-      const gl = getNodesAndLinks()
-      tickForce(nDim, config, gl.nodes, (alpha) => {
-        renderLink(gl.links, nDim, alpha)
-        renderManyBody(gl.nodes, nDim, alpha)
-      })
+      const gl = getNodesAndLinks();
+      tickForce(nDim, config, gl.nodes, alpha => {
+        renderLink(gl.links, nDim, alpha);
+        renderManyBody(gl.nodes, nDim, alpha);
+      });
     }
     hookDestroy(
       subscribeRequestAnimationFrame(() => {
-        didTick()
-        batchSignalEnd()
+        didTick();
+        batchSignalEnd();
       })
-    )
+    );
     renderCanvas(
       fdom.canvas({
         className: 'touch-none',
         s_width() {
-          return width() + 'px'
+          return `${width()}px`;
         },
         s_height() {
-          return height() + 'px'
+          return `${height()}px`;
         },
       }),
       function ({ canvas }) {
         renderArray(
           () => getNodesAndLinks().links,
-          (link) => {
+          link => {
             hookDraw({
               x: link.source.x.dSignal.get,
               y: link.source.y.dSignal.get,
               withPath: true,
               draw({ ctx, path }) {
-                path.moveTo(0, 0)
+                path.moveTo(0, 0);
                 path.lineTo(
                   link.target.x.d - link.source.x.d,
                   link.target.y.d - link.source.y.d
-                )
-                hookStroke(1, '#aaa')
+                );
+                hookStroke(1, '#aaa');
               },
-            })
+            });
           }
-        )
+        );
         renderArray(
           () => getNodesAndLinks().nodes,
-          (node) => {
+          node => {
             hookDraw({
               x: node.x.dSignal.get,
               y: node.y.dSignal.get,
               onPointerDown(e) {
-                config.alphaTarget = 0.3
-                currentNode.set(node)
+                config.alphaTarget = 0.3;
+                currentNode.set(node);
                 pointerMove(
                   {
                     onMove(p) {
-                      node.x.f = p.offsetX - width() / 2
-                      node.y.f = p.offsetY - height() / 2
+                      node.x.f = p.offsetX - width() / 2;
+                      node.y.f = p.offsetY - height() / 2;
                     },
                     onEnd(e) {
-                      config.alphaTarget = 0
-                      node.x.f = undefined
-                      node.y.f = undefined
-                      currentNode.set(undefined)
+                      config.alphaTarget = 0;
+                      node.x.f = undefined;
+                      node.y.f = undefined;
+                      currentNode.set(undefined);
                     },
                     // leave: true,
                     // cancel: true
@@ -174,27 +174,27 @@ export default function () {
                   {
                     element: canvas,
                   }
-                )
+                );
               },
               withPath: true,
               draw(e) {
-                e.path.arc(0, 0, 6, 0, 2 * Math.PI)
+                e.path.arc(0, 0, 6, 0, 2 * Math.PI);
 
-                hookFill('#000')
-                e.ctx.fillText(node.value.index + '', 3, -3)
+                hookFill('#000');
+                e.ctx.fillText(`${node.value.index}`, 3, -3);
               },
-            })
+            });
           }
-        )
+        );
       },
       {
         // translateX: () => width() / 2,
         // translateY: () => height() / 2,
         beforeDraw(ctx: CanvasRenderingContext2D) {
           //这里竟然不会影响点击坐标??
-          ctx.translate(width() / 2, height() / 2)
+          ctx.translate(width() / 2, height() / 2);
         },
       }
-    )
-  })
+    );
+  });
 }

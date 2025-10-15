@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import circle from './circle.png'
+import * as THREE from 'three';
+import circle from './circle.png';
 export default function getStarfield({ numStars = 500 } = {}) {
   function randomSpherePoint() {
     const radius = Math.random() * 25 + 25;
@@ -7,9 +7,9 @@ export default function getStarfield({ numStars = 500 } = {}) {
     const v = Math.random();
     const theta = 2 * Math.PI * u;
     const phi = Math.acos(2 * v - 1);
-    let x = radius * Math.sin(phi) * Math.cos(theta);
-    let y = radius * Math.sin(phi) * Math.sin(theta);
-    let z = radius * Math.cos(phi);
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.sin(phi) * Math.sin(theta);
+    const z = radius * Math.cos(phi);
 
     return {
       pos: new THREE.Vector3(x, y, z),
@@ -22,7 +22,7 @@ export default function getStarfield({ numStars = 500 } = {}) {
   const positions = [];
   let col;
   for (let i = 0; i < numStars; i += 1) {
-    let p = randomSpherePoint();
+    const p = randomSpherePoint();
     const { pos, hue } = p;
     positions.push(p);
     col = new THREE.Color().setHSL(hue, 0.2, Math.random());
@@ -30,14 +30,12 @@ export default function getStarfield({ numStars = 500 } = {}) {
     colors.push(col.r, col.g, col.b);
   }
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
-  geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   const mat = new THREE.PointsMaterial({
     size: 0.2,
     vertexColors: true,
-    map: new THREE.TextureLoader().load(
-      circle
-    ),
+    map: new THREE.TextureLoader().load(circle),
     fog: false,
   });
   const points = new THREE.Points(geo, mat);

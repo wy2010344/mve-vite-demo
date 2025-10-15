@@ -1,11 +1,12 @@
-import { dom } from "mve-dom";
-import { renderArray } from "mve-helper";
-import { arrayCountCreateWith, quote } from "wy-helper";
-import { Scroller } from "../pages/virtual-list/scroller";
+import { dom } from 'mve-dom';
+import { renderArray } from 'mve-helper';
+import { arrayCountCreateWith, quote } from 'wy-helper';
+import { Scroller } from '../pages/virtual-list/scroller';
 
 export default function () {
-  dom.div({
-    style: `
+  dom
+    .div({
+      style: `
     
 		width: 700px;
 		height: 400px;
@@ -20,10 +21,12 @@ export default function () {
 		-ms-user-select: none;
 		-o-user-select: none;
 		user-select: none;
-    `
-  }).render((container) => {
-    const content = dom.div({
-      style: `
+    `,
+    })
+    .render(container => {
+      const content = dom
+        .div({
+          style: `
       
 		background: white;
 		width: 4000px;
@@ -39,70 +42,80 @@ export default function () {
 		-o-transform: translateZ(0);
 		transform-origin: left top;
 		transform: translateZ(0);
-      `
-    }).render(() => {
-      renderArray(() => arrayCountCreateWith(48, quote), function (value, getIndex) {
-
-        dom.div({
-          style() {
-            return `
+      `,
+        })
+        .render(() => {
+          renderArray(
+            () => arrayCountCreateWith(48, quote),
+            function (value, getIndex) {
+              dom.div({
+                style() {
+                  return `
 		width: 100px;
 		height: 100px;
 		display: inline-block;
 		text-align: center;
 		line-height: 100px;
-    background-color:${getIndex() % 2 ? "#ddd" : "#fff"};
-          `
-          }
-        }).renderText`${value}`
-
-      })
-    })
-    // Initialize Scroller
-    var scroller = new Scroller((left, top, zoom) => {
-      content.style.transform = 'translate3d(' + (-left) + 'px,' + (-top) + 'px,0) scale(' + zoom + ')';
-    }, {
-      snapping: true
-    });
-
-
-    // Setup Scroller
-
-    const ob = new ResizeObserver(() => {
-      console.log("in")
-      var rect = container.getBoundingClientRect();
-      scroller.setSnapSize(100, 100);
-      scroller.setPosition(rect.left + container.clientLeft, rect.top + container.clientTop);
-      // Update Scroller dimensions for changed content
-      scroller.setDimensions(
-        container.clientWidth,
-        container.clientHeight,
-        content.offsetWidth,
-        content.offsetHeight
+    background-color:${getIndex() % 2 ? '#ddd' : '#fff'};
+          `;
+                },
+              }).renderText`${value}`;
+            }
+          );
+        });
+      // Initialize Scroller
+      const scroller = new Scroller(
+        (left, top, zoom) => {
+          content.style.transform = `translate3d(${-left}px,${-top}px,0) scale(${zoom})`;
+        },
+        {
+          snapping: true,
+        }
       );
-    })
-    ob.observe(content)
 
-    container.addEventListener("pointerdown", e => {
-      e.preventDefault()
-      scroller.doTouchStart([e], e.timeStamp)
-    })
-    if ('ontouchmove' in document) {
-      document.addEventListener("touchmove", e => {
-        e.preventDefault()
-        scroller.doTouchMove(e.touches, e.timeStamp)
-      }, {
-        passive: false
-      })
-    } else {
-      document.addEventListener("pointermove", e => {
-        scroller.doTouchMove([e], e.timeStamp)
-      })
-    }
-    document.addEventListener("pointerup", e => {
-      //只有pointerup起效果了,pointercancel,touchup,touchcancel都没有,
-      scroller.doTouchEnd(e.timeStamp)
-    })
+      // Setup Scroller
 
-  })
+      const ob = new ResizeObserver(() => {
+        console.log('in');
+        const rect = container.getBoundingClientRect();
+        scroller.setSnapSize(100, 100);
+        scroller.setPosition(
+          rect.left + container.clientLeft,
+          rect.top + container.clientTop
+        );
+        // Update Scroller dimensions for changed content
+        scroller.setDimensions(
+          container.clientWidth,
+          container.clientHeight,
+          content.offsetWidth,
+          content.offsetHeight
+        );
+      });
+      ob.observe(content);
+
+      container.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        scroller.doTouchStart([e], e.timeStamp);
+      });
+      if ('ontouchmove' in document) {
+        document.addEventListener(
+          'touchmove',
+          e => {
+            e.preventDefault();
+            scroller.doTouchMove(e.touches, e.timeStamp);
+          },
+          {
+            passive: false,
+          }
+        );
+      } else {
+        document.addEventListener('pointermove', e => {
+          scroller.doTouchMove([e], e.timeStamp);
+        });
+      }
+      document.addEventListener('pointerup', e => {
+        //只有pointerup起效果了,pointercancel,touchup,touchcancel都没有,
+        scroller.doTouchEnd(e.timeStamp);
+      });
+    });
 }

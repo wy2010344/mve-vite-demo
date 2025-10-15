@@ -1,8 +1,8 @@
-import { faker } from "@faker-js/faker";
-import { renderForEach } from "mve-core";
-import { dom, fdom, renderTextContent } from "mve-dom";
-import { getSubListInfo, hookDestroy, memoArray } from "mve-helper";
-import { animateSignal, pointerMove } from "wy-dom-helper";
+import { faker } from '@faker-js/faker';
+import { renderForEach } from 'mve-core';
+import { dom, fdom, renderTextContent } from 'mve-dom';
+import { getSubListInfo, hookDestroy, memoArray } from 'mve-helper';
+import { animateSignal, pointerMove } from 'wy-dom-helper';
 import {
   arrayCountCreateWith,
   batchSignalEnd,
@@ -13,12 +13,12 @@ import {
   getSubListForVirtualList,
   memo,
   ScrollFromPage,
-} from "wy-helper";
-import hookMeasureHeight from "../hookMeasureHeight";
-import explain from "../../../explain";
-import markdown from "../../../markdown";
-import { dynamidHeightWithData, forEachSub } from "../dynamicHeight";
-import { OnScroll } from "mve-dom-helper";
+} from 'wy-helper';
+import hookMeasureHeight from '../hookMeasureHeight';
+import explain from '../../../explain';
+import markdown from '../../../markdown';
+import { dynamidHeightWithData, forEachSub } from '../dynamicHeight';
+import { OnScroll } from 'mve-dom-helper';
 
 export default function () {
   explain(() => {
@@ -31,7 +31,7 @@ export default function () {
     `;
   });
 
-  const baseList = arrayCountCreateWith(1000, (i) => {
+  const baseList = arrayCountCreateWith(1000, i => {
     return {
       id: i,
       color: faker.color.rgb(),
@@ -58,7 +58,7 @@ export default function () {
   );
   fdom.div({
     className:
-      "touch-none w-[90%] h-[90%] overflow-hidden border-red-100 border-1",
+      'touch-none w-[90%] h-[90%] overflow-hidden border-red-100 border-1',
     children(container: HTMLDivElement) {
       const containerHeight = createSignal(0);
       hookMeasureHeight(container, () => {
@@ -66,7 +66,7 @@ export default function () {
         batchSignalEnd();
       });
 
-      const onScroll = OnScroll.hookGet("y", container, {
+      const onScroll = OnScroll.hookGet('y', container, {
         maxScroll: memo(() => {
           return averageHeight() * list.get().length - containerHeight.get();
         }),
@@ -85,16 +85,16 @@ export default function () {
           return `translateY(${-onScroll.get()}px)`;
         },
         s_paddingTop() {
-          return paddingBegin() + "px";
+          return `${paddingBegin()}px`;
         },
         children() {
           renderForEach<Row, number>(
-            forEachSub(list.get, (v) => v.id, subList),
+            forEachSub(list.get, v => v.id, subList),
             function (key, et) {
               if (key == 0) {
-                console.log("init", `${key}-abc`);
+                console.log('init', `${key}-abc`);
                 hookDestroy(() => {
-                  console.log("destroy", `${key}-abc`);
+                  console.log('destroy', `${key}-abc`);
                 });
               }
               const div = fdom.div({
@@ -105,16 +105,16 @@ export default function () {
                 children() {
                   // debugger
                   renderTextContent(() => {
-                    return et.getValue().id + "--" + et.getIndex();
+                    return `${et.getValue().id}--${et.getIndex()}`;
                   });
                   fdom.input({
-                    className: "daisy-input daisy-input-xs",
+                    className: 'daisy-input daisy-input-xs',
                   });
                   dom.p().renderTextContent(() => et.getValue().content);
                   if (key == 0) {
-                    console.log("initxx", `${key}-abc`);
+                    console.log('initxx', `${key}-abc`);
                     hookDestroy(() => {
-                      console.log("destroyxx", `${key}-abc`);
+                      console.log('destroyxx', `${key}-abc`);
                     });
                   }
                 },

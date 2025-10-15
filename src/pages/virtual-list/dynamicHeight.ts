@@ -1,4 +1,4 @@
-import { getSubListInfo } from "mve-helper";
+import { getSubListInfo } from 'mve-helper';
 import {
   batchSignalEnd,
   createSignal,
@@ -6,15 +6,15 @@ import {
   GetValue,
   memo,
   ReadArray,
-} from "wy-helper";
-import hookMeasureHeight from "./hookMeasureHeight";
+} from 'wy-helper';
+import hookMeasureHeight from './hookMeasureHeight';
 
 export function dynamicHeightWithId() {
   const cacheMap = new Map<number, number>();
   const averageHeight = createSignal(100);
   function getHeightWithId(id: number) {
     const h = cacheMap.get(id);
-    if (typeof h == "number") {
+    if (typeof h == 'number') {
       return h;
     }
     return averageHeight.get();
@@ -56,7 +56,7 @@ export function dynamidHeightWithData<T>(
     let c = 0;
     for (let i = 0; i < array.length; i++) {
       const rowHeight = getCellHeight(array[i]);
-      if (typeof rowHeight == "number") {
+      if (typeof rowHeight == 'number') {
         h = h + rowHeight;
         c++;
       }
@@ -73,7 +73,7 @@ export function dynamidHeightWithData<T>(
 
   function getHeight(v: T) {
     const h = getCellHeight(v);
-    if (typeof h == "number") {
+    if (typeof h == 'number') {
       return h;
     }
     return averageHeight() || 100;
