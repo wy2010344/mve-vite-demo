@@ -96,7 +96,6 @@ export default function ({
                   ]).then(() => {
                     //确实移动完成了,但需要异步处理后台
                     //应该应用乐观更新,如果成功则提交,如果失败则返回
-
                     const dtask = dragTask()!;
                     const beforeId = target.getBeforeId();
                     const out = tasks.set(function (ts) {

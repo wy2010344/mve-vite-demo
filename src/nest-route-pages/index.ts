@@ -17,6 +17,11 @@ const { renderBranch, getBranch, preLoad } = createTreeRoute({
     number: argForceNumber,
   },
   pages,
+  aliasMap: {
+    '/[x]/bb'(args) {
+      return `/bb-${args.x}`;
+    },
+  },
   prefix: './pages/',
 });
 /**

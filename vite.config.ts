@@ -50,22 +50,5 @@ export default defineConfig({
       'history', // 确保 history 被正确预构建
     ],
   },
-  plugins: [
-    tailwindcss(),
-    // 自定义插件来处理 workspace 依赖的外部引用
-    {
-      name: 'resolve-workspace-externals',
-      resolveId(id, importer) {
-        // 如果是从 workspace 包中导入 history，将其解析为实际的 node_modules 路径
-        if (
-          id === 'history' &&
-          importer &&
-          importer.includes('daisy-mobile-helper')
-        ) {
-          return path.resolve(__dirname, 'node_modules/history/index.js');
-        }
-        return null;
-      },
-    },
-  ],
+  plugins: [tailwindcss()],
 });

@@ -5,7 +5,7 @@ export default function (arg: GetValue<{}>) {
   fdom.div({
     children() {
       renderTextContent(() => {
-        return ` -- `;
+        return ` -主页- `;
       });
     },
   });

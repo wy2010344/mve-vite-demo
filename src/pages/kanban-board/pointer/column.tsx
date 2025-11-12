@@ -60,7 +60,6 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
       }
       return true;
     });
-    // .sort((a, b) => priorityValue(a.priority) - priorityValue(b.priority));
   });
 
   const map = new Map<string, HTMLDivElement>();
@@ -85,6 +84,7 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
     }
     const tasks = getTasks();
     for (let i = 0; i < tasks.length; i++) {
+      //可以启用二分查找法
       const task = tasks[i];
       const div = map.get(task.id);
       if (!div) {
@@ -146,7 +146,6 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
         getArray={getTasksWithPreview}
         getKey={v => v.id}
         render={(getTask, getIndex, key) => {
-          // renderIf(() => getIndex() == index(), renderPlaceHolder);
           mve.renderChild(
             <CardBase
               plugin={mergeSet<HTMLDivElement>(
@@ -244,10 +243,6 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
           );
         }}
       />
-      {/* <If
-        condition={() => index() == getTasks().length}
-        whenTrue={renderPlaceHolder}
-      /> */}
     </ColumnBase>
   );
 }
