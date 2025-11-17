@@ -37,14 +37,12 @@ export function render偏移(transY: StoreRef<number>) {
         className: 'w-3 h-3 bg-accent cursor-move',
         onPointerDown(e) {
           let lastE: PointerEvent = e;
-          function didMove(e: PointerEvent) {
-            const deltaY = e.pageY - lastE.pageY;
-            transY.set(deltaY + transY.get());
-            lastE = e;
-          }
           pointerMove({
-            onMove: didMove,
-            onEnd: didMove,
+            onMove(e) {
+              const deltaY = e.pageY - lastE.pageY;
+              transY.set(deltaY + transY.get());
+              lastE = e;
+            },
           });
         },
       });

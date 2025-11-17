@@ -1,6 +1,6 @@
 import { fdom, renderText } from 'mve-dom';
 import { hookDestroy, renderIf, renderOne } from 'mve-helper';
-import { subscribeEventListener } from 'wy-dom-helper';
+import { subscribeEventListener, windowSize } from 'wy-dom-helper';
 import { createSignal, GetValue } from 'wy-helper';
 import fixRightTop from './fixRightTop';
 import themeDropdown from './themeDropdown';
@@ -45,21 +45,10 @@ export function onlyMobile() {
 }
 
 export function renderFullScreen(renderDisplay: (arg: DisplayArg) => void) {
-  const width = createSignal(window.innerWidth);
-  const height = createSignal(window.innerHeight);
-  hookDestroy(
-    subscribeEventListener(window, 'resize', e => {
-      width.set(window.innerWidth);
-      height.set(window.innerHeight);
-    })
-  );
   fdom.div({
     className: 'w-full h-full',
     children() {
-      renderDisplay({
-        width: width.get,
-        height: height.get,
-      });
+      renderDisplay(windowSize);
     },
   });
 }
@@ -106,7 +95,19 @@ export function renderMobileView(
         },
       });
     } else {
-      renderText`屏幕比例不支持,需要小于3/4`;
+      const size = hookMeasureSize();
+      fdom.div({
+        className: 'h-full aspect-3/4',
+        children(div: HTMLElement) {
+          size.plugin(div);
+          renderIf(
+            () => size.width() && size.height(),
+            () => {
+              renderDisplay(size, true);
+            }
+          );
+        },
+      });
     }
   });
 }

@@ -26,6 +26,8 @@ export default function ({
         draggable
         onDragStart={onDragStart}
         onDragEnd={e => {
+          //即使有删除，在执行在已经释放的节点上。
+          console.log('dragEnd', e.currentTarget);
           dragId.set(undefined);
         }}
         onDelete={onDelete}

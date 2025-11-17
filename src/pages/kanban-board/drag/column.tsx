@@ -23,7 +23,7 @@ function priorityValue(n: PriorityType) {
 export default function ({ title, type }: { title: string; type: TaskType }) {
   const { dragId, tasks } = TaskContext.consume();
   const getTasks = memo(function () {
-    return tasks.get().filter(x => x.type == type);
+    return tasks.get().filter(x => x.type == type && x.id != dragId.get());
     // .sort((a, b) => priorityValue(a.priority) - priorityValue(b.priority));
   });
 

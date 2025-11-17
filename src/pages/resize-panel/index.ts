@@ -54,17 +54,14 @@ export default function () {
         const moveY = doMoveAcc(y.onMove(e));
         let lastE = e.point;
         document.body.style.userSelect = 'none';
-        function didMove(e: PointerEvent) {
-          moveX(e.pageX - lastE.pageX);
-          moveY(e.pageY - lastE.pageY);
-          lastE = e;
-        }
+
         pointerMove({
           onMove(e) {
-            didMove(e);
+            moveX(e.pageX - lastE.pageX);
+            moveY(e.pageY - lastE.pageY);
+            lastE = e;
           },
           onEnd(e) {
-            didMove(e);
             document.body.style.userSelect = '';
           },
         });

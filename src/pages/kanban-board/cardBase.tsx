@@ -4,7 +4,7 @@ import { HookRender, If } from './xmlRender';
 import { FPDomAttributes } from 'mve-dom';
 import { renderSizeSvg } from '~/mve-icon';
 import { LuCalendar, LuUser, LuX } from 'mve-icons/lu';
-import { GetValue, getValueOrGet } from 'wy-helper';
+import { GetValue, alawaysFalse, emptyFun, getValueOrGet } from 'wy-helper';
 import { Task } from './type';
 
 const priorityColors = {
@@ -21,13 +21,13 @@ const priorityText = {
 
 export default function ({
   getTask,
-  selected,
-  onDelete,
+  selected = alawaysFalse,
+  onDelete = emptyFun,
   ...props
 }: {
-  onDelete(id: string): void;
+  onDelete?(id: string): void;
   getTask: GetValue<Task>;
-  selected(): any;
+  selected?(): any;
 } & FPDomAttributes<'div'>) {
   return (
     <div

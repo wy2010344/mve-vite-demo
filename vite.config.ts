@@ -8,11 +8,11 @@ export default defineConfig({
   root: path.resolve(__dirname), // apps/demo 的路径
   assetsInclude: ['**/*.glb', '**/*.gltf'],
   server: {
-    watch: {
+    watch:__filename.startsWith('/Volumes/')? {
       usePolling: true,
       interval: 1000,
       ignored: ['**/node_modules/**'], // 忽略 node_modules 目录
-    },
+    }:undefined,
   },
   base: './',
   build: {

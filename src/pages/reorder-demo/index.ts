@@ -1,36 +1,27 @@
 import { faker } from '@faker-js/faker';
 import { fdom } from 'mve-dom';
-import { hookDestroy, hookTrackSignal, renderArrayToArray } from 'mve-helper';
+import { hookDestroy, renderArrayToArray } from 'mve-helper';
 import {
   animateSignal,
-  moveEdgeScroll,
+  observerResize,
   pointerMove,
-  subscribeEventListener,
   subscribeScroller,
 } from 'wy-dom-helper';
 import {
-  addEffect,
   AnimateSignal,
-  AnimationTime,
   arrayMove,
   batchSignalEnd,
   beforeMoveOperate,
   createSignal,
   easeFns,
-  EdgeScrollConfig,
-  emptyFun,
-  EmptyFun,
-  GetValue,
-  PointKey,
   reorderCheckTarget,
-  storeRef,
   StoreRef,
   tween,
 } from 'wy-helper';
 import themeDropdown, { randomTheme } from '../../themeDropdown';
 import fixRightTop from '../../fixRightTop';
 import { renderMobileView } from '../../onlyMobile';
-import { pluginEdgeScroll } from 'mve-dom-helper';
+import { setEdgeScroll } from 'mve-dom-helper';
 
 export const dataList = Array(30)
   .fill(1)
@@ -44,6 +35,15 @@ export const dataList = Array(30)
 
 type Row = (typeof dataList)[0];
 const ease1 = tween(600, easeFns.out(easeFns.circ));
+/**
+ * 不太靠谱，不应该实时交换，而应该最终交换
+ * 1.偏移量，其实正在拖拽的容器，应该向外露出一个高度，即使变，也是observerSize。
+ * 如果大家都是observerSize,则绝对定位也是可以的。
+ * 绝对定位相对轻松
+ * 但每个高度不一样，需要累积前面的高度。。
+ * 那么还是拖拽的预览？？就需要一个预览视图
+ * @returns
+ */
 export default function () {
   fixRightTop(function () {
     themeDropdown();
@@ -61,14 +61,16 @@ export default function () {
       s_userSelect() {
         return onDrag.get() ? 'none' : 'auto';
       },
-      plugin: pluginEdgeScroll({
-        shouldMeasure: onDrag.get,
-        direction: 'y',
-        config: {
-          padding: 10,
-          config: true,
-        },
-      }),
+      plugin(div) {
+        setEdgeScroll(div, {
+          shouldMeasure: onDrag.get,
+          direction: 'y',
+          config: {
+            padding: 10,
+            config: true,
+          },
+        });
+      },
       children() {
         const outArray = renderArrayToArray(orderList.get, (v, getIndex) => {
           const h = Math.floor(Math.random() * 100 + 50);
@@ -100,27 +102,16 @@ export default function () {
               });
               onDrag.set(v);
               let lastPageY = e.pageY;
-              // const mes = moveEdgeScroll(e.pageY, {
-              //   direction: "y",
-              //   container,
-              //   config: {
-              //     padding: 10,
-              //     config: true
-              //   }
-              // })
               pointerMove({
                 onMove(e) {
-                  // mes.changePoint(e.pageY)
                   transY.set(transY.get() + e.pageY - lastPageY);
                   lastPageY = e.pageY;
                   const outList = outArray();
                   didMove(orderList, out, outList, marginTop);
-                  // didMoveMarginTop(orderList, transY, div, getIndex(), outList, marginTop)
                   batchSignalEnd();
                 },
                 onEnd(e) {
                   destroyScroll();
-                  // mes.destroy()
                   transY.animateTo(0, ease1).then(() => {
                     onDrag.set(undefined);
                   });
@@ -149,7 +140,14 @@ export default function () {
             },
           });
 
+          const height = createSignal(0);
+          hookDestroy(
+            observerResize(() => {
+              height.set(div.offsetHeight);
+            }, div)
+          );
           const out = {
+            height: height.get,
             div,
             transY,
             getIndex,
@@ -205,6 +203,7 @@ function didMove<T>(
          */
         row.transY.set(from);
         row.transY.changeTo(0, ease1);
+        console.log('change...');
       }
     );
     orderList.set(arrayMove(orderList.get(), fromIndex, toIndex, true));

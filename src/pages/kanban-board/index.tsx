@@ -113,7 +113,6 @@ export default function () {
               }
             }}
           />
-          <div className="h-100" />
         </>
       );
     },

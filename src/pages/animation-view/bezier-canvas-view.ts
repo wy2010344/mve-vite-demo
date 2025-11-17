@@ -207,26 +207,24 @@ function drawControl(
     },
     onPointerDown(e) {
       let lastE = e.original;
-      function onMove(e: PointerEvent) {
-        const diffX = e.pageX - lastE.pageX;
-        const diffY = e.pageY - lastE.pageY;
-        let nextX = x.get() + diffX / size.get();
-
-        const nextY = y.get() - diffY / size.get();
-        if (nextX < 0) {
-          nextX = 0;
-        } else if (nextX > 1) {
-          nextX = 1;
-        }
-        x.set(nextX);
-        y.set(nextY);
-
-        onChange();
-        lastE = e;
-      }
       pointerMove({
-        onMove,
-        onEnd: onMove,
+        onMove(e) {
+          const diffX = e.pageX - lastE.pageX;
+          const diffY = e.pageY - lastE.pageY;
+          let nextX = x.get() + diffX / size.get();
+
+          const nextY = y.get() - diffY / size.get();
+          if (nextX < 0) {
+            nextX = 0;
+          } else if (nextX > 1) {
+            nextX = 1;
+          }
+          x.set(nextX);
+          y.set(nextY);
+
+          onChange();
+          lastE = e;
+        },
       });
     },
   });

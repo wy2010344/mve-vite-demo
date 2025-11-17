@@ -1,31 +1,30 @@
 import { createContext } from 'mve-core';
 import { AnimateSignal, BatchOptimistic, GetValue, StoreRef } from 'wy-helper';
 import { Task, TaskType } from '../type';
+import { CreateListContainer, SimpleDragData } from '../pointer-absolute/util';
 
-export type DragData = {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  type: StoreRef<'move' | 'remove' | 'cancel' | undefined>;
+export type DragData = SimpleDragData<string> & {
+  targetPlaceholder?: {
+    readonly type: TaskType;
+    readonly getBeforeId: GetValue<string | undefined>;
+  };
+  // type: StoreRef<'move' | 'remove' | 'cancel' | undefined>;
 };
+
+export type DragType = 'move' | 'remove';
 export const taskContext = createContext<{
   tasks: BatchOptimistic<Task[]>;
   dragTask: GetValue<Task | undefined>;
   dragData: StoreRef<DragData | undefined>;
-  dragX: AnimateSignal;
-  dragY: AnimateSignal;
-  columns: Map<string, HTMLElement>;
-  targetHolder: StoreRef<
+  onDrop(d: DragData): void;
+  getAccept: GetValue<
     | {
-        element: HTMLElement;
-        type: TaskType;
-        getBeforeId: GetValue<string | undefined>;
-        // index: number
+        data: DragData;
+        container: Element;
+        accept: DragType;
       }
     | undefined
   >;
-  backHolder: StoreRef<HTMLElement | undefined>;
-  activeColumn: StoreRef<string | undefined>;
+  createListContainer: CreateListContainer<Task, DragData, DragType, string>;
+  // backHolder: StoreRef<HTMLElement | undefined>;
 }>(undefined!);

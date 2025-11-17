@@ -77,15 +77,13 @@ export default function ({
           'absolute w-3 h-3 right-0 bottom-0 bg-accent cursor-nwse-resize',
         onPointerDown(e) {
           let lastE: PointerEvent = e;
-          function didMove(e: PointerEvent) {
-            const deltaX = Math.round(e.pageX - lastE.pageX);
-            // const deltaY = e.pageY - lastE.pageY
-            size.set(size.get() + deltaX);
-            lastE = e;
-          }
           pointerMove({
-            onMove: didMove,
-            onEnd: didMove,
+            onMove(e) {
+              const deltaX = Math.round(e.pageX - lastE.pageX);
+              // const deltaY = e.pageY - lastE.pageY
+              size.set(size.get() + deltaX);
+              lastE = e;
+            },
           });
         },
       });
