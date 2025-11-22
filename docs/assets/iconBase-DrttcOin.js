@@ -1,1 +1,0 @@
-import{ac as f}from"./index-B26XVUiJ.js";function r(t,o){t.forEach(function(n){o(n.tag,n.attr,()=>{r(n.child,o)})})}function u(t,o,n,c){var{renderItem:e,renderRoot:a}=f.consume();(n||a)(t,o.attr,()=>{r(o.child,e)},c)}export{u as G};
