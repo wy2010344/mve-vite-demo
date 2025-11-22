@@ -1,26 +1,15 @@
-import {
-  addEffect,
-  batchSignalEnd,
-  createSignal,
-  GetValue,
-  memo,
-  storeRef,
-} from 'wy-helper';
+import { createSignal, GetValue, memo } from 'wy-helper';
 import ColumnBase from '../columnBase';
 import { Task, TaskType } from '../type';
 import { HookRender } from '../xmlRender';
-import { DragData, DragType, taskContext } from './context';
+import { taskContext } from './context';
 import CardBase from '../cardBase';
 import { mve } from 'mve-dom-helper';
-import {
-  buildContainer,
-  getClickPosition,
-  simpleDragContainer,
-} from '../pointer-absolute/util';
 import { animateSignal } from 'wy-dom-helper';
+import { getClickPosition } from 'mve-dom-helper';
 
 export default function ({ title, type }: { title: string; type: TaskType }) {
-  const { tasks, dragData, onDrop, getAccept, dragTask, createListContainer } =
+  const { tasks, dragData, dragTask, createListContainer } =
     taskContext.consume();
 
   const getTasks = memo(function () {
@@ -43,6 +32,16 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
     },
     accept(n) {
       return 'move';
+    },
+    createDragData(e, key) {
+      return {
+        ...getClickPosition(e),
+        id: key,
+        activeContainer: createSignal(null),
+        dragX: animateSignal(0),
+        dragY: animateSignal(0),
+        onDropEnd: createSignal(false),
+      };
     },
     preview(index, d) {
       mve.renderChild(
@@ -85,34 +84,7 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
                 //拖拽完成的动画，隐藏
                 className={() => (dragData.get()?.id == key ? 'opacity-0' : '')}
                 getTask={getData}
-                onPointerDown={e => {
-                  onPointerDown(e, {
-                    createDragData() {
-                      return {
-                        ...getClickPosition(e),
-                        id: key,
-                        activeContainer: createSignal(null),
-                        dragX: animateSignal(0),
-                        dragY: animateSignal(0),
-                        onDropEnd: createSignal(false),
-                      };
-                    },
-                    onDragFinish(d) {
-                      //这里可以改成
-                      const value = getAccept();
-                      if (value) {
-                        if ((value.accept = 'move')) {
-                          //立即调整本地顺序，乐观更新
-                          onDrop(d);
-                          //先调整顺序，因为先设置dropEnd会导致顺序混乱
-                          // batchSignalEnd();
-                        }
-                      }
-                      d.onDropEnd.set(true);
-                      batchSignalEnd();
-                    },
-                  });
-                }}
+                onPointerDown={onPointerDown}
               />
             );
           });

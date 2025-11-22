@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite --force",
+    "dev": "vite --force --host",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "lint": "eslint src/ --fix",

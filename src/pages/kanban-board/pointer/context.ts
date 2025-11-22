@@ -1,7 +1,7 @@
 import { createContext } from 'mve-core';
-import { AnimateSignal, BatchOptimistic, GetValue, StoreRef } from 'wy-helper';
+import { BatchOptimistic, GetValue, StoreRef } from 'wy-helper';
 import { Task, TaskType } from '../type';
-import { CreateListContainer, SimpleDragData } from '../pointer-absolute/util';
+import { CreateListContainer, SimpleDragData } from 'mve-dom-helper';
 
 export type DragData = SimpleDragData<string> & {
   targetPlaceholder?: {
@@ -16,7 +16,6 @@ export const taskContext = createContext<{
   tasks: BatchOptimistic<Task[]>;
   dragTask: GetValue<Task | undefined>;
   dragData: StoreRef<DragData | undefined>;
-  onDrop(d: DragData): void;
   getAccept: GetValue<
     | {
         data: DragData;

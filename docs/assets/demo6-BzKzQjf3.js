@@ -1,1 +1,0 @@
-import{m as t,an as c,t as r}from"./index-BiAKiJb6.js";function l(){t({x:10,y:10,onClick(e){console.log("1")},withPath:!0,draw({ctx:e,path:o}){o.closePath(),c(o),o.roundRect(0,0,30,30,[10,20,30,40]),r("red")}}),t({x:200,y:200,onClick(e){console.log("2")},withPath:!0,draw({ctx:e,path:o}){o.rect(40,40,20,20),r("green")}})}export{l as default};

@@ -5,9 +5,10 @@ import {
   SimpleDragData,
   getClickPosition,
   simpleDragContainer,
-} from '../kanban-board/pointer-absolute/util';
+} from 'mve-dom-helper';
 import { cns } from 'mve-dom-helper';
 import { animateSignal } from 'wy-dom-helper';
+import { animate } from 'motion';
 
 type Model = number | ListModel;
 type ListModel = StoreRef<Model[]>;
@@ -21,9 +22,43 @@ type DragData = SimpleDragData<Model> & {
 };
 
 const dragData = createSignal<DragData | undefined>(undefined);
-const { createListContainer, getAccept } = simpleDragContainer({
+const { createListContainer } = simpleDragContainer({
   getDragData: dragData.get,
   setDragData: dragData.set,
+  changeIndexAnimate(div, dir, from) {
+    animate(div, { [dir]: [from, 0] });
+  },
+  onDragFinish(d, value) {
+    //这里可以改成
+    if (value) {
+      if (value.accept == 'move') {
+        //立即调整本地顺序，乐观更新
+        // onDrop(d);
+        const preview = d.targetPlaceholder;
+        if (!preview) {
+          throw 'no preview placeholder';
+        }
+        const fromList = d.from.get().filter(x => x != d.id);
+        if (d.from != preview.list) {
+          //操作两处
+          preview.list.set(
+            preview.list.get().toSpliced(preview.index(), 0, d.id)
+          );
+        } else {
+          const beforeId = preview.beforeId();
+          if (beforeId) {
+            const idx = fromList.indexOf(beforeId);
+            fromList.splice(idx, 0, d.id);
+          } else {
+            fromList.push(d.id);
+          }
+        }
+        d.from.set(fromList);
+      }
+    }
+    d.onDropEnd.set(true);
+    batchSignalEnd();
+  },
 });
 /**
  * 嵌套列表，当然可以抽象出单列表
@@ -84,13 +119,24 @@ function renderModel(
         return true;
       });
     });
-    const { renderChildren, plugin } = createListContainer({
+    const { plugin, renderChildren } = createListContainer({
       accept(n) {
         return 'move';
       },
       direction: 'y',
       getList,
       getId: quote,
+      createDragData(e, key, target) {
+        return {
+          ...getClickPosition(e, target),
+          id: key,
+          activeContainer: createSignal(null),
+          dragX: animateSignal(0),
+          dragY: animateSignal(0),
+          onDropEnd: createSignal(false),
+          from: model,
+        };
+      },
       preview(index, d) {
         const element = renderModel(d.id, {
           s_opacity: 0,
@@ -113,7 +159,7 @@ function renderModel(
         args?.plugin?.(e);
       },
       className: cns(
-        'flex flex-col gap-1 items-stretch p-1 relative',
+        'flex flex-col gap-1 items-stretch p-4 relative border-green-700 border-2',
         args?.className
       ),
       children(c: HTMLElement) {
@@ -134,57 +180,7 @@ function renderModel(
                   : '';
               },
             },
-            function (e, container) {
-              {
-                onPointerDown(e, {
-                  createDragData() {
-                    return {
-                      ...getClickPosition(e, container),
-                      id: key,
-                      activeContainer: createSignal(null),
-                      dragX: animateSignal(0),
-                      dragY: animateSignal(0),
-                      onDropEnd: createSignal(false),
-                      from: model,
-                    };
-                  },
-                  onDragFinish(d) {
-                    //这里可以改成
-                    const value = getAccept();
-                    if (value) {
-                      if ((value.accept = 'move')) {
-                        //立即调整本地顺序，乐观更新
-                        // onDrop(d);
-                        const preview = d.targetPlaceholder;
-                        if (!preview) {
-                          throw 'no preview placeholder';
-                        }
-                        const fromList = d.from.get().filter(x => x != d.id);
-                        if (d.from != preview.list) {
-                          //操作两处
-                          preview.list.set(
-                            preview.list
-                              .get()
-                              .toSpliced(preview.index(), 0, d.id)
-                          );
-                        } else {
-                          const beforeId = preview.beforeId();
-                          if (beforeId) {
-                            const idx = fromList.indexOf(beforeId);
-                            fromList.splice(idx, 0, d.id);
-                          } else {
-                            fromList.push(d.id);
-                          }
-                        }
-                        d.from.set(fromList);
-                      }
-                    }
-                    d.onDropEnd.set(true);
-                    batchSignalEnd();
-                  },
-                });
-              }
-            }
+            onPointerDown
           );
         });
       },

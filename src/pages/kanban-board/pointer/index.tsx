@@ -1,6 +1,7 @@
 import {
   alawaysFalse,
   batchOptimistic,
+  batchSignalEnd,
   createSignal,
   emptyFun,
   GetValue,
@@ -16,7 +17,8 @@ import { DragData, DragType, taskContext } from './context';
 import { renderIf, renderOne } from 'mve-helper';
 import CardBase from '../cardBase';
 import { fdom } from 'mve-dom';
-import { simpleDragContainer } from '../pointer-absolute/util';
+import { simpleDragContainer } from 'mve-dom-helper';
+import { animate } from 'motion';
 export default function ({
   tasks: _tasks,
   columns,
@@ -40,6 +42,48 @@ export default function ({
   >({
     getDragData: dragData.get,
     setDragData: dragData.set,
+    changeIndexAnimate(div, dir, from) {
+      animate(div, { [dir]: [from, 0] });
+    },
+    onDragFinish(d, value) {
+      if (value) {
+        if (value.accept == 'move') {
+          //立即调整本地顺序，乐观更新
+
+          const dtask = dragTask()!;
+          const target = d.targetPlaceholder;
+          if (!target) {
+            throw '';
+          }
+          const beforeId = target.getBeforeId();
+          const out = tasks.set(function (ts) {
+            ts = [...ts];
+            const row = { ...dtask, type: target.type };
+            removeWhere(ts, v => v.id == d.id);
+            if (beforeId) {
+              for (let i = 0; i < ts.length; i++) {
+                const t = ts[i];
+                if (t.id == beforeId) {
+                  ts.splice(i, 0, row);
+                  break;
+                }
+              }
+            } else {
+              ts.push(row);
+            }
+            return ts;
+          });
+          setTimeout(() => {
+            //假设成功了
+            out.commit();
+          }, 10 * 1000);
+          //先调整顺序，因为先设置dropEnd会导致顺序混乱
+          // batchSignalEnd();
+        }
+      }
+      d.onDropEnd.set(true);
+      batchSignalEnd();
+    },
   });
   taskContext.provide({
     tasks,
@@ -47,35 +91,6 @@ export default function ({
     dragTask,
     createListContainer,
     getAccept,
-    onDrop(d) {
-      const dtask = dragTask()!;
-      const target = d.targetPlaceholder;
-      if (!target) {
-        throw '';
-      }
-      const beforeId = target.getBeforeId();
-      const out = tasks.set(function (ts) {
-        ts = [...ts];
-        const row = { ...dtask, type: target.type };
-        removeWhere(ts, v => v.id == d.id);
-        if (beforeId) {
-          for (let i = 0; i < ts.length; i++) {
-            const t = ts[i];
-            if (t.id == beforeId) {
-              ts.splice(i, 0, row);
-              break;
-            }
-          }
-        } else {
-          ts.push(row);
-        }
-        return ts;
-      });
-      setTimeout(() => {
-        //假设成功了
-        out.commit();
-      }, 10 * 1000);
-    },
   });
 
   fdom.div({

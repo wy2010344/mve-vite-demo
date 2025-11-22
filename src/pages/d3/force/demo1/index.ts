@@ -54,7 +54,7 @@ import {
 } from 'mve-dom-helper/canvasRender';
 
 const width = 800;
-const height = 800;
+const height = 700;
 
 type NNode = (typeof data.nodes)[number];
 type NLink = (typeof data.links)[number];
@@ -264,6 +264,7 @@ export default function () {
                   const rec = canvas.canvas.getBoundingClientRect();
                   const halfX = rec.left + rec.width / 2;
                   const halfY = rec.top + rec.height / 2;
+
                   node.x.f = e.pageX - halfX;
                   node.y.f = e.pageY - halfY;
                   config.alphaTarget = 0.3;

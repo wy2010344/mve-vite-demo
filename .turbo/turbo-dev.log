@@ -1,0 +1,9 @@
+[?9001h[?1004h[?25l[2J[m[2;1H> vite-mve-demo@0.0.1 dev C:\github\es-pseudo-monorepo\apps\mve-vite-demo
+> vite --force --host[5;1H]0;C:\Windows\system32\cmd.exe[?25h[2m15:06:51[22m [36m[1m[vite][m [90m[2m(client)[m Forced re-optimization of dependencies
+Port 5173 is in use, trying another one...
+[?25l
+  [32m[1mVITE[22m v7.1.9  [m[2mready in [22m[1m8060[22m ms[10;1H  [32m➜  [m[1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[?25h[m
+  [32m➜  [m[1mNetwork[22m: [36mhttp://172.18.0.1:[1m5174[22m/[K[m
+  [32m➜  [m[1mNetwork[22m: [36mhttp://192.168.1.102:[1m5174[22m/[m
+[32m[2m  ➜  [m[2mpress [22m[1mh + enter[22m[2m to show help[22m[K
+/*! 🌼 daisyUI 5.3.7 */

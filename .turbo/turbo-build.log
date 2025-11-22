@@ -1,0 +1,46 @@
+[?9001h[?1004h[?25l[2J[m[2;1H> vite-mve-demo@0.0.1 build C:\github\es-pseudo-monorepo\apps\mve-vite-demo
+> tsc && vite build[5;1H]0;C:\Windows\system32\cmd.exe[?25h[36mvite v7.1.9 [32mbuilding for production...
+[m[Ktransforming (1) [2msrc\main.ts[22m[K[28Ctransforming (40) [2msrc\pages\panel\index.css[22m[K[43Ctransforming (44) [2m..\..\packages\wy-helper\wy-helper\dist\index.mjs[22m[K[67Ctransforming (193) [2msrc\pages\three\physics-with-rapier\index.ts[22m[K[63Ctransforming (236) [2m..\..\node_modules\.pnpm\mve-icons@6.0.0_mve-core@pa_8c52e227cef89d9c4b5aa1be5cc360fb\node_modules\[22m[K[118C[2mtransforming (249) ..\..\node_modules\.pnpm\mve-icons@6.0.0_mve-core@pa_8c52e227cef89d9c4b5aa1be5cc360fb\node_modules\[22m[K[118C[2mtransforming (255) ..\..\node_modules\.pnpm\three@0.176.0\node_modules\three\examples\jsm\postprocessing\RenderPass.js[22m[2m/*!  🌼 daisyUI 5.3.7 */
+[?25l[22m[2mFound 1 warning while optimizing generated CSS:[10;1H│ }[?25h[22m
+[2m│ @layer base {[22m[K
+[2m│[22m   @property --radialprogress {[K
+[2m┆[22m[12X[33m[2m[12C^--[22m Unknown at rule: @property[K[m
+[2m┆[22m[K
+[2m│     syntax: "<percentage>";[22m[K
+[2m│     inherits: true;[22m[K
+
+transforming (260) [2m..\..\node_modules\.pnpm\stylis@4.3.6\node_modules\stylis\src\Utility.js[22m[K[K[91Ctransforming (349) [2m..\..\packages\wy-helper\wy-helper\dist\kanren-Di6qozbx.mjs[22m[K[78Ctransforming (555) [2m..\..\node_modules\.pnpm\daisyui@5.3.7\node_modules\daisyui\functions\themeOrder.js[22m[K[102Ctransforming (564) [2m..\..\node_modules\.pnpm\motion-dom@12.23.23\node_modules\motion-dom\dist\es\index.mjs[22m[K[105Ctransforming (968) [2m..\..\node_modules\.pnpm\tiny-inflate@1.0.3\node_modules\tiny-inflate\index.js[22m[K[97Ctransforming (1267) [2mapp.css[22m[K[27C[32m✓ [m1388 modules transformed.[K
+[31m✗ [mBuild failed in 3.32s[K
+[31merror during build:[m
+[31m../../packages/mve/dom-helper/dist/history.mjs (3:9): "fdom" is not exported by "../../packages/mve/dom/dist/index.js", imp[m
+[31m[9;123Hported by "../../packages/mve/dom-helper/dist/history.mjs".[m
+[31mfile: [36mC:/github/es-pseudo-monorepo/packages/mve/dom-helper/dist/history.mjs:3:9[K[m
+[31m[m
+[33m1: import { batchSignalEnd, createSignal, getValueOrGet, memo } from "wy-helper";[m
+[33m2: import { createContext } from "mve-core";[m
+[33m3: import { fdom } from "mve-dom";[m
+[33m            ^[m
+[33m4: import { Action } from "history";[m
+[33m[m
+[31m    at getRollupError (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/es/sh[m
+[31m[9;123Hhared/parseAst.js:401:41)[m
+[31m    at error (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/es/shared/pars[m
+[31m[9;123HseAst.js:397:42)[m
+[31m    at Module.error (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/es/shar[m
+[31m[9;123Hred/node-entry.js:16939:16)[m
+[31m    at Module.traceVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist[m
+[31m[9;123Ht/es/shared/node-entry.js:17391:29)[m
+[31m    at ModuleScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/[m
+[31m[9;123H/dist/es/shared/node-entry.js:15061:39)[m
+[31m    at FunctionScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollu[m
+[31m[9;123Hup/dist/es/shared/node-entry.js:5642:38)[m
+[31m    at FunctionBodyScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/r[m
+[31m[9;123Hrollup/dist/es/shared/node-entry.js:5642:38)[m
+[31m    at TrackingScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollu[m
+[31m[9;123Hup/dist/es/shared/node-entry.js:5642:38)[m
+[31m    at MemberExpression.bind (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dis[m
+[31m[9;123Hst/es/shared/node-entry.js:7349:49)[m
+[31m    at CallExpression.bind (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/[m
+[31m[9;123H/es/shared/node-entry.js:2804:23)[m
+[30m[41m ELIFECYCLE [m [31mCommand failed with exit code 1.[m
+[?9001l[?1004l

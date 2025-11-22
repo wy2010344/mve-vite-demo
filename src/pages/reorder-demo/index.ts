@@ -1,27 +1,33 @@
 import { faker } from '@faker-js/faker';
-import { fdom } from 'mve-dom';
-import { hookDestroy, renderArrayToArray } from 'mve-helper';
+import { fdom, FPDomAttributes } from 'mve-dom';
+import { hookDestroy, renderArrayToArray, renderOne } from 'mve-helper';
+import { animateSignal } from 'wy-dom-helper';
 import {
-  animateSignal,
-  observerResize,
-  pointerMove,
-  subscribeScroller,
-} from 'wy-dom-helper';
-import {
+  alawaysFalse,
   AnimateSignal,
   arrayMove,
   batchSignalEnd,
   beforeMoveOperate,
   createSignal,
   easeFns,
+  GetValue,
+  memo,
+  quote,
   reorderCheckTarget,
   StoreRef,
   tween,
+  ValueOrGet,
 } from 'wy-helper';
 import themeDropdown, { randomTheme } from '../../themeDropdown';
 import fixRightTop from '../../fixRightTop';
 import { renderMobileView } from '../../onlyMobile';
-import { setEdgeScroll } from 'mve-dom-helper';
+import { cns, setEdgeScroll } from 'mve-dom-helper';
+import {
+  getClickPosition,
+  simpleDragContainer,
+  SimpleDragData,
+} from 'mve-dom-helper';
+import { animate } from 'motion';
 
 export const dataList = Array(30)
   .fill(1)
@@ -30,11 +36,21 @@ export const dataList = Array(30)
       index: i,
       name: faker.person.fullName(),
       avatar: faker.image.avatar(),
+      theme: randomTheme(),
+      h: Math.floor(Math.random() * 100 + 50),
     };
   });
 
 type Row = (typeof dataList)[0];
 const ease1 = tween(600, easeFns.out(easeFns.circ));
+
+type DragData = SimpleDragData<Row> & {
+  targetPlaceholder?: {
+    readonly index: () => number;
+    readonly beforeId: () => Row;
+  };
+};
+
 /**
  * 不太靠谱，不应该实时交换，而应该最终交换
  * 1.偏移量，其实正在拖拽的容器，应该向外露出一个高度，即使变，也是observerSize。
@@ -49,246 +65,177 @@ export default function () {
     themeDropdown();
   });
   const orderList = createSignal(dataList);
-  const onDrag = createSignal<Row | undefined>(undefined);
+  const dragData = createSignal<DragData | undefined>(undefined);
+  const { createListContainer, getAccept } = simpleDragContainer({
+    getDragData: dragData.get,
+    setDragData: dragData.set,
+    changeIndexAnimate(div, dir, from) {
+      animate(div, { [dir]: [from, 0] });
+    },
+    onDragFinish(d, value) {
+      if (value) {
+        if (value.accept == 'move') {
+          //立即调整本地顺序，乐观更新
+          // onDrop(d);
+          const preview = d.targetPlaceholder;
+          if (!preview) {
+            throw 'no preview placeholder';
+          }
+          const fromList = orderList.get().filter(x => x != d.id);
+
+          const beforeId = preview.beforeId();
+          if (beforeId) {
+            const idx = fromList.indexOf(beforeId);
+            fromList.splice(idx, 0, d.id);
+          } else {
+            fromList.push(d.id);
+          }
+          orderList.set(fromList);
+        }
+      }
+      d.onDropEnd.set(true);
+      batchSignalEnd();
+    },
+  });
   return renderMobileView(function ({ width, height }, mock) {
-    const container = fdom.div({
+    const getList = memo<Row[]>(() => {
+      return orderList.get().filter(x => {
+        const d = dragData.get();
+        if (d && x == d.id && !d.onDropEnd.get()) {
+          return false;
+        }
+        return true;
+      });
+    });
+
+    const { renderChildren, plugin } = createListContainer({
+      accept(n) {
+        return 'move';
+      },
+      direction: 'y',
+      getList,
+      getId: quote,
+      createDragData(e, key, container) {
+        return {
+          ...getClickPosition(e, container),
+          id: key,
+          activeContainer: createSignal(null),
+          dragX: animateSignal(0),
+          dragY: animateSignal(0),
+          onDropEnd: createSignal(false),
+        };
+      },
+      preview(index, d) {
+        d.targetPlaceholder = {
+          index,
+          element: renderView(d.id, {
+            children: index,
+            s_opacity: 0,
+            showTop: index,
+          }),
+          beforeId() {
+            return getList()[index()];
+          },
+        };
+      },
+    });
+    fdom.div({
       s_width: '100%',
       s_height: '100%',
       s_overflow: 'auto',
       s_marginInline: 'auto',
       s_position: 'relative',
       className: 'daisy-list touch-none pl-1 pr-1',
-      s_userSelect() {
-        return onDrag.get() ? 'none' : 'auto';
-      },
-      plugin(div) {
-        setEdgeScroll(div, {
-          shouldMeasure: onDrag.get,
-          direction: 'y',
-          config: {
-            padding: 10,
-            config: true,
-          },
-        });
-      },
+      plugin,
       children() {
-        const outArray = renderArrayToArray(orderList.get, (v, getIndex) => {
-          const h = Math.floor(Math.random() * 100 + 50);
-          const transY = animateSignal(0);
-          const marginTop = 10; //Math.floor(Math.random() * 10 + 5)
-          const div = fdom.div({
-            className: 'daisy-row daisy-card flex-row gap-1 pl-1 pr-1',
-            data_theme: randomTheme(),
-            s_display: 'flex',
-            s_alignItems: 'center',
-            s_marginTop() {
-              return getIndex() ? `${marginTop}px` : '0px';
-            },
-            s_position: 'relative',
-            s_minHeight: `${h}px`,
-            s_zIndex() {
-              return onDrag.get() == v ? '1' : '0';
-            },
-            s_transform() {
-              return `translateY(${transY.get()}px)`;
-            },
-            onPointerDown(e) {
-              if (onDrag.get()) {
-                return;
-              }
-              const destroyScroll = subscribeScroller(container, 'y', e => {
-                transY.set(transY.get() + e);
-                return true;
-              });
-              onDrag.set(v);
-              let lastPageY = e.pageY;
-              pointerMove({
-                onMove(e) {
-                  transY.set(transY.get() + e.pageY - lastPageY);
-                  lastPageY = e.pageY;
-                  const outList = outArray();
-                  didMove(orderList, out, outList, marginTop);
-                  batchSignalEnd();
-                },
-                onEnd(e) {
-                  destroyScroll();
-                  transY.animateTo(0, ease1).then(() => {
-                    onDrag.set(undefined);
-                  });
-                  batchSignalEnd();
-                },
-              });
-              batchSignalEnd();
-            },
-            children() {
-              fdom.img({
-                src: v.avatar,
-                s_width: '50px',
-                s_height: '50px',
-              });
-              fdom.span({
-                childrenType: 'text',
-                children: v.name,
-              });
-              fdom.hr({
-                s_flex: 1,
-              });
-              fdom.span({
-                childrenType: 'text',
-                children: getIndex,
-              });
+        renderChildren(function ({
+          key,
+          getData,
+          getIndex,
+          onPointerDown,
+          plugin,
+        }) {
+          renderView(key, {
+            showTop: getIndex,
+            children: getIndex,
+            plugin,
+            onPointerDown,
+            className() {
+              return dragData.get()?.id == key
+                ? 'opacity-0 pointer-events-none'
+                : '';
             },
           });
+        });
 
-          const height = createSignal(0);
-          hookDestroy(
-            observerResize(() => {
-              height.set(div.offsetHeight);
-            }, div)
-          );
-          const out = {
-            height: height.get,
-            div,
-            transY,
-            getIndex,
-          };
-          return out;
+        renderOne(dragData.get, d => {
+          if (d) {
+            renderView(d.id, {
+              children: 'move...',
+              className: 'pointer-events-none opacity-90 fixed',
+              s_position: 'fixed',
+              s_width: `${d.width}px`,
+              s_height: `${d.height}px`,
+              s_top() {
+                return `${d.dragY.get() - d.y}px`;
+              },
+              // s_left() {
+              //   return `${d.dragX.get() - d.x}px`;
+              // },
+              s_transformOrigin() {
+                return `${d.x}px ${d.y}px`;
+              },
+            });
+          }
         });
       },
     });
   });
 }
 
-function getOffset(v: {
-  div: {
-    offsetHeight: number;
-  };
-  transY: AnimateSignal;
-}) {
-  return v.div.offsetHeight;
-}
-
-type MoveItem = {
-  div: HTMLElement;
-  getIndex(): number;
-  transY: AnimateSignal;
-};
-
-function didMove<T>(
-  orderList: StoreRef<T[]>,
-  item: MoveItem,
-  outList: MoveItem[],
-  gap: number = 0
+function renderView(
+  v: Row,
+  {
+    showTop = alawaysFalse,
+    children,
+    ...args
+  }: {
+    showTop?: GetValue<any>;
+    children: ValueOrGet<string | number>;
+  } & FPDomAttributes<'div'>
 ) {
-  const n = reorderCheckTarget(
-    outList,
-    item.getIndex(),
-    getOffset,
-    item.transY.get(),
-    gap
-  );
-  if (n) {
-    const [fromIndex, toIndex] = n;
-    const diff = beforeMoveOperate(
-      fromIndex,
-      toIndex,
-      outList,
-      getOffset,
-      gap,
-      (row, from) => {
-        /**
-         * 如果依margin,则元素应该有margin?
-         * 如果元素在位置1,则无margin与gap
-         * 如果不在位置1,则有margin与gap
-         */
-        row.transY.set(from);
-        row.transY.changeTo(0, ease1);
-        console.log('change...');
-      }
-    );
-    orderList.set(arrayMove(orderList.get(), fromIndex, toIndex, true));
-    item.transY.silentDiff(diff);
-  }
-}
-
-function didMoveMarginTop<T>(
-  orderList: StoreRef<T[]>,
-  { div, transY, getIndex }: MoveItem,
-  outList: MoveItem[],
-  marginTop: number = 0
-) {
-  const index = getIndex();
-
-  const didCenterOffsetTop =
-    div.offsetTop + transY.get() + div.offsetHeight / 2;
-  // console.log("dd", transY.get())
-  if (transY.get() < 0) {
-    //向上
-    let justIndex = -1;
-    for (let i = 0; i < index && justIndex < 0; i++) {
-      const row = outList[i];
-      const rowCenter = row.div.offsetTop + row.div.offsetHeight / 2;
-      if (didCenterOffsetTop < rowCenter) {
-        //第一个超过的元素
-        justIndex = i;
-      }
-    }
-    if (justIndex > -1) {
-      const diff = div.offsetTop - outList[justIndex].div.offsetTop;
-      for (let i = justIndex; i < index; i++) {
-        const row = outList[i];
-        // row.transY.changeTo(-div.offsetHeight - marginTop)
-        row.transY.set(-div.offsetHeight - marginTop);
-        /**
-         * 如果依margin,则元素应该有margin?
-         * 如果元素在位置1,则无margin与gap
-         * 如果不在位置1,则有margin与gap
-         */
-        row.transY.changeTo(0, ease1);
-      }
-      console.log(
-        'aa',
-        index,
-        justIndex,
-        diff,
-        transY.get(),
-        diff + transY.get()
-      );
-      orderList.set(arrayMove(orderList.get(), index, justIndex, true));
-      transY.silentDiff(diff);
-    }
-  } else {
-    //向下
-    let justIndex = -1;
-    for (let i = index + 1; i < outList.length && justIndex < 0; i++) {
-      const row = outList[i];
-      const rowCenter = row.div.offsetTop + row.div.offsetHeight / 2;
-      if (didCenterOffsetTop > rowCenter) {
-        justIndex = i;
-      }
-    }
-    if (justIndex > -1) {
-      const flagDiv = outList[justIndex].div;
-      //就是受影响的间隔
-      const diff =
-        div.offsetTop +
-        div.offsetHeight -
-        (flagDiv.offsetTop + flagDiv.offsetHeight);
-      for (let i = index + 1; i < justIndex + 1; i++) {
-        //受影响的表演一次animation动画
-        const row = outList[i];
-        // row.transY.changeTo(div.offsetHeight + marginTop)
-        row.transY.set(div.offsetHeight + marginTop);
-        /**
-         * 如果依margin,则元素应该有margin?
-         * 如果元素在位置1,则无margin与gap
-         * 如果不在位置1,则有margin与gap
-         */
-        row.transY.changeTo(0, ease1);
-      }
-      console.log('bb', index, justIndex);
-      orderList.set(arrayMove(orderList.get(), index, justIndex, true));
-      transY.silentDiff(diff);
-    }
-  }
+  const marginTop = 10; //Math.floor(Math.random() * 10 + 5)
+  return fdom.div({
+    s_position: 'relative',
+    ...args,
+    className: cns(
+      'daisy-row daisy-card flex-row gap-1 pl-1 pr-1',
+      args.className
+    ),
+    data_theme: v.theme,
+    s_display: 'flex',
+    s_alignItems: 'center',
+    s_marginTop() {
+      return showTop() ? `${marginTop}px` : '0px';
+    },
+    s_minHeight: `${v.h}px`,
+    children() {
+      fdom.img({
+        src: v.avatar,
+        s_width: '50px',
+        s_height: '50px',
+      });
+      fdom.span({
+        childrenType: 'text',
+        children: v.name,
+      });
+      fdom.hr({
+        s_flex: 1,
+      });
+      fdom.span({
+        childrenType: 'text',
+        children: children,
+      });
+    },
+  });
 }
