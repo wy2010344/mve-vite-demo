@@ -1,0 +1,1 @@
+import{a as o}from"./onlyMobile-BKNU6acK.js";import"./index-SfgOm-p3.js";import"./index-PeN622_I.js";import"./canvasRender-DwJvwbpB-BWU3cVJm.js";import"./_commonjsHelpers-CqkleIqs.js";function p(){o(function(){})}export{p as default};

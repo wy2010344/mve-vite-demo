@@ -1,0 +1,1 @@
+import{tileSize as o,tilesPerRow as t}from"./constants-D9wMxaBn.js";import{c6 as n,ap as i,ax as s,c7 as c}from"./three.core-DinwzvY0.js";function p(a){const e=new n;e.position.y=a*o;const r=new i(new s(t*o,o),new c({color:4541017}));return r.receiveShadow=!0,e.add(r),e}export{p as Road};

@@ -1,0 +1,1 @@
+import{c as r,h as s,au as u,av as c,aw as i}from"./index-SfgOm-p3.js";function b(n,e,a){const t=r(n());return s(n,(a?u:c)(t.set,typeof e=="number"?o=>i(o,e):e)),t.get}function m(n,e){return!!n.find(a=>a.address==e.address&&a.name==e.name)}export{b as hookDebounceState,m as includePoint};

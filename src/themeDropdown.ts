@@ -1,7 +1,11 @@
 import { fdom, fsvg, renderText } from 'mve-dom';
 import themes from 'daisyui/functions/themeOrder';
-import { createSignal } from 'wy-helper';
+import { createSignal, tw } from 'wy-helper';
 import { faker } from '@faker-js/faker';
+import { runGlobalHolder } from 'mve-core';
+import { hookTrackSignal } from 'mve-helper';
+import { IoCheckbox } from 'mve-icons/io5';
+import { renderClassNameSvg, renderSizeSvg } from './mve-icon';
 const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
 
 export const themeSignal = createSignal(isDarkMode.matches ? 'dark' : 'light');
@@ -17,6 +21,11 @@ export function randomTheme() {
   ];
 }
 
+runGlobalHolder(() => {
+  hookTrackSignal(themeSignal.get, v => {
+    document.body.dataset.theme = v;
+  });
+});
 export default function () {
   fdom.div({
     className: 'daisy-dropdown',
@@ -75,6 +84,12 @@ export default function () {
                         });
                       },
                     });
+
+                    IoCheckbox(
+                      renderClassNameSvg,
+                      () =>
+                        tw`size-4 absolute right-6 ${themeSignal.get() == theme ? '' : 'opacity-0'}`
+                    );
                     fdom.input({
                       type: 'radio',
                       name: 'theme-dropdown',

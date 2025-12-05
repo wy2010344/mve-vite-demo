@@ -118,6 +118,7 @@ export default function () {
       createDragData(e, key, container) {
         return {
           ...getClickPosition(e, container),
+          startEvent: e,
           id: key,
           activeContainer: createSignal(null),
           dragX: animateSignal(0),

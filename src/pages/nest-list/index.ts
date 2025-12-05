@@ -129,6 +129,7 @@ function renderModel(
       createDragData(e, key, target) {
         return {
           ...getClickPosition(e, target),
+          startEvent: e,
           id: key,
           activeContainer: createSignal(null),
           dragX: animateSignal(0),

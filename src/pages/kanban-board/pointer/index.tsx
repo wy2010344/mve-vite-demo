@@ -35,7 +35,6 @@ export default function ({
     }
   });
   const { getAccept, createListContainer } = simpleDragContainer<
-    Task,
     DragData,
     DragType,
     string

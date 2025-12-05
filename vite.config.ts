@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
-import viteImportMap from 'wy-helper/viteImportmap';
-import path from 'path';
+import path, { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
 // import vitePluginRequire from "vite-plugin-require";
-
+const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   root: path.resolve(__dirname), // apps/demo 的路径
   assetsInclude: ['**/*.glb', '**/*.gltf'],
@@ -40,7 +40,7 @@ export default defineConfig({
     preserveSymlinks: false,
   },
   optimizeDeps: {
-    // force: true,
+    force: true,
     // 显式包含依赖，确保其被正确预构建
     include: [
       'wy-helper',

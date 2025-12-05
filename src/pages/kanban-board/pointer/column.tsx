@@ -36,6 +36,7 @@ export default function ({ title, type }: { title: string; type: TaskType }) {
     createDragData(e, key) {
       return {
         ...getClickPosition(e),
+        startEvent: e,
         id: key,
         activeContainer: createSignal(null),
         dragX: animateSignal(0),

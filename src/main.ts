@@ -8,16 +8,22 @@ import {
   renderOneKey,
 } from 'mve-helper';
 import { IconContext } from 'mve-icons';
-import { renderPop } from 'mve-dom-helper';
+import { renderPop } from 'mve-helper';
 import { createHashHistory } from 'history';
+import { loadContext } from './loadContext';
 const app = document.querySelector<HTMLDivElement>('#app')!;
-const pages = import.meta.glob('./pages/**');
+const pages = import.meta.glob('./pages/**/*.ts');
 const { renderBranch, getBranch, preLoad } = createTreeRoute({
   treeArg: {
     number: argForceNumber,
   },
   pages,
   prefix: './pages/',
+  aliasMap: {
+    '/nest-route-demo/[x]/bb'(args) {
+      return `/nest-route-demo/bb-${args.x}`;
+    },
+  },
   renderError,
 });
 createRoot(app, () => {
@@ -36,6 +42,11 @@ createRoot(app, () => {
         })
         .render(children);
     },
+  });
+  loadContext.provide({
+    renderBranch,
+    getBranch,
+    preLoad,
   });
   renderOneKey(
     getBranch(() => getHistoryState().pathname),

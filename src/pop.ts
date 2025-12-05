@@ -1,5 +1,5 @@
 import { fdom } from 'mve-dom';
-import { createPop } from 'mve-dom-helper';
+import { createPop } from 'mve-helper';
 import { createSignal, emptyArray, EmptyFun, SetValue } from 'wy-helper';
 
 export function createTimeoutPop(time: number, body: EmptyFun) {
