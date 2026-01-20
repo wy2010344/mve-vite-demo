@@ -12,7 +12,7 @@ import { renderPop } from 'mve-helper';
 import { createHashHistory } from 'history';
 import { loadContext } from './loadContext';
 const app = document.querySelector<HTMLDivElement>('#app')!;
-const pages = import.meta.glob('./pages/**/*.ts');
+const pages = import.meta.glob('./pages/**/*.(ts|tsx)');
 const { renderBranch, getBranch, preLoad } = createTreeRoute({
   treeArg: {
     number: argForceNumber,

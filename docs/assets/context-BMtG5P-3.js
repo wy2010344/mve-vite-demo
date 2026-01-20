@@ -1,0 +1,1 @@
+import{o as e}from"./index-XVZQUbQ5.js";import"./canvasRender-DlxfwZGY.js";import"./index-Bn6QTqXa.js";import"./_commonjsHelpers-CqkleIqs.js";const r=e("panel-theme-color","#ffffff"),p=e("panel-theme-scheme","light"),a=e("panel-theme-level",0);export{a as level,p as scheme,r as sourceColor};

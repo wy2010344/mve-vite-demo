@@ -34,6 +34,8 @@ export default defineConfig({
   resolve: {
     // dedupe: ['wy-helper', 'wy-dom-helper', 'mve-core', 'mve-dom'],
     alias: {
+      // 显式指定导入路径，跳过自动查找
+      // 'konva': 'konva/konva.js' ,
       '~': path.resolve(__dirname, 'src'), // 例如 @/components → src/components
     },
     // 确保能正确解析 node_modules 中的依赖
@@ -51,6 +53,7 @@ export default defineConfig({
       'mve-dom-helper',
       'daisy-mobile-helper',
       'history', // 确保 history 被正确预构建
+      'konva',
     ],
   },
   plugins: [tailwindcss()],

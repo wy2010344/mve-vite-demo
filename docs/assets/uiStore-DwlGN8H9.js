@@ -1,1 +1,0 @@
-import{c as t}from"./index-SfgOm-p3.js";const s={isStartMenuOpen:t(!1),toggleStartMenu(){this.isStartMenuOpen.set(!this.isStartMenuOpen.get())},closeStartMenu(){this.isStartMenuOpen.set(!1)}};export{s as uiStore};
