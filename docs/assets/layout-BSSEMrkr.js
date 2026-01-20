@@ -1,0 +1,1 @@
+import{aH as t,f as n,aJ as r,aI as i}from"./index-Dxu4lnfn.js";import{a}from"./onlyMobile-DoxvEJsg.js";import"./index-CT0uQ99y.js";import"./canvasRender-CK3mhhFQ.js";import"./_commonjsHelpers-CqkleIqs.js";function y(e){const{renderBranch:o}=t.consume();a(function({width:d,height:m},c){n.div({children(){r(e.getChildren,i,function(f){o(e.getChildren)})}})})}export{y as default};

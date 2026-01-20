@@ -1,0 +1,1 @@
+import{c as r,h as s,az as u,aA as c,aB as i}from"./index-Dxu4lnfn.js";function b(n,e,a){const t=r(n());return s(n,(a?u:c)(t.set,typeof e=="number"?o=>i(o,e):e)),t.get}function m(n,e){return!!n.find(a=>a.address==e.address&&a.name==e.name)}export{b as hookDebounceState,m as includePoint};

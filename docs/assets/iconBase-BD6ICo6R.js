@@ -1,0 +1,1 @@
+import{O as f}from"./index-Dxu4lnfn.js";function r(t,o){t.forEach(function(n){o(n.tag,n.attr,()=>{r(n.child,o)})})}function u(t,o,n,e){var{renderItem:c,renderRoot:a}=f.consume();(n||a)(t,o.attr,()=>{r(o.child,c)},e)}export{u as G};
