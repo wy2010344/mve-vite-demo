@@ -21,7 +21,7 @@ export const AudioVisualizerApp = panel(function (info) {
       let animationId: number;
       let audioContext: AudioContext;
       let analyser: AnalyserNode;
-      let dataArray: Uint8Array;
+      let dataArray: Uint8Array<ArrayBuffer>;
       let oscillator: OscillatorNode;
 
       function initAudio() {

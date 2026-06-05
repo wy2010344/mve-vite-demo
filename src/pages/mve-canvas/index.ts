@@ -2,7 +2,6 @@ import { renderMobileView } from '../../onlyMobile';
 import {
   alignSelf,
   arrayCountCreateWith,
-  ClampingScrollFactory,
   createSignal,
   LayoutNode,
   memo,
@@ -13,7 +12,8 @@ import {
   hookDrawRect,
   simpleFlex,
   hookDrawText,
-  hookDrawTextWrap,
+  // hookDrawTextWrap,
+  hookPretextTextWrap as hookDrawTextWrap,
   renderCanvas,
   hookFill,
   hookDrawUrlImage,
@@ -246,6 +246,8 @@ export default function () {
                                 config: {
                                   maxLines: 3,
                                   text: faker.lorem.lines(4),
+                                  // font: '12px',
+                                  // lineHeight: 12,
                                   fontSize: '12px',
                                 },
                                 alignSelf: alignSelf('stretch'),

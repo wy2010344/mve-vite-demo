@@ -17,6 +17,12 @@ import { createSignal } from 'wy-helper';
 import { generateParseXml } from 'wy-helper/tokenParser';
 import { isSVG } from 'wy-dom-helper';
 
+/**
+ * convet html to mve
+ * html2mve
+ * xml2mve
+ * convert xml to mve
+ */
 const nots = whiteList.concat('=/>'.split('').map(v => v.charCodeAt(0)));
 const parseKey = ruleGet(manyMatch(matchCharNotIn(...nots), 1), ruleGetString);
 const parseValue = orRuleGet([

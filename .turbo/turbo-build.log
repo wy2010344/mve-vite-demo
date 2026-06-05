@@ -1,46 +1,123 @@
-[?9001h[?1004h[?25l[2J[m[2;1H> vite-mve-demo@0.0.1 build C:\github\es-pseudo-monorepo\apps\mve-vite-demo
-> tsc && vite build[5;1H]0;C:\Windows\system32\cmd.exe[?25h[36mvite v7.1.9 [32mbuilding for production...
-[m[Ktransforming (1) [2msrc\main.ts[22m[K[28Ctransforming (40) [2msrc\pages\panel\index.css[22m[K[43Ctransforming (44) [2m..\..\packages\wy-helper\wy-helper\dist\index.mjs[22m[K[67Ctransforming (193) [2msrc\pages\three\physics-with-rapier\index.ts[22m[K[63Ctransforming (236) [2m..\..\node_modules\.pnpm\mve-icons@6.0.0_mve-core@pa_8c52e227cef89d9c4b5aa1be5cc360fb\node_modules\[22m[K[118C[2mtransforming (249) ..\..\node_modules\.pnpm\mve-icons@6.0.0_mve-core@pa_8c52e227cef89d9c4b5aa1be5cc360fb\node_modules\[22m[K[118C[2mtransforming (255) ..\..\node_modules\.pnpm\three@0.176.0\node_modules\three\examples\jsm\postprocessing\RenderPass.js[22m[2m/*!  🌼 daisyUI 5.3.7 */
-[?25l[22m[2mFound 1 warning while optimizing generated CSS:[10;1H│ }[?25h[22m
-[2m│ @layer base {[22m[K
-[2m│[22m   @property --radialprogress {[K
-[2m┆[22m[12X[33m[2m[12C^--[22m Unknown at rule: @property[K[m
-[2m┆[22m[K
-[2m│     syntax: "<percentage>";[22m[K
-[2m│     inherits: true;[22m[K
+[?9001h[?1004h[?25l[2J[m[2;1H> mve-vite-demo@0.0.1 build C:\github\es-pseudo-monorepo\apps\mve-vite-demo
+> tsc && vite build[5;1H]0;C:\Windows\system32\cmd.exe[?25h[?25l[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m82[m:[93m18 [m- [91merror [90mTS18046: [m'v' is of type 'unknown'.[7m[7;1H82[27m             v => v.key,[7m
+  [27m[18X[91m[18C~[10;1H[?25h[m[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m84[m:[93m37 [m- [91merror [90mTS2345: [mArgument of type 'GetValue<unknown>' is not assignable to parameter of type 'GetValue<ExitModel<ListRow>>'.
+  Type 'unknown' is not assignable to type 'ExitModel<ListRow>'.
+    Type 'unknown' is not assignable to type 'Omit<ExitModelInner<ListRow>, "step">'.
 
-transforming (260) [2m..\..\node_modules\.pnpm\stylis@4.3.6\node_modules\stylis\src\Utility.js[22m[K[K[91Ctransforming (349) [2m..\..\packages\wy-helper\wy-helper\dist\kanren-Di6qozbx.mjs[22m[K[78Ctransforming (555) [2m..\..\node_modules\.pnpm\daisyui@5.3.7\node_modules\daisyui\functions\themeOrder.js[22m[K[102Ctransforming (564) [2m..\..\node_modules\.pnpm\motion-dom@12.23.23\node_modules\motion-dom\dist\es\index.mjs[22m[K[105Ctransforming (968) [2m..\..\node_modules\.pnpm\tiny-inflate@1.0.3\node_modules\tiny-inflate\index.js[22m[K[97Ctransforming (1267) [2mapp.css[22m[K[27C[32m✓ [m1388 modules transformed.[K
-[31m✗ [mBuild failed in 3.32s[K
-[31merror during build:[m
-[31m../../packages/mve/dom-helper/dist/history.mjs (3:9): "fdom" is not exported by "../../packages/mve/dom/dist/index.js", imp[m
-[31m[9;123Hported by "../../packages/mve/dom-helper/dist/history.mjs".[m
-[31mfile: [36mC:/github/es-pseudo-monorepo/packages/mve/dom-helper/dist/history.mjs:3:9[K[m
-[31m[m
-[33m1: import { batchSignalEnd, createSignal, getValueOrGet, memo } from "wy-helper";[m
-[33m2: import { createContext } from "mve-core";[m
-[33m3: import { fdom } from "mve-dom";[m
-[33m            ^[m
-[33m4: import { Action } from "history";[m
-[33m[m
-[31m    at getRollupError (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/es/sh[m
-[31m[9;123Hhared/parseAst.js:401:41)[m
-[31m    at error (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/es/shared/pars[m
-[31m[9;123HseAst.js:397:42)[m
-[31m    at Module.error (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/es/shar[m
-[31m[9;123Hred/node-entry.js:16939:16)[m
-[31m    at Module.traceVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist[m
-[31m[9;123Ht/es/shared/node-entry.js:17391:29)[m
-[31m    at ModuleScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/[m
-[31m[9;123H/dist/es/shared/node-entry.js:15061:39)[m
-[31m    at FunctionScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollu[m
-[31m[9;123Hup/dist/es/shared/node-entry.js:5642:38)[m
-[31m    at FunctionBodyScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/r[m
-[31m[9;123Hrollup/dist/es/shared/node-entry.js:5642:38)[m
-[31m    at TrackingScope.findVariable (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollu[m
-[31m[9;123Hup/dist/es/shared/node-entry.js:5642:38)[m
-[31m    at MemberExpression.bind (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dis[m
-[31m[9;123Hst/es/shared/node-entry.js:7349:49)[m
-[31m    at CallExpression.bind (file:///C:/github/es-pseudo-monorepo/node_modules/.pnpm/rollup@4.52.4/node_modules/rollup/dist/[m
-[31m[9;123H/es/shared/node-entry.js:2804:23)[m
-[30m[41m ELIFECYCLE [m [31mCommand failed with exit code 1.[m
+[7m84[27m               const div = renderRow(getRow, getIndex);[K
+[7m  [27m[37X[91m[37C~~~~~~[K[m
+
+[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m86[m:[93m23 [m- [91merror [90mTS2571: [mObject is of type 'unknown'.[K
+
+[7m86[27m                 () => getRow().step,[K
+[7m  [27m[23X[91m[23C~~~~~~~~[K[m
+
+[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m91[m:[93m29 [m- [91merror [90mTS2571: [mObject is of type 'unknown'.[K
+
+[7m91[27m                     }).then(getRow().resolve);[K
+[7m  [27m[29X[91m[29C~~~~~~~~[K[m
+
+[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m95[m:[93m29 [m- [91merror [90mTS2571: [mObject is of type 'unknown'.[K
+
+[7m95[27m                     }).then(getRow().resolve);[K
+[7m  [27m[29X[91m[29C~~~~~~~~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m178[m:[93m35 [m- [91merror [90mTS2345: [mArgument of type 'unknown' is not assignable to parameter of type 'ExitModel<RowModel, number>'.[K
+
+[7m178[27m             const div = renderRow(row, getIndex);[K
+[7m   [27m[35X[91m[35C~~~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m180[m:[93m23 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
+
+[7m180[27m             renderOne(row.step, v => {[K
+[7m   [27m[23X[91m[23C~~~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m181[m:[93m33 [m- [91merror [90mTS2345: [mArgument of type 'unknown' is not assignable to parameter of type 'ValueOrGet<string | number>'.[K
+
+[7m181[27m               renderTextContent(v);[K
+[7m   [27m[33X[91m[33C~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m183[m:[93m29 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
+
+[7m183[27m             hookTrackSignal(row.step, function (value) {[K
+[7m   [27m[29X[91m[29C~~~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m184[m:[93m20 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
+
+[7m184[27m               if (!row.promise()) {[K
+[7m   [27m[20X[91m[20C~~~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m190[m:[93m25 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
+
+[7m190[27m                 }).then(row.resolve);[K
+[7m   [27m[25X[91m[25C~~~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m194[m:[93m25 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
+
+[7m194[27m                 }).then(row.resolve);[K
+[7m   [27m[25X[91m[25C~~~[K[m
+
+[96msrc/pages/exit-animate/index.ts[m:[93m203[m:[93m35 [m- [91merror [90mTS2345: [mArgument of type 'ExitModel<unknown, unknown>' is not assignable to parameter of type 'ExitModel<RowModel, number>'.[K
+  Type 'unknown' is not assignable to type 'RowModel'.
+
+[7m203[27m             const div = renderRow(row, getIndex);[K
+[7m   [27m[35X[91m[35C~~~[K[m
+
+[96msrc/pages/fixed-table.ts[m:[93m239[m:[93m21 [m- [91merror [90mTS2339: [mProperty 'type' does not exist on type '{}'.[K
+
+[7m239[27m             v => v?.type,[K
+[7m   [27m[21X[91m[21C~~~~[K[m
+
+[96msrc/pages/fixed-table.ts[m:[93m266[m:[93m28 [m- [91merror [90mTS18046: [m'v' is of type 'unknown'.[K
+
+[7m266[27m                       v => v.id,[K
+[7m   [27m[28X[91m[28C~[K[m
+
+[96msrc/pages/fixed-table.ts[m:[93m271[m:[93m46 [m- [91merror [90mTS2345: [mArgument of type 'GetValue<unknown>' is not assignable to parameter of type 'GetValue<Movie>'.[K
+  Type 'unknown' is not assignable to type 'Movie'.
+
+[7m271[27m                               columnDef.cell(getValue, getIndex);[K
+[7m   [27m[46X[91m[46C~~~~~~~~[K[m
+
+[96msrc/pages/map-analysis/index.ts[m:[93m318[m:[93m31 [m- [91merror [90mTS2345: [mArgument of type '"type"' is not assignable to parameter of type 'never'.[K
+
+[7m318[27m           renderOrKey(getMap, 'type', function (key, get) {[K
+[7m   [27m[31X[91m[31C~~~~~~[K[m
+
+[96msrc/pages/map-analysis/index.ts[m:[93m321[m:[93m29 [m- [91merror [90mTS2339: [mProperty 'value' does not exist on type 'never'.[K
+
+[7m321[27m                 () => get().value,[K
+[7m   [27m[29X[91m[29C~~~~~[K[m
+
+[96msrc/pages/map-analysis/index.ts[m:[93m356[m:[93m41 [m- [91merror [90mTS7006: [mParameter 'd' implicitly has an 'any' type.[K
+
+[7m356[27m                             psv.forEach(d => {[K
+[7m   [27m[41X[91m[41C~[K[m
+
+[96msrc/pages/panel/index.ts[m:[93m29[m:[93m15 [m- [91merror [90mTS7053: [mElement implicitly has an 'any' type because expression of type 'V_1' can't be used to index type '{ light: Scheme; dark: Scheme; }'.[K
+
+[7m29[27m     const v = theme.schemes[scheme.get()];[K
+[7m  [27m[15X[91m[15C~~~~~~~~~~~~~~~~~~~~~~~~~~~[K[m
+
+[96msrc/pages/panel/index.ts[m:[93m47[m:[93m23 [m- [91merror [90mTS2345: [mArgument of type 'unknown' is not assignable to parameter of type 'number'.[K
+
+[7m47[27m       ] = hexFromArgb(token);[K
+[7m  [27m[23X[91m[23C~~~~~[K[m
+
+[96msrc/pages/three/physics-with-rapier/index.ts[m:[93m36[m:[93m16 [m- [91merror [90mTS2339: [mProperty 'type' does not exist on type '{}'.[K
+
+[7m36[27m     if (value?.type == 'success') {[K
+[7m  [27m[16X[91m[16C~~~~[K[m
+
+
+Found 22 errors in 6 files.
+
+Errors  Files
+     5  src/pages/exit-animate/exit-model/index.ts[90m:82[K[m
+     8  src/pages/exit-animate/index.ts[90m:178[K[m
+     3  src/pages/fixed-table.ts[90m:239[K[m
+     3  src/pages/map-analysis/index.ts[90m:318[K[m
+     2  src/pages/panel/index.ts[90m:29[K[m
+     1  src/pages/three/physics-with-rapier/index.ts[90m:36[K[m
+[30m[41m ELIFECYCLE [m [31mCommand failed with exit code 2.[m
 [?9001l[?1004l

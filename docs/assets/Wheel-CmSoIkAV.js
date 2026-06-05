@@ -1,0 +1,1 @@
+import{aR as t,q as a,aV as n}from"./three.core-DLxfQLdm.js";function i(o){const e=new t(new a(12,33,12),new n({color:3355443,flatShading:!0}));return e.position.x=o,e.position.z=6,e}export{i as Wheel};
