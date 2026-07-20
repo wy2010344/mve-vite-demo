@@ -159,7 +159,6 @@ export default function () {
                     });
                   },
                   children() {
-                    console.log('render');
                     // return
                     renderArray(data, function (row, getIndex) {
                       const r = hookDrawRect({
