@@ -1,5 +1,4 @@
 import { createRoot, fdom, fsvg, svg } from 'mve-dom';
-import { destroyGlobalHolder } from 'mve-core';
 import { routerProvide } from 'mve-dom-helper/history';
 import {
   argForceNumber,
@@ -86,5 +85,3 @@ function renderError(message: string) {
     },
   });
 }
-
-window.addEventListener('unload', destroyGlobalHolder);

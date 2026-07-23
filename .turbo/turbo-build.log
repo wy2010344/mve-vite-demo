@@ -1,123 +1,2 @@
-[?9001h[?1004h[?25l[2J[m[2;1H> mve-vite-demo@0.0.1 build C:\github\es-pseudo-monorepo\apps\mve-vite-demo
-> tsc && vite build[5;1H]0;C:\Windows\system32\cmd.exe[?25h[?25l[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m82[m:[93m18 [m- [91merror [90mTS18046: [m'v' is of type 'unknown'.[7m[7;1H82[27m             v => v.key,[7m
-  [27m[18X[91m[18C~[10;1H[?25h[m[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m84[m:[93m37 [m- [91merror [90mTS2345: [mArgument of type 'GetValue<unknown>' is not assignable to parameter of type 'GetValue<ExitModel<ListRow>>'.
-  Type 'unknown' is not assignable to type 'ExitModel<ListRow>'.
-    Type 'unknown' is not assignable to type 'Omit<ExitModelInner<ListRow>, "step">'.
-
-[7m84[27m               const div = renderRow(getRow, getIndex);[K
-[7m  [27m[37X[91m[37C~~~~~~[K[m
-
-[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m86[m:[93m23 [m- [91merror [90mTS2571: [mObject is of type 'unknown'.[K
-
-[7m86[27m                 () => getRow().step,[K
-[7m  [27m[23X[91m[23C~~~~~~~~[K[m
-
-[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m91[m:[93m29 [m- [91merror [90mTS2571: [mObject is of type 'unknown'.[K
-
-[7m91[27m                     }).then(getRow().resolve);[K
-[7m  [27m[29X[91m[29C~~~~~~~~[K[m
-
-[96msrc/pages/exit-animate/exit-model/index.ts[m:[93m95[m:[93m29 [m- [91merror [90mTS2571: [mObject is of type 'unknown'.[K
-
-[7m95[27m                     }).then(getRow().resolve);[K
-[7m  [27m[29X[91m[29C~~~~~~~~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m178[m:[93m35 [m- [91merror [90mTS2345: [mArgument of type 'unknown' is not assignable to parameter of type 'ExitModel<RowModel, number>'.[K
-
-[7m178[27m             const div = renderRow(row, getIndex);[K
-[7m   [27m[35X[91m[35C~~~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m180[m:[93m23 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
-
-[7m180[27m             renderOne(row.step, v => {[K
-[7m   [27m[23X[91m[23C~~~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m181[m:[93m33 [m- [91merror [90mTS2345: [mArgument of type 'unknown' is not assignable to parameter of type 'ValueOrGet<string | number>'.[K
-
-[7m181[27m               renderTextContent(v);[K
-[7m   [27m[33X[91m[33C~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m183[m:[93m29 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
-
-[7m183[27m             hookTrackSignal(row.step, function (value) {[K
-[7m   [27m[29X[91m[29C~~~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m184[m:[93m20 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
-
-[7m184[27m               if (!row.promise()) {[K
-[7m   [27m[20X[91m[20C~~~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m190[m:[93m25 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
-
-[7m190[27m                 }).then(row.resolve);[K
-[7m   [27m[25X[91m[25C~~~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m194[m:[93m25 [m- [91merror [90mTS18046: [m'row' is of type 'unknown'.[K
-
-[7m194[27m                 }).then(row.resolve);[K
-[7m   [27m[25X[91m[25C~~~[K[m
-
-[96msrc/pages/exit-animate/index.ts[m:[93m203[m:[93m35 [m- [91merror [90mTS2345: [mArgument of type 'ExitModel<unknown, unknown>' is not assignable to parameter of type 'ExitModel<RowModel, number>'.[K
-  Type 'unknown' is not assignable to type 'RowModel'.
-
-[7m203[27m             const div = renderRow(row, getIndex);[K
-[7m   [27m[35X[91m[35C~~~[K[m
-
-[96msrc/pages/fixed-table.ts[m:[93m239[m:[93m21 [m- [91merror [90mTS2339: [mProperty 'type' does not exist on type '{}'.[K
-
-[7m239[27m             v => v?.type,[K
-[7m   [27m[21X[91m[21C~~~~[K[m
-
-[96msrc/pages/fixed-table.ts[m:[93m266[m:[93m28 [m- [91merror [90mTS18046: [m'v' is of type 'unknown'.[K
-
-[7m266[27m                       v => v.id,[K
-[7m   [27m[28X[91m[28C~[K[m
-
-[96msrc/pages/fixed-table.ts[m:[93m271[m:[93m46 [m- [91merror [90mTS2345: [mArgument of type 'GetValue<unknown>' is not assignable to parameter of type 'GetValue<Movie>'.[K
-  Type 'unknown' is not assignable to type 'Movie'.
-
-[7m271[27m                               columnDef.cell(getValue, getIndex);[K
-[7m   [27m[46X[91m[46C~~~~~~~~[K[m
-
-[96msrc/pages/map-analysis/index.ts[m:[93m318[m:[93m31 [m- [91merror [90mTS2345: [mArgument of type '"type"' is not assignable to parameter of type 'never'.[K
-
-[7m318[27m           renderOrKey(getMap, 'type', function (key, get) {[K
-[7m   [27m[31X[91m[31C~~~~~~[K[m
-
-[96msrc/pages/map-analysis/index.ts[m:[93m321[m:[93m29 [m- [91merror [90mTS2339: [mProperty 'value' does not exist on type 'never'.[K
-
-[7m321[27m                 () => get().value,[K
-[7m   [27m[29X[91m[29C~~~~~[K[m
-
-[96msrc/pages/map-analysis/index.ts[m:[93m356[m:[93m41 [m- [91merror [90mTS7006: [mParameter 'd' implicitly has an 'any' type.[K
-
-[7m356[27m                             psv.forEach(d => {[K
-[7m   [27m[41X[91m[41C~[K[m
-
-[96msrc/pages/panel/index.ts[m:[93m29[m:[93m15 [m- [91merror [90mTS7053: [mElement implicitly has an 'any' type because expression of type 'V_1' can't be used to index type '{ light: Scheme; dark: Scheme; }'.[K
-
-[7m29[27m     const v = theme.schemes[scheme.get()];[K
-[7m  [27m[15X[91m[15C~~~~~~~~~~~~~~~~~~~~~~~~~~~[K[m
-
-[96msrc/pages/panel/index.ts[m:[93m47[m:[93m23 [m- [91merror [90mTS2345: [mArgument of type 'unknown' is not assignable to parameter of type 'number'.[K
-
-[7m47[27m       ] = hexFromArgb(token);[K
-[7m  [27m[23X[91m[23C~~~~~[K[m
-
-[96msrc/pages/three/physics-with-rapier/index.ts[m:[93m36[m:[93m16 [m- [91merror [90mTS2339: [mProperty 'type' does not exist on type '{}'.[K
-
-[7m36[27m     if (value?.type == 'success') {[K
-[7m  [27m[16X[91m[16C~~~~[K[m
-
-
-Found 22 errors in 6 files.
-
-Errors  Files
-     5  src/pages/exit-animate/exit-model/index.ts[90m:82[K[m
-     8  src/pages/exit-animate/index.ts[90m:178[K[m
-     3  src/pages/fixed-table.ts[90m:239[K[m
-     3  src/pages/map-analysis/index.ts[90m:318[K[m
-     2  src/pages/panel/index.ts[90m:29[K[m
-     1  src/pages/three/physics-with-rapier/index.ts[90m:36[K[m
-[30m[41m ELIFECYCLE [m [31mCommand failed with exit code 2.[m
-[?9001l[?1004l
+[6n[?9001h[?1004h[m]0;C:\Windows\system32\cmd.exe[?25h[2m$ tsc && vite build
+[22m[?9001l[?1004l

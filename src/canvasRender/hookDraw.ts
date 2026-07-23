@@ -267,15 +267,6 @@ const mouseEvents = (
   };
 });
 
-const devicePixelRatio = createSignal(window.devicePixelRatio || 1);
-matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener(
-  'change',
-  e => {
-    devicePixelRatio.set(window.devicePixelRatio);
-    batchSignalEnd();
-  }
-);
-
 const ctxs: CanvasRenderingContext2D[] = [];
 export function getOneCtx() {
   return ctxs[0];

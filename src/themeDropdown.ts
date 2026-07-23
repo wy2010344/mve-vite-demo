@@ -2,7 +2,6 @@ import { fdom, fsvg, renderText } from 'mve-dom';
 import themes from 'daisyui/functions/themeOrder';
 import { createSignal, tw } from 'wy-helper';
 import { faker } from '@faker-js/faker';
-import { runGlobalHolder } from 'mve-core';
 import { hookTrackSignal } from 'mve-helper';
 import { IoCheckbox } from 'mve-icons/io5';
 import { renderClassNameSvg, renderSizeSvg } from './mve-icon';
@@ -21,10 +20,8 @@ export function randomTheme() {
   ];
 }
 
-runGlobalHolder(() => {
-  hookTrackSignal(themeSignal.get, v => {
-    document.body.dataset.theme = v;
-  });
+hookTrackSignal(themeSignal.get, v => {
+  document.body.dataset.theme = v;
 });
 export default function () {
   fdom.div({
