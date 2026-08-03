@@ -9,12 +9,15 @@ import {
 
 import * as THREE from 'three';
 import { hookDestroy, hookTrackSignal } from 'mve-helper';
-import { createRenderBatcher } from 'motion';
 import {
-  createAppendSet,
   createContext,
   createRenderChildren,
   hookAddResult,
+  hookCurrentStateHolder,
+  purifySet,
+  renderRoot,
+  ShareConfig,
+  StateHolderWithNode,
 } from 'mve-core';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 /* eslint-disable */
@@ -131,7 +134,16 @@ export function renderGroup(render: SetValue<THREE.Group>) {
   return group;
 }
 
-export const n = createRenderChildren<THREE.Object3D, ReadSet<THREE.Object3D>>(
+const object3DConfig: ShareConfig<THREE.Object3D, ReadSet<THREE.Object3D>> = {
+  purifyList(list) {
+    const newSet = new Set<THREE.Object3D>();
+    purifySet(list, newSet, () => false);
+    return newSet;
+  },
+  after() {},
+};
+
+const n = createRenderChildren<THREE.Object3D, ReadSet<THREE.Object3D>>(
   //顺序无影响
   diffMoveOrderLess({
     removeChild(parent, child) {
@@ -149,43 +161,38 @@ export const n = createRenderChildren<THREE.Object3D, ReadSet<THREE.Object3D>>(
       parent.add(child);
     },
   }),
-  createAppendSet
-  //   {
-  //   moveBefore(parent, newChild, beforeChild) {
-  //     if (!parent.children.includes(newChild)) {
-  //       newChild?.parent?.remove(newChild);
-  //       parent.add(newChild);
-  //     }
-  //     if (beforeChild) {
-  //       const refIndex = parent.children.indexOf(beforeChild);
-  //       if (refIndex === -1) return;
-  //       // 删除刚刚 add 的
-  //       parent.children.splice(parent.children.indexOf(newChild), 1);
-  //       // 插入到目标前面
-  //       parent.children.splice(refIndex, 0, newChild);
-  //     }
-  //   },
-  //   removeChild(parent, child) {
-  //     if (child.parent == parent) {
-  //       parent.remove(child);
-  //     }
-  //   },
-  //   nextSibling(child) {
-  //     return (
-  //       child.parent?.children[child.parent?.children.indexOf(child) + 1] || null
-  //     );
-  //   },
-  //   firstChild(child) {
-  //     return child.children[0];
-  //   },
-  // }
+  function (node, callback) {
+    const state = hookCurrentStateHolder(true);
+    const root = renderRoot(node, object3DConfig, function () {
+      const three = state.consume(ThreeContext);
+      ThreeContext.provide(three);
+      callback.call(this);
+    });
+    state.addDestroy(() => {
+      root.destroy();
+    });
+    return root.target;
+  },
+  function (node, callback) {
+    const state = hookCurrentStateHolder(true);
+    const root = renderRoot(node, object3DConfig, function () {
+      const three = state.consume(ThreeContext);
+      ThreeContext.provide(three);
+      callback.call(this);
+    });
+    return root;
+  }
 );
 
 export function renderChildren<N extends THREE.Object3D>(
   node: N,
   render: SetValue<N>
 ) {
-  const getChildren = n.renderChildren(node, render as any);
+  const getChildren = n.renderChildren(node, function (
+    this: StateHolderWithNode<THREE.Object3D, ReadSet<THREE.Object3D>>
+  ) {
+    render(this.node as N);
+  } as any);
   (node as any)._children = getChildren;
   return getChildren;
 }

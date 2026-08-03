@@ -46,12 +46,7 @@ import {
 import { createTabList } from 'daisy-mobile-helper';
 import * as THREE from 'three';
 import { hookAddResult } from 'mve-core';
-import {
-  hookDraw,
-  hookDrawRect,
-  hookFill,
-  renderCanvas,
-} from 'mve-dom-helper/canvasRender';
+import { renderCanvas, renderNode } from 'mve-dom-helper/canvasRender';
 
 const width = 800;
 const height = 700;
@@ -228,21 +223,27 @@ export default function () {
           renderDirY(gl.nodes, alpha);
         }
       );
-      renderCanvas(
-        fdom.canvas({
-          s_width: `${width}px`,
-          s_height: `${height}px`,
-        }),
-        function (canvas) {
-          hookDraw({
+      const canvas = fdom.canvas({
+        s_width: `${width}px`,
+        s_height: `${height}px`,
+      });
+      renderCanvas(canvas, {
+        children() {
+          renderNode({
             x: 0,
             y: 0,
-            draw({ ctx }) {
+            draw(ctx) {
               ctx.strokeStyle = '#999';
               getNodesAndLinks().links.forEach(link => {
                 ctx.beginPath();
-                ctx.moveTo(link.source.x.d, link.source.y.d);
-                ctx.lineTo(link.target.x.d, link.target.y.d);
+                ctx.moveTo(
+                  link.source.x.d + width / 2,
+                  link.source.y.d + height / 2
+                );
+                ctx.lineTo(
+                  link.target.x.d + width / 2,
+                  link.target.y.d + height / 2
+                );
                 ctx.lineWidth = Math.sqrt(link.value.value);
                 ctx.stroke();
               });
@@ -251,22 +252,19 @@ export default function () {
           renderArray(
             () => getNodesAndLinks().nodes,
             function (node) {
-              hookDrawRect({
-                x: node.x.dSignal.get,
-                y: node.y.dSignal.get,
-                width: 0,
-                height: 0,
-                draw({ ctx, path }) {
-                  path.ellipse(0, 0, 5, 5, 0, 0, 360);
-                  hookFill(colorOrdinal(node.value.group));
+              renderNode({
+                x: () => node.x.dSignal.get() + width / 2,
+                y: () => node.y.dSignal.get() + height / 2,
+                acceptHit(x, y) {
+                  return x * x + y * y <= 25;
                 },
-                onPointerDown({ original: e }) {
-                  const rec = canvas.canvas.getBoundingClientRect();
+                mouseDown(e) {
+                  const rec = canvas.getBoundingClientRect();
                   const halfX = rec.left + rec.width / 2;
                   const halfY = rec.top + rec.height / 2;
 
-                  node.x.f = e.pageX - halfX;
-                  node.y.f = e.pageY - halfY;
+                  node.x.f = e.globalX + rec.left - halfX;
+                  node.y.f = e.globalY + rec.top - halfY;
                   config.alphaTarget = 0.3;
                   didTick();
                   const destroy = subscribeDragMove(e => {
@@ -281,19 +279,17 @@ export default function () {
                     }
                   });
                 },
+                draw(ctx) {
+                  ctx.beginPath();
+                  ctx.ellipse(0, 0, 5, 5, 0, 0, 360);
+                  ctx.fillStyle = colorOrdinal(node.value.group);
+                  ctx.fill();
+                },
               });
             }
           );
         },
-        {
-          // translateX: width / 2,
-          // translateY: height / 2,
-          beforeDraw(ctx) {
-            // ctx.restore()
-            ctx.translate(width / 2, height / 2);
-          },
-        }
-      );
+      });
     } else if (type == '3D') {
       const hoverShpere = createSignal<
         THREE.Mesh<THREE.SphereGeometry, THREE.MeshPhongMaterial> | undefined

@@ -1,10 +1,5 @@
 import { fdom } from 'mve-dom';
-import {
-  hookDraw,
-  hookFill,
-  hookStroke,
-  renderCanvas,
-} from 'mve-dom-helper/canvasRender';
+import { renderCanvas, renderNode } from 'mve-dom-helper/canvasRender';
 import { hookDestroy, renderArray } from 'mve-helper';
 import {
   pointerMove,
@@ -118,31 +113,33 @@ export default function () {
         batchSignalEnd();
       })
     );
-    renderCanvas(
-      fdom.canvas({
-        className: 'touch-none',
-        s_width() {
-          return `${width()}px`;
-        },
-        s_height() {
-          return `${height()}px`;
-        },
-      }),
-      function ({ canvas }) {
+    const canvas = fdom.canvas({
+      className: 'touch-none',
+      s_width() {
+        return `${width()}px`;
+      },
+      s_height() {
+        return `${height()}px`;
+      },
+    });
+    renderCanvas(canvas, {
+      children() {
         renderArray(
           () => getNodesAndLinks().links,
           link => {
-            hookDraw({
-              x: link.source.x.dSignal.get,
-              y: link.source.y.dSignal.get,
-              withPath: true,
-              draw({ ctx, path }) {
-                path.moveTo(0, 0);
-                path.lineTo(
+            renderNode({
+              x: () => link.source.x.dSignal.get() + width() / 2,
+              y: () => link.source.y.dSignal.get() + height() / 2,
+              draw(ctx) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(
                   link.target.x.d - link.source.x.d,
                   link.target.y.d - link.source.y.d
                 );
-                hookStroke(1, '#aaa');
+                ctx.strokeStyle = '#aaa';
+                ctx.lineWidth = 1;
+                ctx.stroke();
               },
             });
           }
@@ -150,10 +147,13 @@ export default function () {
         renderArray(
           () => getNodesAndLinks().nodes,
           node => {
-            hookDraw({
-              x: node.x.dSignal.get,
-              y: node.y.dSignal.get,
-              onPointerDown(e) {
+            renderNode({
+              x: () => node.x.dSignal.get() + width() / 2,
+              y: () => node.y.dSignal.get() + height() / 2,
+              acceptHit(x, y) {
+                return x * x + y * y <= 36;
+              },
+              mouseDown() {
                 config.alphaTarget = 0.3;
                 currentNode.set(node);
                 pointerMove(
@@ -168,33 +168,23 @@ export default function () {
                       node.y.f = undefined;
                       currentNode.set(undefined);
                     },
-                    // leave: true,
-                    // cancel: true
                   },
                   {
                     element: canvas,
                   }
                 );
               },
-              withPath: true,
-              draw(e) {
-                e.path.arc(0, 0, 6, 0, 2 * Math.PI);
-
-                hookFill('#000');
-                e.ctx.fillText(`${node.value.index}`, 3, -3);
+              draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+                ctx.fillStyle = '#000';
+                ctx.fill();
+                ctx.fillText(`${node.value.index}`, 3, -3);
               },
             });
           }
         );
       },
-      {
-        // translateX: () => width() / 2,
-        // translateY: () => height() / 2,
-        beforeDraw(ctx: CanvasRenderingContext2D) {
-          //这里竟然不会影响点击坐标??
-          ctx.translate(width() / 2, height() / 2);
-        },
-      }
-    );
+    });
   });
 }

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { hookDraw, hookFill, renderCanvas } from 'mve-dom-helper/canvasRender';
+import { renderCanvas, renderNode } from 'mve-dom-helper/canvasRender';
 import { hookDestroy, renderArray } from 'mve-helper';
 import { subscribeRequestAnimationFrame } from 'wy-dom-helper';
 import {
@@ -110,30 +110,27 @@ export default function () {
           batchSignalEnd();
         },
       }),
-      function () {
-        renderArray(getNodes, (node, getIndex) => {
-          hookDraw({
-            x() {
-              return node.x.dSignal.get() + width() / 2;
-            },
-            y() {
-              return node.y.dSignal.get() + height() / 2;
-            },
-            withPath: true,
-
-            draw({ path }) {
-              path.arc(0, 0, node.value.r, 0, 2 * Math.PI);
-              if (getIndex()) {
-                hookFill(color(`${node.value.group}`));
-              }
-            },
-          });
-        });
-      },
       {
-        // beforeDraw(ctx: CanvasRenderingContext2D) {
-        //   ctx.translate(width / 2, height / 2)
-        // }
+        children() {
+          renderArray(getNodes, (node, getIndex) => {
+            renderNode({
+              x() {
+                return node.x.dSignal.get() + width() / 2;
+              },
+              y() {
+                return node.y.dSignal.get() + height() / 2;
+              },
+              draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(0, 0, node.value.r, 0, 2 * Math.PI);
+                if (getIndex()) {
+                  ctx.fillStyle = color(`${node.value.group}`);
+                  ctx.fill();
+                }
+              },
+            });
+          });
+        },
       }
     );
   });

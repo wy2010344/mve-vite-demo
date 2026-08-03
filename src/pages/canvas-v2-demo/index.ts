@@ -12,23 +12,26 @@ import {
   getActiveEditor,
   grow,
   layoutSizeDirection,
+  loadCanvasKit,
+  registerFont,
   registerScroll,
   renderCanvas,
   renderEditableText,
   renderImage,
   renderRect,
   renderScrollContent,
+  renderWrappedText,
+  strokeInnerRect,
 } from 'mve-dom-helper/canvasRender';
 import { fdom } from 'mve-dom';
 import { renderArray } from 'mve-helper';
-import { loadCanvasKit, registerFont } from 'mve-dom-helper/canvasRender';
 
-const FONT_URLS = [
-  'https://unpkg.com/@fontsource/noto-sans-sc@5.1.1/files/noto-sans-sc-chinese-simplified-400-normal.woff2',
-  'https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-sc@5.1.1/files/noto-sans-sc-chinese-simplified-400-normal.woff2',
-];
+const FONT_URLS = ['/fonts/noto-sans-sc-chinese-simplified-400-normal.woff2'];
 
-await loadCanvasKit();
+await loadCanvasKit(
+  '/canvas-kit/canvaskit.js'
+  // 'https://unpkg.com/canvaskit-wasm@0.41.1/bin/canvaskit.js'
+);
 await loadDemoFont();
 
 export default function () {
@@ -78,7 +81,8 @@ export default function () {
                   height: 50,
                   draw(ctx) {
                     ctx.fillStyle = 'blue';
-                    drawRect.call(this, ctx);
+                    ctx.fillText(this.index() + 'xx', 0, 0);
+                    strokeInnerRect.call(this, ctx);
                   },
                   mouseClick() {
                     list.set(list.get().filter(x => x != value));
@@ -131,10 +135,17 @@ export default function () {
           superCall(this, 'draw', ctx);
         },
         children() {
+          const t = createSignal(
+            '点击编辑：键盘输入 / Ctrl+Z 撤销 / Ctrl+A 全选 / 支持中文输入法'
+          );
           renderEditableText({
-            text: '点击编辑：键盘输入 / Ctrl+Z 撤销 / Ctrl+A 全选 / 支持中文输入法',
+            text: t.get,
+            setText: t.set,
             fontFamily: 'Noto Sans SC',
             fontSize: 15,
+          });
+          renderWrappedText({
+            text: t.get,
           });
         },
       });
