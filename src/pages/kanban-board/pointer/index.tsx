@@ -10,11 +10,10 @@ import {
   StoreRef,
 } from 'wy-helper';
 import { ColumnDef, Task } from '../type';
-import { renderStateHolder } from 'mve-core';
 import { mve, setEdgeScroll } from 'mve-dom-helper';
 import pointerColumn from './column';
 import { DragData, DragType, taskContext } from './context';
-import { renderIf, renderOne } from 'mve-helper';
+import { renderArray, renderIf, renderOne } from 'mve-helper';
 import CardBase from '../cardBase';
 import { fdom } from 'mve-dom';
 import { simpleDragContainer } from 'mve-dom-helper';
@@ -102,11 +101,12 @@ export default function ({
     className:
       'flex gap-6 overflow-x-auto overflow-y-hidden pb-6 flex-1 relative',
     children() {
-      columns.map(c => {
-        renderStateHolder(() => {
+      renderArray(
+        () => columns,
+        c => {
           mve.renderChild(pointerColumn(c));
-        });
-      });
+        }
+      );
 
       renderOne(dragData.get, d => {
         if (d) {

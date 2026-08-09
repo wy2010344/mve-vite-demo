@@ -1,0 +1,1 @@
+import{Q as r,aK as s,Z as u,X as c,bA as i}from"./index-BCxd8sac.js";function d(n,e,t){const o=r(n());return s(n,(t?u:c)(o.set,typeof e=="number"?a=>i(a,e):e)),o.get}function m(n,e){return!!n.find(t=>t.address==e.address&&t.name==e.name)}export{d as hookDebounceState,m as includePoint};

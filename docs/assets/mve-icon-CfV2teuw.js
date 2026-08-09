@@ -1,0 +1,1 @@
+import{ak as o}from"./index-BCxd8sac.js";function u(n,t,e,r){return o.svg({...t,fill:"currentColor",stroke:"currentColor",strokeWidth:0,width:r,height:r,children:e})}function i(n,t,e,r){return o.svg({...t,className:r,fill:"currentColor",stroke:"currentColor",strokeWidth:0,children:e})}export{u as a,i as r};

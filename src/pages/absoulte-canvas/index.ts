@@ -1,15 +1,25 @@
-import { createSignal, arrayCountCreateWith, simpleFlex } from 'wy-helper';
+import { arrayCountCreateWith, createSignal, superCall } from 'wy-helper';
 import {
+  drawRect,
   renderCanvas,
-  hookDraw,
-  hookDrawRect,
-  hookDrawText,
-  hookFill,
-  hookStroke,
+  renderNode,
+  renderRect,
 } from 'mve-dom-helper/canvasRender';
 import { hookDestroy, renderArrayKey, renderIf } from 'mve-helper';
 import { subscribeRequestAnimationFrame } from 'wy-dom-helper';
 import { fdom } from 'mve-dom';
+
+const CANVAS_WIDTH = 1000;
+const CANVAS_HEIGHT = 700;
+
+{
+  const font = new FontFace(
+    'Noto Sans SC',
+    'url(/fonts/noto-sans-sc-chinese-simplified-400-normal.woff2)'
+  );
+  await font.load();
+  (document.fonts as any).add(font);
+}
 
 // 粒子类型定义
 interface Particle {
@@ -167,287 +177,214 @@ export default function () {
   }
 
   // 动画循环
-  renderCanvas(
-    fdom.canvas({
-      s_width: `${1000}px`,
-      s_height: `${700}px`,
-      className: 'border border-gray-300 rounded-lg shadow-lg',
-      data_canvasContainer: true,
-      onMouseMove: e => {
-        mouseX.set(e.offsetX);
-        mouseY.set(e.offsetY);
-      },
-      onMouseEnter: () => isMouseInside.set(true),
-      onMouseLeave: () => isMouseInside.set(false),
-      onClick: e => {
-        console.log('click', e);
-        // 点击时在鼠标位置创建爆炸效果
-        const newParticles = arrayCountCreateWith(10, i => ({
-          id: Date.now() + i,
-          x: e.offsetX,
-          y: e.offsetY,
-          vx: (Math.random() - 0.5) * 8,
-          vy: (Math.random() - 0.5) * 8,
-          size: Math.random() * 4 + 2,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          opacity: 1,
-          life: 0,
-          maxLife: 60,
-        }));
+  const canvasEl = fdom.canvas({
+    s_width: `${CANVAS_WIDTH}px`,
+    s_height: `${CANVAS_HEIGHT}px`,
+    className: 'border border-gray-300 rounded-lg shadow-lg',
+    data_canvasContainer: true,
+    onMouseMove: e => {
+      mouseX.set(e.offsetX);
+      mouseY.set(e.offsetY);
+    },
+    onMouseEnter: () => isMouseInside.set(true),
+    onMouseLeave: () => isMouseInside.set(false),
+    onClick: e => {
+      console.log('click', e);
+      // 点击时在鼠标位置创建爆炸效果
+      const newParticles = arrayCountCreateWith(10, i => ({
+        id: Date.now() + i,
+        x: e.offsetX,
+        y: e.offsetY,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.5) * 8,
+        size: Math.random() * 4 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        opacity: 1,
+        life: 0,
+        maxLife: 60,
+      }));
 
-        particles.set([...particles.get(), ...newParticles]);
-      },
-    }),
-    ({ canvas }) => {
+      particles.set([...particles.get(), ...newParticles]);
+    },
+  });
+  renderCanvas(canvasEl, {
+    children() {
       // 初始化粒子
-
-      // 背景渐变
-      hookDraw({
-        x: 0,
-        y: 0,
-        draw({ ctx }) {
-          const gradient = ctx.createLinearGradient(0, 0, 0, 700);
+      renderRect({
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
+        draw(ctx) {
+          // 清除画布 + 背景渐变
+          ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+          const gradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
           gradient.addColorStop(0, '#0f0f23');
           gradient.addColorStop(0.5, '#1a1a2e');
           gradient.addColorStop(1, '#16213e');
 
           ctx.fillStyle = gradient;
-          ctx.fillRect(0, 0, 1000, 700);
-        },
-      });
-
-      // 渲染连接线
-      hookDraw({
-        x: 0,
-        y: 0,
-        draw({ ctx }) {
-          const connections = calculateConnections();
-
-          connections.forEach(connection => {
-            ctx.beginPath();
-            ctx.moveTo(connection.from.x, connection.from.y);
-            ctx.lineTo(connection.to.x, connection.to.y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${connection.opacity})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          });
-        },
-      });
-
-      // 渲染粒子
-      renderArrayKey(
-        particles.get,
-        v => v.id,
-        function (getParticle) {
-          hookDraw({
-            x: () => getParticle().x - getParticle().size,
-            y: () => getParticle().y - getParticle().size,
-            draw({ ctx }) {
-              const particle = getParticle();
-              // 粒子光晕
-              const gradient = ctx.createRadialGradient(
-                particle.size,
-                particle.size,
-                0,
-                particle.size,
-                particle.size,
-                particle.size * 3
-              );
-              gradient.addColorStop(
-                0,
-                particle.color +
-                  Math.floor(particle.opacity * 255)
-                    .toString(16)
-                    .padStart(2, '0')
-              );
-              gradient.addColorStop(0.5, `${particle.color}20`);
-              gradient.addColorStop(1, 'transparent');
-
-              ctx.fillStyle = gradient;
-              ctx.fillRect(0, 0, particle.size * 6, particle.size * 6);
-
-              // 粒子核心
-              ctx.beginPath();
-              ctx.arc(
-                particle.size,
-                particle.size,
-                particle.size,
-                0,
-                Math.PI * 2
-              );
-              ctx.fillStyle = particle.color;
-              ctx.globalAlpha = particle.opacity;
-              ctx.fill();
-              ctx.globalAlpha = 1;
-            },
-          });
-        }
-      );
-
-      // 鼠标位置指示器
-      renderIf(isMouseInside.get, function () {
-        hookDraw({
-          x: () => mouseX.get() - 30,
-          y: () => mouseY.get() - 30,
-          draw({ ctx }) {
-            ctx.beginPath();
-            ctx.arc(30, 30, 25, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          },
-        });
-      });
-
-      // 控制面板
-      hookDrawRect({
-        x: 20,
-        y: 20,
-        layout(v) {
-          return simpleFlex({
-            direction: 'y',
-            alignItems: 'start',
-          });
-        },
-        draw() {
-          hookFill('rgba(0, 0, 0, 0.7)');
-          hookStroke(1, 'rgba(255, 255, 255, 0.3)');
+          ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+          superCall(this, 'draw', ctx);
         },
         children() {
-          // 标题
-          hookDrawText({
-            config: {
-              text: '🌟 粒子星空控制台',
-              fontSize: '16px',
-              fontWeight: 'bold',
-            },
-            draw(e) {
-              e.draw({
-                style: 'white',
+          // 渲染连接线
+          renderNode({
+            x: 0,
+            y: 0,
+            draw(ctx) {
+              const connections = calculateConnections();
+
+              connections.forEach(connection => {
+                ctx.beginPath();
+                ctx.moveTo(connection.from.x, connection.from.y);
+                ctx.lineTo(connection.to.x, connection.to.y);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${connection.opacity})`;
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
               });
             },
           });
 
-          // 粒子数量显示
-          hookDrawText({
-            config() {
-              return {
-                text: `粒子数量: ${particles.get().length}`,
-                fontSize: '12px',
-              };
-            },
-            draw(e) {
-              e.draw({
-                style: '#4ecdc4',
+          // 渲染粒子
+          renderArrayKey(
+            particles.get,
+            v => v.id,
+            function (getParticle) {
+              renderNode({
+                x: () => getParticle().x - getParticle().size,
+                y: () => getParticle().y - getParticle().size,
+                draw(ctx) {
+                  const particle = getParticle();
+                  // 粒子光晕
+                  const gradient = ctx.createRadialGradient(
+                    particle.size,
+                    particle.size,
+                    0,
+                    particle.size,
+                    particle.size,
+                    particle.size * 3
+                  );
+                  gradient.addColorStop(
+                    0,
+                    particle.color +
+                      Math.floor(particle.opacity * 255)
+                        .toString(16)
+                        .padStart(2, '0')
+                  );
+                  gradient.addColorStop(0.5, `${particle.color}20`);
+                  gradient.addColorStop(1, 'transparent');
+
+                  ctx.fillStyle = gradient;
+                  ctx.fillRect(0, 0, particle.size * 6, particle.size * 6);
+
+                  // 粒子核心
+                  ctx.beginPath();
+                  ctx.arc(
+                    particle.size,
+                    particle.size,
+                    particle.size,
+                    0,
+                    Math.PI * 2
+                  );
+                  ctx.fillStyle = particle.color;
+                  ctx.globalAlpha = particle.opacity;
+                  ctx.fill();
+                  ctx.globalAlpha = 1;
+                },
               });
-            },
+            }
+          );
+
+          // 鼠标位置指示器
+          renderIf(isMouseInside.get, function () {
+            renderNode({
+              x: () => mouseX.get() - 30,
+              y: () => mouseY.get() - 30,
+              draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(30, 30, 25, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+              },
+            });
           });
 
-          // 连接数量显示
-          hookDrawText({
-            config() {
-              return {
-                text: `连接数量: ${calculateConnections().length}`,
-                fontSize: '12px',
-              };
-            },
-            draw(e) {
-              e.draw({
-                style: '#45b7d1',
-              });
-            },
-          });
-
-          // 操作提示
-          hookDrawText({
-            config: {
-              text: '💡 移动鼠标吸引粒子',
-              fontSize: '11px',
-            },
-            draw(e) {
-              e.draw({
-                style: '#feca57',
-              });
-            },
-          });
-
-          hookDrawText({
-            config: {
-              text: '🎆 点击创建爆炸效果',
-              fontSize: '11px',
-            },
-            draw(e) {
-              e.draw({
-                style: '#ff9ff3',
-              });
-            },
-          });
-        },
-      });
-
-      // 性能指示器
-      hookDrawRect({
-        x: 800,
-        y: 20,
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 10,
-        paddingRight: 10,
-        layout(v) {
-          return simpleFlex({
-            direction: 'x',
-            gap: 10,
-            alignItems: 'center',
-          });
-        },
-        draw() {
-          hookFill('rgba(0, 0, 0, 0.7)');
-          hookStroke(1, 'rgba(255, 255, 255, 0.3)');
-        },
-        children() {
-          hookDrawText({
-            config: {
-              text: '⚡ 性能监控',
-              fontSize: '14px',
-              fontWeight: 'bold',
-            },
-            draw(e) {
-              // ctx.textBaseline='bottom'
-              hookStroke(1, 'blue');
-              e.draw();
-            },
-          });
-
-          hookDrawText({
-            config: {
-              text: `FPS: ~60`,
-              fontSize: '12px',
-              // textBaseline: 'hanging',
-            },
-            draw({ ctx, draw }) {
+          // 控制面板
+          renderRect({
+            x: 20,
+            y: 20,
+            width: 240,
+            height: 118,
+            draw(ctx) {
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+              drawRect.call(this, ctx);
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(
+                0.5,
+                0.5,
+                this.outerWidth() - 1,
+                this.outerHeight() - 1
+              );
+              ctx.textAlign = 'left';
               ctx.textBaseline = 'top';
-              hookStroke(1, 'blue');
-              draw({
-                style: '#26de81',
-              });
+              ctx.font = '700 16px "Noto Sans SC", sans-serif';
+              ctx.fillStyle = '#ffffff';
+              ctx.fillText('🌟 粒子星空控制台', 10, 10);
+              ctx.font = '12px "Noto Sans SC", sans-serif';
+              ctx.fillStyle = 'rgb(78, 205, 196)';
+              ctx.fillText(`粒子数量: ${particles.get().length}`, 10, 34);
+              ctx.fillStyle = 'rgb(69, 183, 209)';
+              ctx.fillText(
+                `连接数量: ${calculateConnections().length}`,
+                10,
+                52
+              );
+              ctx.font = '11px "Noto Sans SC", sans-serif';
+              ctx.fillStyle = 'rgb(254, 202, 87)';
+              ctx.fillText('💡 移动鼠标吸引粒子', 10, 74);
+              ctx.fillStyle = 'rgb(255, 159, 243)';
+              ctx.fillText('🎆 点击创建爆炸效果', 10, 92);
             },
           });
+
+          // 性能指示器
+          renderRect({
+            x: 780,
+            y: 20,
+            width: 200,
+            height: 60,
+            draw(ctx) {
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+              drawRect.call(this, ctx);
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(
+                0.5,
+                0.5,
+                this.outerWidth() - 1,
+                this.outerHeight() - 1
+              );
+              ctx.textAlign = 'left';
+              ctx.textBaseline = 'top';
+              ctx.font = '700 14px "Noto Sans SC", sans-serif';
+              ctx.fillStyle = '#ffffff';
+              ctx.fillText('⚡ 性能监控', 10, 10);
+              ctx.font = '12px "Noto Sans SC", sans-serif';
+              ctx.fillStyle = 'rgb(38, 222, 129)';
+              ctx.fillText('FPS: ~60', 10, 34);
+            },
+          });
+
+          hookDestroy(
+            subscribeRequestAnimationFrame(function () {
+              updateParticles(CANVAS_WIDTH, CANVAS_HEIGHT);
+            })
+          );
         },
       });
-
-      hookDestroy(
-        subscribeRequestAnimationFrame(function () {
-          updateParticles(canvas.width, canvas.height);
-        })
-      );
     },
-    {
-      beforeDraw(ctx) {
-        // 清除画布
-        ctx.clearRect(0, 0, 1000, 700);
-      },
-    }
-  );
+  });
 }

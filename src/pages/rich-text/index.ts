@@ -23,7 +23,7 @@ import {
   hide,
   offset,
 } from '@floating-ui/dom';
-import { hookAddDestroy } from 'mve-core';
+
 import { cns } from 'wy-dom-helper';
 
 export default function () {

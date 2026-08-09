@@ -1,4 +1,4 @@
-import { renderStateHolder } from 'mve-core';
+import { renderArray } from 'mve-helper';
 import { TaskContext } from './context';
 import { mve } from 'mve-dom-helper';
 
@@ -22,11 +22,12 @@ export default function ({
         dragId,
         tasks,
       });
-      columns.map(c => {
-        renderStateHolder(() => {
+      renderArray(
+        () => columns,
+        c => {
           mve.renderChild(dragColumn(c));
-        });
-      });
+        }
+      );
     },
   });
 }

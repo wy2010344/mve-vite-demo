@@ -11,7 +11,6 @@ import {
   movePanelResizeAuto,
 } from 'wy-helper';
 import Typed from 'typed.js';
-import { hookAddDestroy } from 'mve-core';
 import { createSign } from 'crypto';
 export default function () {
   const show = createSignal<MouseEvent | undefined>(undefined);

@@ -131,9 +131,10 @@ function renderTube() {
   // create a tube geometry from the spline
   const tubeColor = 0x00ccff;
   const tubeGeo = new THREE.TubeGeometry(spline, 222, 0.65, 16, true);
-  const tubeLines = hookAddResult(new THREE.LineSegments());
+  const tubeLines = new THREE.LineSegments();
   tubeLines.geometry = new THREE.EdgesGeometry(tubeGeo, 0.2);
   tubeLines.material = new THREE.LineBasicMaterial({ color: tubeColor });
+  hookAddResult(tubeLines);
 
   const tubeHitArea = renderMesh();
   tubeHitArea.geometry = tubeGeo;

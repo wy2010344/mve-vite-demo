@@ -1,1 +1,0 @@
-import{be as o,bh as f,bi as d}from"./index-BrILyg7S.js";function t({condition:e,whenTrue:n,whenFalse:r}){f(e,n,r)}function a({render:e}){e()}function c({getArray:e,getKey:n,render:r}){o(e,n,r)}function u({key:e,render:n}){d(e,n)}export{c as ArrayRender,a as HookRender,t as If,u as OneRender};

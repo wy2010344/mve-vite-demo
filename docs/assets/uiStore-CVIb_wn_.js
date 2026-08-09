@@ -1,1 +1,0 @@
-import{P as t}from"./index-BrILyg7S.js";const s={isStartMenuOpen:t(!1),toggleStartMenu(){this.isStartMenuOpen.set(!this.isStartMenuOpen.get())},closeStartMenu(){this.isStartMenuOpen.set(!1)}};export{s as uiStore};

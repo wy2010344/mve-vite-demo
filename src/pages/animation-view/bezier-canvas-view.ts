@@ -1,5 +1,5 @@
 import { dom, fdom } from 'mve-dom';
-import { hookDraw, hookFill, renderCanvas } from 'mve-dom-helper/canvasRender';
+import { renderCanvas, renderRect } from 'mve-dom-helper/canvasRender';
 import {
   createSignal,
   StoreRef,
@@ -57,93 +57,97 @@ export default function () {
             return `${getOuterHeight()}px`;
           },
         }),
-        () => {
-          hookDraw({
-            y() {
-              return 5 + beforeHeight.get();
-            },
-            x: 5,
-            draw({ ctx }) {
-              const w = size.get();
-              const h = w;
+        {
+          children() {
+            renderRect({
+              x: 5,
+              y() {
+                return 5 + beforeHeight.get();
+              },
+              width: size.get,
+              height: size.get,
+              draw(ctx) {
+                const w = size.get();
+                const h = w;
 
-              ctx.strokeStyle = getBaseContentColor();
-              // // 将坐标原点移动到画布的左下角
-              // ctx.translate(0, h);
-              // ctx.scale(1, -1);
+                ctx.strokeStyle = getBaseContentColor();
+                // // 将坐标原点移动到画布的左下角
+                // ctx.translate(0, h);
+                // ctx.scale(1, -1);
 
-              //y轴
-              ctx.moveTo(0, 0);
-              ctx.lineTo(0, h);
-              ctx.stroke();
+                //y轴
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, h);
+                ctx.stroke();
 
-              //y-right轴
-              ctx.moveTo(w, 0);
-              ctx.lineTo(w, h);
-              ctx.stroke();
+                //y-right轴
+                ctx.moveTo(w, 0);
+                ctx.lineTo(w, h);
+                ctx.stroke();
 
-              //x轴
-              ctx.moveTo(0, 0);
-              ctx.lineTo(w, 0);
-              ctx.stroke();
+                //x轴
+                ctx.moveTo(0, 0);
+                ctx.lineTo(w, 0);
+                ctx.stroke();
 
-              const scale = size.get();
-              const x_1 = x1.get();
-              const y_1 = y1.get();
-              const x_2 = x2.get();
-              const y_2 = y2.get();
+                const scale = size.get();
+                const x_1 = x1.get();
+                const y_1 = y1.get();
+                const x_2 = x2.get();
+                const y_2 = y2.get();
 
-              ctx.beginPath();
-              //绘制canvas曲线
-              ctx.moveTo(0, 0);
-              ctx.bezierCurveTo(
-                x_1 * scale,
-                y_1 * scale,
+                ctx.beginPath();
+                //绘制canvas曲线
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(
+                  x_1 * scale,
+                  y_1 * scale,
 
-                x_2 * scale,
-                y_2 * scale,
+                  x_2 * scale,
+                  y_2 * scale,
 
-                scale,
-                scale
-              );
+                  scale,
+                  scale
+                );
 
-              ctx.stroke();
+                ctx.stroke();
 
-              //绘制js曲线
-              ctx.beginPath();
-              const list = dotList();
-              ctx.moveTo(0, 0);
-              for (let i = 0; i < list.length; i++) {
-                ctx.lineTo(i, list[i] * scale);
-              }
+                //绘制js曲线
+                ctx.beginPath();
+                const list = dotList();
+                ctx.moveTo(0, 0);
+                for (let i = 0; i < list.length; i++) {
+                  ctx.lineTo(i, list[i] * scale);
+                }
 
-              ctx.strokeStyle = getCssVariableColor('--color-primary');
-              ctx.stroke();
+                ctx.strokeStyle = getCssVariableColor('--color-primary');
+                ctx.stroke();
 
-              ctx.strokeStyle = getCssVariableColor('--color-secondary');
-              ctx.beginPath();
-              //连线1
-              ctx.moveTo(0, 0);
-              ctx.lineTo(x_1 * scale, y_1 * scale);
-              ctx.stroke();
+                ctx.strokeStyle = getCssVariableColor('--color-secondary');
+                ctx.beginPath();
+                //连线1
+                ctx.moveTo(0, 0);
+                ctx.lineTo(x_1 * scale, y_1 * scale);
+                ctx.stroke();
 
-              ctx.beginPath();
-              //连线2
-              ctx.moveTo(scale, scale);
-              ctx.lineTo(x_2 * scale, y_2 * scale);
-              ctx.stroke();
-            },
-            children() {
-              function didChange() {
-                const min = -Math.min(0, y1.get(), y2.get());
-                beforeHeight.set(Math.ceil(min * size.get()));
-                const max = Math.max(1, y1.get(), y2.get());
-                afterHeight.set(Math.ceil((max - 1) * size.get()));
-              }
-              drawControl(x1, y1, size, didChange);
-              drawControl(x2, y2, size, didChange);
-            },
-          });
+                ctx.beginPath();
+                //连线2
+                ctx.moveTo(scale, scale);
+                ctx.lineTo(x_2 * scale, y_2 * scale);
+                ctx.stroke();
+              },
+              children() {
+                function didChange() {
+                  const min = -Math.min(0, y1.get(), y2.get());
+                  beforeHeight.set(Math.ceil(min * size.get()));
+                  const max = Math.max(1, y1.get(), y2.get());
+                  afterHeight.set(Math.ceil((max - 1) * size.get()));
+                }
+                drawControl(x1, y1, size, didChange);
+                drawControl(x2, y2, size, didChange);
+              },
+            });
+          },
         }
       );
     },
@@ -193,38 +197,46 @@ function drawControl(
   size: StoreRef<number>,
   onChange: EmptyFun
 ) {
-  hookDraw({
+  renderRect({
     x() {
       return x.get() * size.get();
     },
     y() {
       return y.get() * size.get();
     },
-    withPath: true,
-    draw({ ctx, path }) {
-      path.ellipse(0, 0, 10, 10, 360, 0, 360);
-      hookFill('green');
+    width: 20,
+    height: 20,
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.ellipse(10, 10, 10, 10, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'green';
+      ctx.fill();
     },
-    onPointerDown(e) {
-      let lastE = e.original;
-      pointerMove({
-        onMove(e) {
-          const diffX = e.pageX - lastE.pageX;
-          const diffY = e.pageY - lastE.pageY;
-          let nextX = x.get() + diffX / size.get();
+    mouseDown(e) {
+      const startX = e.globalX;
+      const startY = e.globalY;
+      const initX = x.get();
+      const initY = y.get();
+      const engine = this.engineGlobal!;
+      const destroyMove = engine.registerMouseMove(move => {
+        const diffX = move.x - startX;
+        const diffY = move.y - startY;
+        let nextX = initX + diffX / size.get();
 
-          const nextY = y.get() - diffY / size.get();
-          if (nextX < 0) {
-            nextX = 0;
-          } else if (nextX > 1) {
-            nextX = 1;
-          }
-          x.set(nextX);
-          y.set(nextY);
+        const nextY = initY + diffY / size.get();
+        if (nextX < 0) {
+          nextX = 0;
+        } else if (nextX > 1) {
+          nextX = 1;
+        }
+        x.set(nextX);
+        y.set(nextY);
 
-          onChange();
-          lastE = e;
-        },
+        onChange();
+      });
+      const destroyUp = engine.registerMouseUp(() => {
+        destroyMove();
+        destroyUp();
       });
     },
   });

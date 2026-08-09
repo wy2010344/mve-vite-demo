@@ -1,0 +1,400 @@
+$ vite --force --host
+[2m21:33:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Forced re-optimization of dependencies
+
+  [32m[1mVITE[22m v7.3.3[39m  [2mready in [0m[1m1444[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://10.209.184.108:[1m5173[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[31m(!) Failed to run dependency scan. Skipping dependency pre-bundling. Error: [31m  Failed to scan for dependencies from entries:
+  C:/github/es-pseudo-monorepo/apps/mve-vite-demo/index.html
+
+  [31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDraw"[0m
+
+    src/pages/absoulte-canvas/index.ts:4:2:
+[37m      4 │   [32mhookDraw[37m,
+        ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawRect"[0m
+
+    src/pages/absoulte-canvas/index.ts:5:2:
+[37m      5 │   [32mhookDrawRect[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawText"[0m
+
+    src/pages/absoulte-canvas/index.ts:6:2:
+[37m      6 │   [32mhookDrawText[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/absoulte-canvas/index.ts:7:2:
+[37m      7 │   [32mhookFill[37m,
+        ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookStroke"[0m
+
+    src/pages/absoulte-canvas/index.ts:8:2:
+[37m      8 │   [32mhookStroke[37m,
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDraw"[0m
+
+    src/pages/animation-view/bezier-canvas-view.ts:2:9:
+[37m      2 │ import { [32mhookDraw[37m, hookFill, renderCanvas } from 'mve-dom-helper/ca...
+        ╵          [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/animation-view/bezier-canvas-view.ts:2:19:
+[37m      2 │ import { hookDraw, [32mhookFill[37m, renderCanvas } from 'mve-dom-helper/ca...
+        ╵                    [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDraw"[0m
+
+    src/pages/animation-view/draw-canvas-curve.ts:2:9:
+[37m      2 │ import { [32mhookDraw[37m, renderCanvas } from 'mve-dom-helper/canvasRender';
+        ╵          [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookClip"[0m
+
+    src/pages/canvas-demo/demo1.ts:1:9:
+[37m      1 │ import { [32mhookClip[37m, hookDraw, hookStroke } from 'mve-dom-helper/canv...
+        ╵          [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDraw"[0m
+
+    src/pages/canvas-demo/demo1.ts:1:19:
+[37m      1 │ import { hookClip, [32mhookDraw[37m, hookStroke } from 'mve-dom-helper/canv...
+        ╵                    [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookStroke"[0m
+
+    src/pages/canvas-demo/demo1.ts:1:29:
+[37m      1 │ import { hookClip, hookDraw, [32mhookStroke[37m } from 'mve-dom-helper/canv...
+        ╵                              [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookClip"[0m
+
+    src/pages/canvas-demo/demo2.ts:1:9:
+[37m      1 │ import { [32mhookClip[37m, hookDraw, hookStroke } from 'mve-dom-helper/canv...
+        ╵          [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDraw"[0m
+
+    src/pages/canvas-demo/demo2.ts:1:19:
+[37m      1 │ import { hookClip, [32mhookDraw[37m, hookStroke } from 'mve-dom-helper/canv...
+        ╵                    [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookStroke"[0m
+
+    src/pages/canvas-demo/demo2.ts:1:29:
+[37m      1 │ import { hookClip, hookDraw, [32mhookStroke[37m } from 'mve-dom-helper/canv...
+        ╵                              [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawRect"[0m
+
+    src/pages/canvas-demo/demo3.ts:3:2:
+[37m      3 │   [32mhookDrawRect[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "simpleFlex"[0m
+
+    src/pages/canvas-demo/demo3.ts:4:2:
+[37m      4 │   [32msimpleFlex[37m,
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawUrlImage"[0m
+
+    src/pages/canvas-demo/demo3.ts:6:2:
+[37m      6 │   [32mhookDrawUrlImage[37m,
+        ╵   [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawTextWrap"[0m
+
+    src/pages/canvas-demo/demo3.ts:7:2:
+[37m      7 │   [32mhookDrawTextWrap[37m,
+        ╵   [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/canvas-demo/demo3.ts:8:2:
+[37m      8 │   [32mhookFill[37m,
+        ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookStroke"[0m
+
+    src/pages/canvas-demo/demo3.ts:9:2:
+[37m      9 │   [32mhookStroke[37m,
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookAddRect"[0m
+
+    src/pages/canvas-demo/demo3.ts:11:2:
+[37m      11 │   [32mhookAddRect[37m,
+         ╵   [32m~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawRect"[0m
+
+    src/pages/canvas-demo/demo5.ts:3:2:
+[37m      3 │   [32mhookDrawRect[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "simpleFlex"[0m
+
+    src/pages/canvas-demo/demo5.ts:4:2:
+[37m      4 │   [32msimpleFlex[37m,
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawText"[0m
+
+    src/pages/canvas-demo/demo5.ts:5:2:
+[37m      5 │   [32mhookDrawText[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/canvas-demo/demo5.ts:7:2:
+[37m      7 │   [32mhookFill[37m,
+        ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookAddRect"[0m
+
+    src/pages/canvas-demo/demo5.ts:8:2:
+[37m      8 │   [32mhookAddRect[37m,
+        ╵   [32m~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDraw"[0m
+
+    src/pages/canvas-demo/demo6.ts:1:9:
+[37m      1 │ import { [32mhookDraw[37m, hookFill } from 'mve-dom-helper/canvasRender';
+        ╵          [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/canvas-demo/demo6.ts:1:19:
+[37m      1 │ import { hookDraw, [32mhookFill[37m } from 'mve-dom-helper/canvasRender';
+        ╵                    [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookAddRect"[0m
+
+    src/pages/canvas-demo/demo7.ts:2:2:
+[37m      2 │   [32mhookAddRect[37m,
+        ╵   [32m~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawRect"[0m
+
+    src/pages/canvas-demo/demo7.ts:3:2:
+[37m      3 │   [32mhookDrawRect[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/canvas-demo/demo7.ts:4:2:
+[37m      4 │   [32mhookFill[37m,
+        ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "simpleFlex"[0m
+
+    src/pages/canvas-demo/demo7.ts:5:2:
+[37m      5 │   [32msimpleFlex[37m,
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookAddRect"[0m
+
+    src/pages/canvas-demo/drawText.ts:3:2:
+[37m      3 │   [32mhookAddRect[37m,
+        ╵   [32m~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawTextWrap"[0m
+
+    src/pages/canvas-demo/drawText.ts:5:2:
+[37m      5 │   [32mhookDrawTextWrap[37m,
+        ╵   [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookStroke"[0m
+
+    src/pages/canvas-demo/drawText.ts:6:2:
+[37m      6 │   [32mhookStroke[37m,
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookAddRect"[0m
+
+    src/pages/canvas-demo/index.ts:12:2:
+[37m      12 │   [32mhookAddRect[37m,
+         ╵   [32m~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawRect"[0m
+
+    src/pages/canvas-demo/index.ts:13:2:
+[37m      13 │   [32mhookDrawRect[37m,
+         ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/canvas-demo/index.ts:14:2:
+[37m      14 │   [32mhookFill[37m,
+         ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "simpleFlex"[0m
+
+    src/pages/canvas-demo/index.ts:16:2:
+[37m      16 │   [32msimpleFlex[37m,
+         ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawRect"[0m
+
+    src/pages/mve-canvas/index.ts:12:2:
+[37m      12 │   [32mhookDrawRect[37m,
+         ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "simpleFlex"[0m
+
+    src/pages/mve-canvas/index.ts:13:2:
+[37m      13 │   [32msimpleFlex[37m,
+         ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawText"[0m
+
+    src/pages/mve-canvas/index.ts:14:2:
+[37m      14 │   [32mhookDrawText[37m,
+         ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookPretextTextWrap"[0m
+
+    src/pages/mve-canvas/index.ts:16:2:
+[37m      16 │   [32mhookPretextTextWrap[37m as hookDrawTextWrap,
+         ╵   [32m~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/mve-canvas/index.ts:18:2:
+[37m      18 │   [32mhookFill[37m,
+         ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawUrlImage"[0m
+
+    src/pages/mve-canvas/index.ts:19:2:
+[37m      19 │   [32mhookDrawUrlImage[37m,
+         ╵   [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookAddRect"[0m
+
+    src/pages/mve-canvas/index.ts:20:2:
+[37m      20 │   [32mhookAddRect[37m,
+         ╵   [32m~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookClip"[0m
+
+    src/pages/mve-canvas/index.ts:21:2:
+[37m      21 │   [32mhookClip[37m,
+         ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawRect"[0m
+
+    src/pages/pretext/index.ts:4:2:
+[37m      4 │   [32mhookDrawRect[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookDrawText"[0m
+
+    src/pages/pretext/index.ts:5:2:
+[37m      5 │   [32mhookDrawText[37m,
+        ╵   [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "simpleFlex"[0m
+
+    src/pages/pretext/index.ts:6:2:
+[37m      6 │   [32msimpleFlex[37m,
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookPretextTextWrap"[0m
+
+    src/pages/pretext/index.ts:8:2:
+[37m      8 │   [32mhookPretextTextWrap[37m,
+        ╵   [32m~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookFill"[0m
+
+    src/pages/pretext/index.ts:10:2:
+[37m      10 │   [32mhookFill[37m,
+         ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookAddRect"[0m
+
+    src/pages/pretext/index.ts:11:2:
+[37m      11 │   [32mhookAddRect[37m,
+         ╵   [32m~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNo matching export in "../../packages/mve/dom-helper/src/canvasRender/index.ts" for import "hookClip"[0m
+
+    src/pages/pretext/index.ts:12:2:
+[37m      12 │   [32mhookClip[37m,
+         ╵   [32m~~~~~~~~[0m
+
+
+    at failureErrorWithLog (C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:1748:15)
+    at C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:1207:25
+    at runOnEndCallbacks (C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:1588:45)
+    at buildResponseToResult (C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:1205:7)
+    at C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:1217:9
+    at new Promise (<anonymous>)
+    at requestCallbacks.on-end (C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:1216:54)
+    at handleRequest (C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:909:17)
+    at handleIncomingPacket (C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:934:7)
+    at Socket.readFromStdout (C:\github\es-pseudo-monorepo\node_modules\.pnpm\esbuild@0.27.7\node_modules\esbuild\lib\main.js:862:7)[39m
+[ELIFECYCLE] Command failed with exit code 4294967295.

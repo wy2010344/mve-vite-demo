@@ -1,0 +1,1 @@
+import{aN as o,aj as t,bf as r,ap as i}from"./index-BCxd8sac.js";import{a}from"./onlyMobile-Bxyt2qo9.js";import"./index-BMxOGu3m.js";import"./canvasRender-CRddz0Wb-DhzwJvmV.js";function u(e){const{renderBranch:n}=o.consume();a(function({width:d,height:c},m){t.div({children(){r(e.getChildren,i,function(f){n(e.getChildren)})}})})}export{u as default};

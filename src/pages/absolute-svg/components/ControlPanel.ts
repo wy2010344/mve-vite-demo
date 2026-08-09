@@ -1,44 +1,19 @@
-import { fdom, fsvg } from 'mve-dom';
-import { simpleFlex, ValueOrGet } from 'wy-helper';
-import { renderALayout } from 'mve-dom-helper';
+import { fdom } from 'mve-dom';
+import { ValueOrGet } from 'wy-helper';
 
-// SVG 按钮组件 - 在 SVG 内部使用
+// 按钮组件
 function renderSVGButton(content: ValueOrGet<string>, onClick: () => void) {
-  renderALayout({
-    width: 60,
-    height: 40,
-    render(button) {
-      return fsvg.g({
-        transform() {
-          return `translate(${button.axis.x.position()}, ${button.axis.y.position()})`;
-        },
-        s_cursor: 'pointer',
-        onClick,
-        children() {
-          // 按钮背景
-          fsvg.rect({
-            width: 60,
-            height: 40,
-            fill: 'rgba(255,255,255,0.1)',
-            stroke: 'rgba(255,255,255,0.3)',
-            strokeWidth: 1,
-            rx: 8,
-          });
-
-          // 按钮文字
-          fsvg.text({
-            x: 30,
-            y: 20,
-            textAnchor: 'middle',
-            dominantBaseline: 'middle',
-            fontSize: '16px',
-            fill: 'white',
-            childrenType: 'text',
-            children: content,
-          });
-        },
-      });
-    },
+  fdom.button({
+    s_width: '60px',
+    s_height: '40px',
+    s_background: 'rgba(255,255,255,0.1)',
+    s_border: '1px solid rgba(255,255,255,0.3)',
+    s_borderRadius: '8px',
+    s_color: 'white',
+    s_cursor: 'pointer',
+    onClick,
+    childrenType: 'text',
+    children: content,
   });
 }
 
@@ -54,66 +29,30 @@ export function renderControlPanel(
   onChangeBallCount: () => void,
   onChangeGravity: () => void
 ) {
-  renderALayout({
-    height: 80,
-    render(panel) {
-      return fsvg.svg({
-        s_position: 'absolute',
-        s_left: () => `${panel.axis.x.position()}px`,
-        s_top: () => `${panel.axis.y.position()}px`,
-        width: panel.axis.x.size,
-        height: panel.axis.y.size,
-        children() {
-          // 面板背景
-          fsvg.rect({
-            width: panel.axis.x.size(),
-            height: panel.axis.y.size(),
-            fill: 'rgba(255,255,255,0.1)',
-            stroke: 'rgba(255,255,255,0.2)',
-            strokeWidth: 1,
-          });
+  fdom.div({
+    s_width: '100%',
+    s_height: '80px',
+    s_display: 'flex',
+    s_justifyContent: 'space-around',
+    s_alignItems: 'center',
+    s_background: 'rgba(255,255,255,0.1)',
+    s_border: '1px solid rgba(255,255,255,0.2)',
+    s_borderRadius: '8px',
+    children() {
+      // 播放/暂停按钮
+      renderSVGButton(() => (isPlaying() ? '⏸️' : '▶️'), onTogglePlay);
 
-          // 使用布局系统排列控制按钮
-          renderALayout({
-            width: () => panel.axis.x.size(),
-            height: () => panel.axis.y.size(),
-            layout() {
-              return simpleFlex({
-                direction: 'x',
-                alignItems: 'center',
-                alignFix: true,
-                directionFix: 'around',
-              });
-            },
-            render(buttonContainer) {
-              return fsvg.g({
-                children() {
-                  // 播放/暂停按钮
-                  renderSVGButton(
-                    () => (isPlaying() ? '⏸️' : '▶️'),
-                    onTogglePlay
-                  );
+      // 重置按钮
+      renderSVGButton('🔄', onReset);
 
-                  // 重置按钮
-                  renderSVGButton('🔄', onReset);
+      // 轨迹开关 - 根据状态改变颜色
+      renderSVGButton('✨', onToggleTrails);
 
-                  // 轨迹开关 - 根据状态改变颜色
-                  renderSVGButton('✨', onToggleTrails);
+      // 小球数量控制
+      renderSVGButton(() => `🔢 ${ballCount()}`, onChangeBallCount);
 
-                  // 小球数量控制
-                  renderSVGButton(() => `🔢 ${ballCount()}`, onChangeBallCount);
-
-                  // 重力控制
-                  renderSVGButton(
-                    () => `🌍 ${gravity().toFixed(1)}`,
-                    onChangeGravity
-                  );
-                },
-              });
-            },
-          });
-        },
-      });
+      // 重力控制
+      renderSVGButton(() => `🌍 ${gravity().toFixed(1)}`, onChangeGravity);
     },
   });
 }

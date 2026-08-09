@@ -1,0 +1,1 @@
+import{am as s,a5 as m}from"./index-BCxd8sac.js";import{m as o}from"./marked.esm-BaswSlok.js";function p(a,...r){const e=s(a,r);m.article({className:"daisy-prose prose"}).renderInnerHTML(o.parse(e,{async:!1}))}export{p as m};

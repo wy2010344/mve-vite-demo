@@ -1,34 +1,37 @@
 import { renderMobileView } from '../../onlyMobile';
 import {
-  alignSelf,
   arrayCountCreateWith,
   createSignal,
-  LayoutNode,
   memo,
   numberBetween,
-  Point,
 } from 'wy-helper';
 import {
-  hookDrawRect,
-  simpleFlex,
-  hookDrawText,
-  // hookDrawTextWrap,
-  hookPretextTextWrap as hookDrawTextWrap,
+  LayoutNode,
+  Scroll,
+  flex,
+  grow,
+  loadCanvasKit,
+  registerFont,
+  registerScroll,
   renderCanvas,
-  hookFill,
-  hookDrawUrlImage,
-  hookAddRect,
-  hookClip,
-  CMNode,
+  renderRect,
+  renderScrollContent,
+  renderWrappedText,
 } from 'mve-dom-helper/canvasRender';
 
 import { faker } from '@faker-js/faker';
-import { OnScroll } from 'mve-dom-helper';
 import explain from '~/explain';
 import markdown from '~/markdown';
-import { pointerMoveDir } from 'wy-dom-helper';
 import { renderArray } from 'mve-helper';
 import { fdom } from 'mve-dom';
+
+const FONT_URLS = ['/fonts/noto-sans-sc-chinese-simplified-400-normal.woff2'];
+
+await loadCanvasKit('/canvas-kit/canvaskit.js');
+await loadDemoFont();
+
+const refresh = createSignal(0);
+
 export default function () {
   explain(() => {
     markdown`
@@ -48,221 +51,199 @@ export default function () {
           return `${height()}px`;
         },
       }),
-      () => {
-        hookDrawRect({
-          width,
-          height,
-          layout(v) {
-            return simpleFlex({
+      {
+        children() {
+          renderRect({
+            width,
+            height,
+            layout: flex({
               direction: 'y',
               gap: 10,
               alignFix: true,
-              alignItems: 'stretch',
-            });
-          },
-          children() {
-            const x = createSignal(10);
-            const data = memo(() =>
-              arrayCountCreateWith(x.get() * 5, i => {
-                return i;
-              })
-            );
+              alignItem: 'stretch',
+              directionJustify: 'start',
+            }),
+            children() {
+              const x = createSignal(10);
+              const data = memo(() =>
+                arrayCountCreateWith(x.get() * 5, i => {
+                  return i;
+                })
+              );
 
-            const rect = hookDrawRect({
-              paddingInline: 20,
-              height: 20,
-              children() {
-                /**
-                 * 内部的坐标都应该translate到相应的位置
-                 * 但绘制的矩形,可能需要最终绘制
-                 */
-                hookDrawRect({
-                  y: 20,
-                  x(n) {
-                    return n.parent!.axis.x.paddingStart() + x.get();
-                  },
-                  onPointerDown(e) {
-                    pointerMoveDir(e.original, {
-                      onMove(initE, dir) {
-                        if (dir == 'x') {
-                          const initX = x.get();
-                          return {
-                            onMove(e) {
-                              const diff = e.pageX - initE.pageX;
-                              x.set(
-                                numberBetween(
-                                  0,
-                                  diff + initX,
-                                  rect.axis.x.innerSize()
-                                )
-                              );
-                            },
-                            onEnd(e) {},
-                          };
-                        }
-                      },
-                    });
-                  },
-                  draw({ path, rect }) {
-                    hookAddRect();
-                    path.ellipse(0, 0, 10, 10, 360, 0, 360);
-                    hookFill('green');
-                  },
-                });
-              },
-            });
-            hookDrawText({
-              paddingInline: 10,
-              config() {
-                return {
-                  text: `${data().length} 条记录`,
-                };
-              },
-            });
+              renderRect({
+                paddingInline: 20,
+                height: 20,
+                children() {
+                  renderRect({
+                    x() {
+                      return this.paddingInlineStart() + x.get();
+                    },
+                    y: 0,
+                    width: 20,
+                    height: 20,
+                    draw(ctx) {
+                      ctx.beginPath();
+                      ctx.ellipse(10, 10, 10, 10, 0, 0, Math.PI * 2);
+                      ctx.fillStyle = 'green';
+                      ctx.fill();
+                    },
+                    mouseDown(e) {
+                      const initX = x.get();
+                      const startX = e.globalX;
+                      const engine = this.engineGlobal!;
+                      const destroyMove = engine.registerMouseMove(move => {
+                        const diff = move.x - startX;
+                        const max =
+                          (this.parent as LayoutNode).innerWidth() - 20;
+                        x.set(numberBetween(0, diff + initX, max));
+                      });
+                      const destroyUp = engine.registerMouseUp(() => {
+                        destroyMove();
+                        destroyUp();
+                      });
+                    },
+                  });
+                },
+              });
+              renderWrappedText({
+                text: () => `${data().length} 条记录`,
+                fontFamily: 'Noto Sans SC',
+                fontSize: 16,
+              });
 
-            let container!: LayoutNode<CMNode, keyof Point<number>>;
-            const scrollY = new OnScroll('y', {
-              maxScroll() {
-                return container.axis.y.size() - content.axis.y.size();
-              },
-            });
-            const content = hookDrawRect({
-              grow: 1,
-              draw() {
-                hookAddRect();
-                hookFill('yellow');
-                hookClip();
-              },
-              onPointerDown(e) {
-                scrollY.pointerEventListner(e.original);
-              },
-              paddingRight: 4,
-              children() {
-                container = hookDrawRect({
-                  grow: 1,
-                  width(n) {
-                    return n.parent!.axis.x.innerSize();
-                  },
-                  y(n) {
-                    return -scrollY.get();
-                  },
-                  draw() {
-                    hookAddRect();
-                    hookFill('white');
-                  },
-                  layout() {
-                    return simpleFlex({
+              renderRect({
+                exts: [grow({ argGrow: 1 })],
+                layout: flex({
+                  direction: 'y',
+                  alignFix: true,
+                  alignItem: 'stretch',
+                  directionJustify: 'start',
+                }),
+                children() {
+                  const container = this.node as LayoutNode;
+                  const scroll = new Scroll(container, 'y');
+                  registerScroll(scroll);
+                  renderScrollContent({
+                    exts: [grow({ argGrow: 1 })],
+                    y: () => -scroll.value(),
+                    layout: flex({
                       direction: 'y',
                       alignFix: true,
-                      alignItems: 'stretch',
+                      alignItem: 'stretch',
                       gap: 4,
-                    });
-                  },
-                  children() {
-                    // return
-                    renderArray(data, function (row, getIndex) {
-                      const r = hookDrawRect({
-                        layout(v) {
-                          return simpleFlex({
+                      directionJustify: 'start',
+                    }),
+                    children() {
+                      renderArray(data, function (row, getIndex) {
+                        const avatar = new Image();
+                        avatar.src = faker.image.avatarGitHub();
+                        avatar.onload = () => {
+                          refresh.set(refresh.get() + 1);
+                        };
+                        renderRect({
+                          height: 88,
+                          paddingInlineStart: 4,
+                          layout: flex({
                             direction: 'x',
                             gap: 4,
-                          });
-                        },
-                        skipDraw(n) {
-                          const s = scrollY.get();
-                          if (
-                            n.axis.y.position() - s >
-                            content.axis.y.innerSize()
-                          ) {
-                            return true;
-                          }
-                          if (n.axis.y.position() - s + n.axis.y.size() < 0) {
-                            return true;
-                          }
-                          return false;
-                        },
-                        draw() {
-                          hookAddRect();
-                          hookFill(getIndex() % 2 ? '#A5D2EE' : '#EEEEEE');
-                        },
-                        paddingLeft: 4,
-                        children() {
-                          hookDrawRect({
-                            paddingBottom: 4,
-                            paddingTop: 4,
-                            height: 88,
-                            width: 80,
-                            layout(v) {
-                              return simpleFlex({
+                            alignFix: true,
+                            alignItem: 'stretch',
+                            directionJustify: 'start',
+                          }),
+                          draw(ctx) {
+                            refresh.get();
+                            ctx.fillStyle =
+                              getIndex() % 2 ? '#A5D2EE' : '#EEEEEE';
+                            ctx.fillRect(
+                              0,
+                              0,
+                              this.outerWidth(),
+                              this.outerHeight()
+                            );
+                          },
+                          children() {
+                            renderRect({
+                              width: 80,
+                              height: 88,
+                              paddingBlockEnd: 4,
+                              paddingBlockStart: 4,
+                              layout: flex({
                                 direction: 'y',
-                              });
-                            },
-                            children() {
-                              hookDrawUrlImage({
-                                grow: 1,
-                                relay: 'height',
-                                src: faker.image.avatarGitHub(),
-                              });
-                            },
-                          });
-                          hookDrawRect({
-                            /**
-                             * 这里
-                             * 本来应该由父容器决定stretch固定高度
-                             * 但却来自了子容器?
-                             *  directionFix需要来自自身的尺寸,自身尺寸却通过所有子元素获得,而不通过父元素获得?
-                             *  需要在子元素里使用grow,则自动填充满!
-                             */
-                            layout(v) {
-                              return simpleFlex({
-                                direction: 'y',
-                                directionFix: 'start',
                                 alignFix: true,
-                                alignItems: 'start',
+                                alignItem: 'stretch',
+                                directionJustify: 'start',
+                              }),
+                              children() {
+                                renderRect({
+                                  exts: [grow({ argGrow: 1 })],
+                                  width: 72,
+                                  draw(ctx) {
+                                    refresh.get();
+                                    if (
+                                      avatar.complete &&
+                                      avatar.naturalWidth
+                                    ) {
+                                      ctx.drawImage(
+                                        avatar,
+                                        0,
+                                        0,
+                                        this.outerWidth(),
+                                        this.outerHeight()
+                                      );
+                                    }
+                                  },
+                                });
+                              },
+                            });
+                            renderRect({
+                              exts: [grow({ argGrow: 1 })],
+                              layout: flex({
+                                direction: 'y',
                                 gap: 12,
-                              });
-                            },
-                            alignSelf: alignSelf('stretch'),
-                            grow: 1,
-                            children() {
-                              hookDrawText({
-                                config() {
-                                  return {
-                                    text: `${faker.person.fullName()}   ${getIndex()}`,
-                                  };
-                                },
-                              });
-                              // hookDrawRect({
-                              //   alignSelf: alignSelf('stretch'),
-                              //   grow: 1,
-                              //   draw(e) {
-                              //     hookAddRect()
-                              //     hookFill('blue')
-                              //   },
-                              // })
-                              // return
-                              hookDrawTextWrap({
-                                config: {
-                                  maxLines: 3,
+                                alignFix: true,
+                                alignItem: 'stretch',
+                                directionJustify: 'start',
+                              }),
+                              children() {
+                                renderWrappedText({
+                                  text: `${faker.person.fullName()}   ${getIndex()}`,
+                                  fontFamily: 'Noto Sans SC',
+                                  fontSize: 16,
+                                });
+                                renderWrappedText({
                                   text: faker.lorem.lines(4),
-                                  // font: '12px',
-                                  // lineHeight: 12,
-                                  fontSize: '12px',
-                                },
-                                alignSelf: alignSelf('stretch'),
-                              });
-                            },
-                          });
-                        },
+                                  fontFamily: 'Noto Sans SC',
+                                  fontSize: 12,
+                                  maxLines: 3,
+                                });
+                              },
+                            });
+                          },
+                        });
                       });
-                    });
-                  },
-                });
-              },
-            });
-          },
-        });
+                    },
+                  });
+                },
+              });
+            },
+          });
+        },
       }
     );
   });
+}
+
+async function loadDemoFont(): Promise<void> {
+  for (const url of FONT_URLS) {
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) continue;
+      const bytes = await resp.arrayBuffer();
+      registerFont('Noto Sans SC', bytes);
+      return;
+    } catch {
+      // 尝试下一个源
+    }
+  }
 }

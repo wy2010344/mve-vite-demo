@@ -63,7 +63,7 @@ export default function ({
             value = v;
             return v;
           },
-          v => value
+          () => value
         )
       );
       if (callback) {

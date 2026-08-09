@@ -1,5 +1,4 @@
-import { fsvg } from 'mve-dom';
-import { renderALayout } from 'mve-dom-helper';
+import { fdom, fsvg } from 'mve-dom';
 import type { Ball } from '../types';
 import { renderArray } from 'mve-helper';
 
@@ -9,20 +8,20 @@ export function renderPhysicsWorld(
   showTrails: () => boolean,
   onBallClick: (ballId: number) => void
 ) {
-  renderALayout({
-    grow: 1, // 占据剩余空间
-    render(world) {
-      return fsvg.svg({
+  fdom.div({
+    s_flex: '1 1 0%', // 占据剩余空间
+    s_position: 'relative',
+    children() {
+      fsvg.svg({
         s_position: 'absolute',
-        s_left: () => `${world.axis.x.position()}px`,
-        s_top: () => `${world.axis.y.position()}px`,
-        width: world.axis.x.size,
-        height: world.axis.y.size,
+        s_inset: '0',
+        s_width: '100%',
+        s_height: '100%',
         children() {
           // 世界背景
           fsvg.rect({
-            width: world.axis.x.size,
-            height: world.axis.y.size,
+            width: '100%',
+            height: '100%',
             fill: 'rgba(0,0,0,0.2)',
             data_physicsContainer: 'true',
           });

@@ -2,7 +2,6 @@ import { createSignal, storeRef } from 'wy-helper';
 import { ColumnDef, Task, TaskType } from './type';
 import { mve } from 'mve-dom-helper';
 import pointerColumn from './pointer/column';
-import { renderStateHolder } from 'mve-core';
 import { OneRender } from './xmlRender';
 import { createTabList } from 'daisy-mobile-helper';
 import { fdom, renderTextContent } from 'mve-dom';

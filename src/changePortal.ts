@@ -1,11 +1,10 @@
-import { hookAddResult, renderSubOps } from 'mve-core';
 import { dom } from 'mve-dom';
 import { renderIf } from 'mve-helper';
 import { createSignal } from 'wy-helper';
 
 export default function () {
   const version = createSignal(0);
-  const ops = renderSubOps(() => {
+  function renderButton() {
     const sversion = createSignal(0);
     dom.button({
       onClick() {
@@ -13,7 +12,7 @@ export default function () {
         version.set(version.get() + 1);
       },
     }).renderText`abc--${version.get}--${sversion.get}`;
-  });
+  }
   dom
     .div({
       className: 'bg-red-400 p-20',
@@ -24,7 +23,7 @@ export default function () {
           return version.get() % 2;
         },
         () => {
-          hookAddResult(ops);
+          renderButton();
         }
       );
     });
@@ -39,7 +38,7 @@ export default function () {
           return !(version.get() % 2);
         },
         () => {
-          hookAddResult(ops);
+          renderButton();
         }
       );
     });

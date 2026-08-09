@@ -1,2 +1,224 @@
-[6n[?9001h[?1004h[m]0;C:\Windows\system32\cmd.exe[?25h[2m$ tsc && vite build
-[22m[?9001l[?1004l
+$ tsc && vite build
+src/pages/absolute-dom/index.ts(5,3): error TS2305: Module '"wy-helper"' has no exported member 'flexDisplayUtil'.
+src/pages/absolute-dom/index.ts(7,3): error TS2305: Module '"wy-helper"' has no exported member 'simpleFlex'.
+src/pages/absolute-dom/index.ts(8,3): error TS2305: Module '"wy-helper"' has no exported member 'simpleStack'.
+src/pages/absolute-dom/index.ts(13,27): error TS2305: Module '"mve-dom-helper"' has no exported member 'renderALayout'.
+src/pages/absolute-dom/index.ts(37,12): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/absolute-dom/index.ts(52,20): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/absolute-dom/index.ts(84,14): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/absolute-svg/components/ControlPanel.ts(2,10): error TS2305: Module '"wy-helper"' has no exported member 'simpleFlex'.
+src/pages/absolute-svg/components/ControlPanel.ts(3,10): error TS2305: Module '"mve-dom-helper"' has no exported member 'renderALayout'.
+src/pages/absolute-svg/components/ControlPanel.ts(10,12): error TS7006: Parameter 'button' implicitly has an 'any' type.
+src/pages/absolute-svg/components/ControlPanel.ts(59,12): error TS7006: Parameter 'panel' implicitly has an 'any' type.
+src/pages/absolute-svg/components/ControlPanel.ts(88,20): error TS7006: Parameter 'buttonContainer' implicitly has an 'any' type.
+src/pages/absolute-svg/components/DynamicText.ts(2,27): error TS2305: Module '"mve-dom-helper"' has no exported member 'renderALayout'.
+src/pages/absolute-svg/components/DynamicText.ts(16,12): error TS7006: Parameter 'button' implicitly has an 'any' type.
+src/pages/absolute-svg/components/DynamicText.ts(46,12): error TS7006: Parameter 'container' implicitly has an 'any' type.
+src/pages/absolute-svg/components/InfoPanel.ts(2,10): error TS2305: Module '"wy-helper"' has no exported member 'simpleFlex'.
+src/pages/absolute-svg/components/InfoPanel.ts(3,10): error TS2305: Module '"mve-dom-helper"' has no exported member 'renderALayout'.
+src/pages/absolute-svg/components/InfoPanel.ts(11,12): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/pages/absolute-svg/components/InfoPanel.ts(46,12): error TS7006: Parameter 'panel' implicitly has an 'any' type.
+src/pages/absolute-svg/components/InfoPanel.ts(77,22): error TS7006: Parameter 'infoContainer' implicitly has an 'any' type.
+src/pages/absolute-svg/components/PhysicsWorld.ts(2,10): error TS2305: Module '"mve-dom-helper"' has no exported member 'renderALayout'.
+src/pages/absolute-svg/components/PhysicsWorld.ts(14,12): error TS7006: Parameter 'world' implicitly has an 'any' type.
+src/pages/absolute-svg/index.ts(1,24): error TS2305: Module '"wy-helper"' has no exported member 'simpleFlex'.
+src/pages/absolute-svg/index.ts(3,27): error TS2305: Module '"mve-dom-helper"' has no exported member 'renderALayout'.
+src/pages/absolute-svg/index.ts(103,12): error TS7006: Parameter 'container' implicitly has an 'any' type.
+src/pages/absolute-svg/test.ts(3,10): error TS2305: Module '"mve-dom-helper"' has no exported member 'renderALayout'.
+src/pages/absolute-svg/test.ts(13,12): error TS7006: Parameter 'container' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(1,46): error TS2305: Module '"wy-helper"' has no exported member 'simpleFlex'.
+src/pages/absoulte-canvas/index.ts(4,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDraw'.
+src/pages/absoulte-canvas/index.ts(5,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'hookDrawRect'. Did you mean 'drawRect'?
+src/pages/absoulte-canvas/index.ts(6,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawText'.
+src/pages/absoulte-canvas/index.ts(7,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/absoulte-canvas/index.ts(8,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookStroke'.
+src/pages/absoulte-canvas/index.ts(201,8): error TS7031: Binding element 'canvas' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(208,16): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(223,16): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(245,20): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(292,18): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(308,16): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(326,18): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(341,18): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(356,18): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(369,18): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(381,18): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(398,16): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(416,18): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(429,20): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(429,25): error TS7031: Binding element 'draw' implicitly has an 'any' type.
+src/pages/absoulte-canvas/index.ts(446,5): error TS2554: Expected 2 arguments, but got 3.
+src/pages/absoulte-canvas/index.ts(447,18): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+src/pages/animation-view/bezier-canvas-view.ts(2,10): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDraw'.
+src/pages/animation-view/bezier-canvas-view.ts(2,20): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/animation-view/bezier-canvas-view.ts(60,9): error TS2559: Type '() => void' has no properties in common with type 'Omit<RendererArgs<Renderer>, "x" | "y" | "frameCallback" | "position">'.
+src/pages/animation-view/bezier-canvas-view.ts(66,20): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/animation-view/bezier-canvas-view.ts(204,12): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/animation-view/bezier-canvas-view.ts(204,17): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/animation-view/bezier-canvas-view.ts(208,19): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/animation-view/draw-canvas-curve.ts(2,10): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDraw'.
+src/pages/animation-view/draw-canvas-curve.ts(53,9): error TS2559: Type '() => void' has no properties in common with type 'Omit<RendererArgs<Renderer>, "x" | "y" | "frameCallback" | "position">'.
+src/pages/animation-view/draw-canvas-curve.ts(59,20): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/animation-view/draw-unknown-end-view.ts(66,11): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/animation-view/draw-unknown-end-view.ts(66,11): error TS2345: Argument of type '(v: any) => number' is not assignable to parameter of type 'GetValue<number>'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/pages/canvas-demo/demo1.ts(1,10): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookClip'.
+src/pages/canvas-demo/demo1.ts(1,20): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDraw'.
+src/pages/canvas-demo/demo1.ts(1,30): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookStroke'.
+src/pages/canvas-demo/demo1.ts(8,12): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo1.ts(8,17): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo1.ts(32,19): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo1.ts(35,12): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo1.ts(35,17): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(1,10): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookClip'.
+src/pages/canvas-demo/demo2.ts(1,20): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDraw'.
+src/pages/canvas-demo/demo2.ts(1,30): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookStroke'.
+src/pages/canvas-demo/demo2.ts(8,12): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(8,17): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(18,23): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(21,16): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(21,21): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(31,23): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(35,16): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo2.ts(35,21): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(3,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'hookDrawRect'. Did you mean 'drawRect'?
+src/pages/canvas-demo/demo3.ts(4,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'simpleFlex'.
+src/pages/canvas-demo/demo3.ts(5,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawText'.
+src/pages/canvas-demo/demo3.ts(6,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawUrlImage'.
+src/pages/canvas-demo/demo3.ts(7,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawTextWrap'.
+src/pages/canvas-demo/demo3.ts(8,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/canvas-demo/demo3.ts(9,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookStroke'.
+src/pages/canvas-demo/demo3.ts(10,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDraw'.
+src/pages/canvas-demo/demo3.ts(11,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookAddRect'.
+src/pages/canvas-demo/demo3.ts(39,12): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(39,17): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(48,16): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(48,21): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(57,16): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(57,21): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(69,14): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo3.ts(85,14): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(3,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'hookDrawRect'. Did you mean 'drawRect'?
+src/pages/canvas-demo/demo5.ts(4,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'simpleFlex'.
+src/pages/canvas-demo/demo5.ts(5,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawText'.
+src/pages/canvas-demo/demo5.ts(6,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawTextWrap'.
+src/pages/canvas-demo/demo5.ts(7,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/canvas-demo/demo5.ts(8,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookAddRect'.
+src/pages/canvas-demo/demo5.ts(12,10): error TS2305: Module '"mve-core"' has no exported member 'hookAlterStateHolder'.
+src/pages/canvas-demo/demo5.ts(19,12): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(32,16): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(32,21): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(38,18): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(49,18): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(49,23): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(49,29): error TS7031: Binding element 'draw' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(54,19): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(78,16): error TS7031: Binding element 'draw' implicitly has an 'any' type.
+src/pages/canvas-demo/demo5.ts(87,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo6.ts(1,10): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDraw'.
+src/pages/canvas-demo/demo6.ts(1,20): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/canvas-demo/demo6.ts(8,13): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo6.ts(12,12): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo6.ts(12,17): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo6.ts(24,13): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo6.ts(28,12): error TS7031: Binding element 'ctx' implicitly has an 'any' type.
+src/pages/canvas-demo/demo6.ts(28,17): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(2,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookAddRect'.
+src/pages/canvas-demo/demo7.ts(3,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'hookDrawRect'. Did you mean 'drawRect'?
+src/pages/canvas-demo/demo7.ts(4,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/canvas-demo/demo7.ts(5,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'simpleFlex'.
+src/pages/canvas-demo/demo7.ts(11,12): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(19,16): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(24,14): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(32,21): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(35,18): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(43,21): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(46,18): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(56,17): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(59,14): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(67,16): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(72,14): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(80,21): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(83,18): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(91,21): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(94,18): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(104,17): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/demo7.ts(107,14): error TS7006: Parameter 'arg' implicitly has an 'any' type.
+src/pages/canvas-demo/drawText.ts(3,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookAddRect'.
+src/pages/canvas-demo/drawText.ts(4,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookCurrentCtx'.
+src/pages/canvas-demo/drawText.ts(5,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawTextWrap'.
+src/pages/canvas-demo/drawText.ts(6,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookStroke'.
+src/pages/canvas-demo/drawText.ts(30,10): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/drawText.ts(38,19): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/drawText.ts(44,17): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/index.ts(1,10): error TS2305: Module '"mve-core"' has no exported member 'hookAddDestroy'.
+src/pages/canvas-demo/index.ts(2,24): error TS2305: Module '"wy-helper"' has no exported member 'flexDisplayUtil'.
+src/pages/canvas-demo/index.ts(12,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookAddRect'.
+src/pages/canvas-demo/index.ts(13,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'hookDrawRect'. Did you mean 'drawRect'?
+src/pages/canvas-demo/index.ts(14,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/canvas-demo/index.ts(16,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'simpleFlex'.
+src/pages/canvas-demo/index.ts(43,14): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/canvas-demo/index.ts(58,5): error TS2554: Expected 2 arguments, but got 3.
+src/pages/canvas-demo/index.ts(65,17): error TS7006: Parameter 'ctx' implicitly has an 'any' type.
+src/pages/depth-chart/1/getOrderBooks.ts(1,10): error TS2305: Module '"mve-core"' has no exported member 'runGlobalHolder'.
+src/pages/desktop-a/components/Window.ts(8,10): error TS2305: Module '"mve-core"' has no exported member 'hookCurrentParent'.
+src/pages/desktop-a/components/Window.ts(8,29): error TS2305: Module '"mve-core"' has no exported member 'hookIsDestroyed'.
+src/pages/desktop/components/WindowManager.ts(8,10): error TS2305: Module '"mve-core"' has no exported member 'hookCurrentParent'.
+src/pages/desktop/components/WindowManager.ts(8,29): error TS2305: Module '"mve-core"' has no exported member 'hookIsDestroyed'.
+src/pages/kanban-board/drag/index.ts(1,10): error TS2305: Module '"mve-core"' has no exported member 'renderStateHolder'.
+src/pages/kanban-board/index.tsx(5,10): error TS2305: Module '"mve-core"' has no exported member 'renderStateHolder'.
+src/pages/kanban-board/pointer/index.tsx(13,10): error TS2305: Module '"mve-core"' has no exported member 'renderStateHolder'.
+src/pages/map-analysis/markerRender.ts(1,10): error TS2305: Module '"mve-core"' has no exported member 'createAppendSet'.
+src/pages/map-analysis/markerRender.ts(8,29): error TS2554: Expected 3 arguments, but got 2.
+src/pages/mve-canvas/index.ts(6,3): error TS2305: Module '"wy-helper"' has no exported member 'LayoutNode'.
+src/pages/mve-canvas/index.ts(12,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'hookDrawRect'. Did you mean 'drawRect'?
+src/pages/mve-canvas/index.ts(13,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'simpleFlex'.
+src/pages/mve-canvas/index.ts(14,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawText'.
+src/pages/mve-canvas/index.ts(16,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookPretextTextWrap'.
+src/pages/mve-canvas/index.ts(18,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/mve-canvas/index.ts(19,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawUrlImage'.
+src/pages/mve-canvas/index.ts(20,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookAddRect'.
+src/pages/mve-canvas/index.ts(21,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookClip'.
+src/pages/mve-canvas/index.ts(22,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'CMNode'. Did you mean 'Node'?
+src/pages/mve-canvas/index.ts(51,7): error TS2559: Type '() => void' has no properties in common with type 'Omit<RendererArgs<Renderer>, "x" | "y" | "frameCallback" | "position">'.
+src/pages/mve-canvas/index.ts(55,18): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(81,21): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(84,33): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(106,26): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(106,32): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(136,29): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(143,25): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(146,21): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(165,32): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(171,34): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(195,36): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/mve-canvas/index.ts(216,36): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/pretext/index.ts(2,35): error TS2305: Module '"wy-helper"' has no exported member 'LayoutNode'.
+src/pages/pretext/index.ts(4,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'hookDrawRect'. Did you mean 'drawRect'?
+src/pages/pretext/index.ts(5,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookDrawText'.
+src/pages/pretext/index.ts(6,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'simpleFlex'.
+src/pages/pretext/index.ts(8,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookPretextTextWrap'.
+src/pages/pretext/index.ts(10,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookFill'.
+src/pages/pretext/index.ts(11,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookAddRect'.
+src/pages/pretext/index.ts(12,3): error TS2305: Module '"mve-dom-helper/canvasRender"' has no exported member 'hookClip'.
+src/pages/pretext/index.ts(13,3): error TS2724: '"mve-dom-helper/canvasRender"' has no exported member named 'CMNode'. Did you mean 'Node'?
+src/pages/pretext/index.ts(40,7): error TS2559: Type '() => void' has no properties in common with type 'Omit<RendererArgs<Renderer>, "x" | "y" | "frameCallback" | "position">'.
+src/pages/pretext/index.ts(44,18): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/pretext/index.ts(66,29): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/pretext/index.ts(72,25): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/pretext/index.ts(75,21): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/pages/pretext/index.ts(101,30): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/pretext/index.ts(118,30): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/pretext/index.ts(138,30): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/pretext/index.ts(155,30): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/pretext/index.ts(174,30): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/pretext/index.ts(197,28): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/pretext/index.ts(206,37): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/pretext/index.ts(250,32): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/pretext/index.ts(253,32): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/pretext/index.ts(261,36): error TS7031: Binding element 'path' implicitly has an 'any' type.
+src/pages/pretext/index.ts(261,42): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/pretext/index.ts(268,36): error TS7006: Parameter 'v' implicitly has an 'any' type.
+src/pages/pretext/index.ts(311,12): error TS7031: Binding element 'rect' implicitly has an 'any' type.
+src/pages/test/index.ts(2,10): error TS2305: Module '"three/tsl"' has no exported member 'tri'.
+[ELIFECYCLE] Command failed with exit code 2.

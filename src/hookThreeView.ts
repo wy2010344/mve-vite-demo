@@ -184,15 +184,4 @@ const n = createRenderChildren<THREE.Object3D, ReadSet<THREE.Object3D>>(
   }
 );
 
-export function renderChildren<N extends THREE.Object3D>(
-  node: N,
-  render: SetValue<N>
-) {
-  const getChildren = n.renderChildren(node, function (
-    this: StateHolderWithNode<THREE.Object3D, ReadSet<THREE.Object3D>>
-  ) {
-    render(this.node as N);
-  } as any);
-  (node as any)._children = getChildren;
-  return getChildren;
-}
+export const renderChildren = n.renderChildren;

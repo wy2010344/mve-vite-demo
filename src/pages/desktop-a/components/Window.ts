@@ -5,7 +5,7 @@ import {
   instanceWithCopy,
   PanelWithClose,
 } from 'daisy-mobile-helper';
-import { hookCurrentParent, hookIsDestroyed } from 'mve-core';
+import { hookCurrentStateHolder } from 'mve-core';
 import { EmptyFun, OneSetStoreRef, run, ValueOrGet } from 'wy-helper';
 import { PopWithRearrange } from 'mve-helper';
 import { cns } from 'mve-dom-helper';
@@ -34,7 +34,8 @@ export const panel = instanceWithCopy<
       closeList.forEach(run);
     },
     panel(info) {
-      const parent = hookCurrentParent() as HTMLDivElement;
+      const holder = hookCurrentStateHolder(true);
+      const parent = holder.getParent() as HTMLDivElement;
       const {
         title,
         icon,
@@ -45,7 +46,7 @@ export const panel = instanceWithCopy<
         ...args
       } = callback(info);
       const { x, y, beginStep } = getWindowMoveInfo(args, parent);
-      const isDestroyed = hookIsDestroyed();
+      const isDestroyed = () => holder.destroyed();
       fdom.div({
         className: cns(
           `${styles.glass} absolute flex flex-col rounded-lg overflow-hidden shadow-2xl transition-opacity duration-200`,

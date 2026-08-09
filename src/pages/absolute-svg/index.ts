@@ -1,6 +1,5 @@
-import { createSignal, simpleFlex, addEffect } from 'wy-helper';
+import { createSignal, addEffect } from 'wy-helper';
 import { fdom } from 'mve-dom';
-import { hookMeasureSize, renderALayout } from 'mve-dom-helper';
 
 import type { Ball, PhysicsParams } from './types';
 import { createBalls, updateBallPhysics, AnimationManager } from './physics';
@@ -89,70 +88,58 @@ export default function () {
     return balls.get().find(b => b.selected);
   }
 
-  return renderALayout({
-    width: 800,
-    height: 600,
-    layout() {
-      return simpleFlex({
-        direction: 'y',
-        alignItems: 'stretch',
-        alignFix: true,
-        gap: 0,
-      });
-    },
-    render(container) {
-      return fdom.div({
-        s_width: () => `${container.axis.x.size()}px`,
-        s_height: () => `${container.axis.y.size()}px`,
-        s_position: 'relative',
-        s_background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
-        s_borderRadius: '12px',
-        s_boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-        s_overflow: 'hidden',
-        children() {
-          // 控制面板
-          renderControlPanel(
-            isPlaying.get,
-            showTrails.get,
-            ballCount.get,
-            gravity.get,
-            function () {
-              isPlaying.set(!isPlaying.get());
-            },
-            resetBalls,
-            toggleTrails,
-            changeBallCount,
-            changeGravity
-          );
-
-          // 物理世界容器
-          renderPhysicsWorld(balls.get, showTrails.get, handleBallClick);
-
-          // 信息面板
-          renderInfoPanel(getSelectedBall);
-
-          // 演示 hookMeasureSize 的正确使用：动态文本按钮
-          renderDynamicTextButton(
-            () => {
-              const ballsCount = balls.get().length;
-              const selectedCount = balls.get().filter(b => b.selected).length;
-              const status = isPlaying.get() ? '运行中' : '已暂停';
-              // 动态文本内容，长度会变化
-              return `${status} | 小球: ${ballsCount} | 选中: ${selectedCount}`;
-            },
-            () => {
-              // 点击显示详细统计
-              const ballsData = balls.get();
-              const avgSpeed =
-                ballsData.reduce(
-                  (sum, b) => sum + Math.sqrt(b.vx * b.vx + b.vy * b.vy),
-                  0
-                ) / ballsData.length;
-              alert(`平均速度: ${avgSpeed.toFixed(2)}`);
-            }
-          );
+  return fdom.div({
+    s_width: '800px',
+    s_height: '600px',
+    s_position: 'relative',
+    s_display: 'flex',
+    s_flexDirection: 'column',
+    s_background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+    s_borderRadius: '12px',
+    s_boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+    s_overflow: 'hidden',
+    children() {
+      // 控制面板
+      renderControlPanel(
+        isPlaying.get,
+        showTrails.get,
+        ballCount.get,
+        gravity.get,
+        function () {
+          isPlaying.set(!isPlaying.get());
         },
-      });
+        resetBalls,
+        toggleTrails,
+        changeBallCount,
+        changeGravity
+      );
+
+      // 物理世界容器
+      renderPhysicsWorld(balls.get, showTrails.get, handleBallClick);
+
+      // 信息面板
+      renderInfoPanel(getSelectedBall);
+
+      // 演示 hookMeasureSize 的正确使用：动态文本按钮
+      renderDynamicTextButton(
+        () => {
+          const ballsCount = balls.get().length;
+          const selectedCount = balls.get().filter(b => b.selected).length;
+          const status = isPlaying.get() ? '运行中' : '已暂停';
+          // 动态文本内容，长度会变化
+          return `${status} | 小球: ${ballsCount} | 选中: ${selectedCount}`;
+        },
+        () => {
+          // 点击显示详细统计
+          const ballsData = balls.get();
+          const avgSpeed =
+            ballsData.reduce(
+              (sum, b) => sum + Math.sqrt(b.vx * b.vx + b.vy * b.vy),
+              0
+            ) / ballsData.length;
+          alert(`平均速度: ${avgSpeed.toFixed(2)}`);
+        }
+      );
     },
   });
 }

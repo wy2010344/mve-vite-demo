@@ -1,5 +1,20 @@
-import { createAppendSet, createRenderChildren } from 'mve-core';
+import {
+  createRenderChildren,
+  hookCurrentStateHolder,
+  purifySet,
+  renderRoot,
+  ShareConfig,
+} from 'mve-core';
 import { diffMoveOrderLess, ReadSet } from 'wy-helper';
+
+const markerConfig: ShareConfig<any, ReadSet<any>> = {
+  purifyList(list) {
+    const newSet = new Set<any>();
+    purifySet(list, newSet, () => false);
+    return newSet;
+  },
+  after() {},
+};
 
 /**
  * parent是map
@@ -15,5 +30,21 @@ export const markerRender = createRenderChildren<any, ReadSet<any>>(
       parent.add(child);
     },
   }),
-  createAppendSet
+  function (node, callback) {
+    const state = hookCurrentStateHolder(true);
+    const root = renderRoot(node, markerConfig, function () {
+      callback.call(this);
+    });
+    state.addDestroy(() => {
+      root.destroy();
+    });
+    return root.target;
+  },
+  function (node, callback) {
+    const state = hookCurrentStateHolder(true);
+    const root = renderRoot(node, markerConfig, function () {
+      callback.call(this);
+    });
+    return root;
+  }
 );

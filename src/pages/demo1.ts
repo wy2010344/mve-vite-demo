@@ -8,8 +8,7 @@ import {
   numberStoreTranfrom,
 } from 'wy-helper';
 import { dom, fdom, fsvg, svg } from 'mve-dom';
-import { renderArray } from 'mve-helper';
-import { hookAddDestroy } from 'mve-core';
+import { renderArray, hookDestroy } from 'mve-helper';
 import {
   renderContentEditable,
   renderContentEditableTrans,
@@ -202,7 +201,7 @@ function renderList(list: StoreRef<number[]>) {
       },
     }).renderText`删除`;
     count();
-    hookAddDestroy()(() => {
+    hookDestroy(() => {
       console.log('销毁了...');
     });
     addEffect(() => {

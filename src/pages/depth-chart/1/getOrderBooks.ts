@@ -1,4 +1,3 @@
-import { runGlobalHolder } from 'mve-core';
 import { hookTrackSignal } from 'mve-helper';
 import {
   createSignal,

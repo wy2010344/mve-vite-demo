@@ -1,0 +1,1 @@
+import{ba as o,bd as d,be as f}from"./index-BCxd8sac.js";function t({condition:e,whenTrue:n,whenFalse:r}){d(e,n,r)}function i({render:e}){e()}function c({getArray:e,getKey:n,render:r}){o(e,n,r)}function u({key:e,render:n}){f(e,n)}export{c as ArrayRender,i as HookRender,t as If,u as OneRender};

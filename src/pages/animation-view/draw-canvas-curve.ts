@@ -1,5 +1,5 @@
 import { fdom } from 'mve-dom';
-import { hookDraw, renderCanvas } from 'mve-dom-helper/canvasRender';
+import { renderCanvas, renderRect } from 'mve-dom-helper/canvasRender';
 import { createSignal, emptyFun, GetValue, memo, StoreRef } from 'wy-helper';
 import { getBaseContentColor, render偏移 } from './util';
 
@@ -50,44 +50,48 @@ export default function drawCanvasCurve({
             return `${getOutterHeight()}px`;
           },
         }),
-        () => {
-          hookDraw({
-            x: 5,
-            y() {
-              return 5 - dotList().minEdge;
-            },
-            draw({ ctx }) {
-              const w = size.get();
-              const h = w;
-              const list = dotList().list;
-              const perWidth = w / (list.length - 1);
-              ctx.strokeStyle = getBaseContentColor();
+        {
+          children() {
+            renderRect({
+              x: 5,
+              y() {
+                return 5 - dotList().minEdge;
+              },
+              width: size.get,
+              height: size.get,
+              draw(ctx) {
+                const w = size.get();
+                const h = w;
+                const list = dotList().list;
+                const perWidth = w / (list.length - 1);
+                ctx.strokeStyle = getBaseContentColor();
 
-              ctx.beginPath();
-              //y轴
-              ctx.moveTo(0, 0);
-              ctx.lineTo(0, h);
-              ctx.stroke();
+                ctx.beginPath();
+                //y轴
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, h);
+                ctx.stroke();
 
-              //y-right轴
-              ctx.moveTo(w, 0);
-              ctx.lineTo(w, h);
-              ctx.stroke();
+                //y-right轴
+                ctx.moveTo(w, 0);
+                ctx.lineTo(w, h);
+                ctx.stroke();
 
-              //x轴
-              ctx.moveTo(0, 0);
-              ctx.lineTo(w, 0);
-              ctx.stroke();
+                //x轴
+                ctx.moveTo(0, 0);
+                ctx.lineTo(w, 0);
+                ctx.stroke();
 
-              ctx.beginPath();
-              ctx.moveTo(0, 0);
-              for (let i = 0; i < list.length; i++) {
-                const cell = list[i];
-                ctx.lineTo(perWidth * i, cell);
-              }
-              ctx.stroke();
-            },
-          });
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                for (let i = 0; i < list.length; i++) {
+                  const cell = list[i];
+                  ctx.lineTo(perWidth * i, cell);
+                }
+                ctx.stroke();
+              },
+            });
+          },
         }
       );
       renderEnd(size, () => dotList().list);
