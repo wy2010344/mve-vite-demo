@@ -269,6 +269,10 @@ function keyCodeOf(e: KeyboardEvent): KeyCode {
       return KeyCode.Up;
     case 'ArrowDown':
       return KeyCode.Down;
+    case 'PageUp':
+      return KeyCode.PageUp;
+    case 'PageDown':
+      return KeyCode.PageDown;
     case 'Home':
       return KeyCode.Home;
     case 'End':

@@ -132,11 +132,12 @@ export default function () {
                       alignFix: true,
                       alignItem: 'stretch',
                       gap: 4,
-                      directionJustify: 'start',
+                      directionJustify: 'grow',
                     }),
                     children() {
                       renderArray(data, function (row, getIndex) {
                         const avatar = new Image();
+                        avatar.crossOrigin = 'anonymous';
                         avatar.src = faker.image.avatarGitHub();
                         avatar.onload = () => {
                           refresh.set(refresh.get() + 1);
@@ -151,13 +152,13 @@ export default function () {
                             alignItem: 'stretch',
                             directionJustify: 'start',
                           }),
-                          draw(ctx) {
+                          drawAtParent(ctx) {
                             refresh.get();
                             ctx.fillStyle =
                               getIndex() % 2 ? '#A5D2EE' : '#EEEEEE';
                             ctx.fillRect(
-                              0,
-                              0,
+                              this.x(),
+                              this.y(),
                               this.outerWidth(),
                               this.outerHeight()
                             );
