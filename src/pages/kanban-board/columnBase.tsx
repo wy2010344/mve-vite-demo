@@ -5,7 +5,6 @@ import { HookRender, If } from './xmlRender';
 import { LuPlus } from 'mve-icons/lu';
 import { renderSizeSvg } from '~/mve-icon';
 import { mve } from 'mve-dom-helper';
-import type { React } from 'wy-dom-helper';
 import { FPDomAttributes } from 'mve-dom';
 
 export default function ({
