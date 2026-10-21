@@ -6,7 +6,7 @@ import {
   renderMesh,
   renderThreeView,
   ThreeContext,
-} from '../../../hookThreeView';
+} from 'mve-three';
 import { hookAddResult } from 'mve-core';
 
 import * as THREE from 'three';

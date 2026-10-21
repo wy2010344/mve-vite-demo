@@ -4,7 +4,7 @@ import {
   hookOrbitControls,
   renderThreeView,
   ThreeContext,
-} from '../../../hookThreeView';
+} from 'mve-three';
 import {
   hookDestroy,
   hookPromiseSignal,

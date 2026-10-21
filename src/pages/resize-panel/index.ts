@@ -11,7 +11,6 @@ import {
   movePanelResizeAuto,
 } from 'wy-helper';
 import Typed from 'typed.js';
-import { createSign } from 'crypto';
 export default function () {
   const show = createSignal<MouseEvent | undefined>(undefined);
   dom.button({
@@ -85,6 +84,7 @@ export default function () {
         },
         children() {
           let typed: Typed | undefined = undefined;
+          hookDestroy(() => typed?.destroy());
           // let span: HTMLSpanElement
           const panel = fdom.div({
             children() {
@@ -115,9 +115,15 @@ export default function () {
               fdom.div({
                 children() {
                   const text = createSignal('');
-                  setTimeout(() => {
-                    text.set(faker.lorem.paragraphs(6));
-                  }, 3000);
+                  let textTimer: ReturnType<typeof setTimeout> | undefined;
+                  function setTextDelayed() {
+                    clearTimeout(textTimer);
+                    textTimer = setTimeout(() => {
+                      text.set(faker.lorem.paragraphs(6));
+                    }, 3000);
+                  }
+                  setTextDelayed();
+                  hookDestroy(() => clearTimeout(textTimer));
                   renderOne(text.get, function (text) {
                     if (text) {
                       const span = fdom.span();
@@ -157,9 +163,7 @@ export default function () {
                           onComplete.set(false);
                           onAutoHeight.set(true);
                           text.set('');
-                          setTimeout(() => {
-                            text.set(faker.lorem.paragraphs(6));
-                          }, 3000);
+                          setTextDelayed();
                         },
                       });
                     }

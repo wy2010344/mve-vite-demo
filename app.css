@@ -5,7 +5,7 @@
   prefix:"daisy-";
   themes: all;
 }
-@source './node_modules/daisy-mobile-helper/dist/index.js';
+@source '../../packages/mve/daisy-mobile-helper/src';
 @theme {
   /* 📌 Display (展示) */
   --text-display-large: 57px;

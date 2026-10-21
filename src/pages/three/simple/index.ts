@@ -5,7 +5,7 @@ import {
   hookOrbitControls,
   renderMesh,
   renderThreeView,
-} from '../../../hookThreeView';
+} from 'mve-three';
 import { windowSize } from 'wy-dom-helper';
 
 export default function () {

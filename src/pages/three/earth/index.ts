@@ -7,7 +7,7 @@ import {
   renderMesh,
   renderThreeView,
   ThreeContext,
-} from '../../../hookThreeView';
+} from 'mve-three';
 import earthmap1k from './00_earthmap1k.jpg';
 import earthbump1k from './01_earthbump1k.jpg';
 import earthspec1k from './02_earthspec1k.jpg';

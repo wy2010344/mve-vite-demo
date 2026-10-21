@@ -1,0 +1,1 @@
+import{ak as a}from"./index-DwOSKAKP.js";function o(r){a.div({className:"relative",children(){a.div({className:"overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"})}})}export{o as default};

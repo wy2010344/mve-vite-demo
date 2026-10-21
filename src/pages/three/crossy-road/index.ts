@@ -7,7 +7,8 @@ import { movesQueue, player, position, queueMove, score } from './Player';
 import { dom, fdom, renderText } from 'mve-dom';
 import { animatePlayer } from './animatePlayer';
 import { finished, hitTest } from './hitTest';
-import { renderThreeView, ThreeContext } from '../../../hookThreeView';
+import { renderThreeView, ThreeContext } from 'mve-three';
+import { hookDestroy } from 'mve-helper';
 
 export default function () {
   fdom.div({
@@ -95,7 +96,7 @@ export default function () {
           fdom.div({
             className: 'grid grid-cols-[50px_50px_50px] gap-[10px]',
             children() {
-              window.addEventListener('keydown', event => {
+              function onKeydown(event: KeyboardEvent) {
                 if (event.key === 'ArrowUp') {
                   event.preventDefault(); // Avoid scrolling the page
                   queueMove('forward');
@@ -109,7 +110,11 @@ export default function () {
                   event.preventDefault(); // Avoid scrolling the page
                   queueMove('right');
                 }
-              });
+              }
+              window.addEventListener('keydown', onKeydown);
+              hookDestroy(() =>
+                window.removeEventListener('keydown', onKeydown)
+              );
               fdom.button({
                 className:
                   'w-full h-[40px] bg-white border-1 border-gray-100 shadow-2xl [grid-column:1/-1]',

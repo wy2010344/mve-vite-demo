@@ -8,13 +8,15 @@ export default defineConfig({
   root: path.resolve(__dirname), // apps/demo 的路径
   assetsInclude: ['**/*.glb', '**/*.gltf'],
   server: {
-    watch: __filename.startsWith('/Volumes/')
-      ? {
-          usePolling: true,
-          interval: 1000,
-          ignored: ['**/node_modules/**'], // 忽略 node_modules 目录
-        }
-      : undefined,
+    port: 5364,
+    watch:
+      process.env.VITE_USE_POLLING === 'true'
+        ? {
+            usePolling: true,
+            interval: 1000,
+            ignored: ['**/node_modules/**'], // 忽略 node_modules 目录
+          }
+        : undefined,
   },
   base: './',
   build: {
@@ -22,36 +24,16 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true, // 处理混合模块
     },
-    rollupOptions: {
-      // 应用包需要打包所有依赖，不应该有 external
-      // 但需要特殊处理 workspace 依赖的外部引用
-      output: {
-        // 确保正确处理动态导入
-        manualChunks: undefined,
-      },
-    },
   },
   resolve: {
-    // dedupe: ['wy-helper', 'wy-dom-helper', 'mve-core', 'mve-dom'],
     alias: {
-      // 显式指定导入路径，跳过自动查找
-      // 'konva': 'konva/konva.js' ,
       '~': path.resolve(__dirname, 'src'), // 例如 @/components → src/components
     },
-    // 确保能正确解析 node_modules 中的依赖
     preserveSymlinks: false,
   },
   optimizeDeps: {
-    force: true,
     // 显式包含依赖，确保其被正确预构建
     include: [
-      'wy-helper',
-      'wy-dom-helper',
-      'mve-core',
-      'mve-helper',
-      'mve-dom',
-      'mve-dom-helper',
-      'daisy-mobile-helper',
       'history', // 确保 history 被正确预构建
       'konva',
     ],

@@ -5,9 +5,9 @@ import {
   createTreeRoute,
   getBranchKey,
   renderOneKey,
+  renderPop,
 } from 'mve-helper';
 import { IconContext } from 'mve-icons';
-import { renderPop } from 'mve-helper';
 import { createHashHistory } from 'history';
 import { loadContext } from './loadContext';
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -57,7 +57,9 @@ createRoot(app, () => {
   renderPop();
 });
 
-function renderError(message: string) {
+function renderError(error: unknown) {
+  const message =
+    error instanceof Error ? error.message : String(error ?? '未知错误');
   fdom.div({
     role: 'alert',
     className: 'daisy-alert daisy-alert-error',

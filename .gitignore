@@ -2,7 +2,8 @@ node_modules
 .DS_Store
 dist-ssr
 *.local
-vite-dev.log
+*.log
+*.tsbuildinfo
 
 public/canvas-kit
 

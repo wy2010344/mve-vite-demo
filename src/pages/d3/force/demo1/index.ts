@@ -42,7 +42,7 @@ import {
   hookOrbitControls,
   renderThreeView,
   ThreeContext,
-} from '../../../../hookThreeView';
+} from 'mve-three';
 import { createTabList } from 'daisy-mobile-helper';
 import * as THREE from 'three';
 import { hookAddResult } from 'mve-core';

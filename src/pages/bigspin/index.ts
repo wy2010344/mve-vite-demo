@@ -13,7 +13,7 @@ import {
 import centerEmpty from './center-empty.png';
 import opButton from './op-button.png';
 import centerArrow from './center-arrow.png';
-import { hookTrackSignal, renderArray } from 'mve-helper';
+import { hookDestroy, hookTrackSignal, renderArray } from 'mve-helper';
 import { animateSignal, subscribeRequestAnimationFrame } from 'wy-dom-helper';
 export default function () {
   const prizeCount = createSignal(6);
@@ -57,18 +57,21 @@ export default function () {
     }
   }
 
+  let drawTimer: ReturnType<typeof setTimeout> | undefined;
   function draw() {
     if (!beginDraw()) {
       return;
     }
     startRadian.set(0);
-    setTimeout(() => {
-      const demoIndex = Math.floor(Math.random() * prizes.length);
+    clearTimeout(drawTimer);
+    drawTimer = setTimeout(() => {
+      const demoIndex = Math.floor(Math.random() * prizes().length);
       setWinPrize({
         index: demoIndex,
       });
     }, 2000);
   }
+  hookDestroy(() => clearTimeout(drawTimer));
 
   const { beginDraw, drawValue, onDrawEffect, setDistance } = createBigSpin({
     beginConfig: bigSpinStepTo(200, 1), // springBaseAnimationConfigNoEnd(200),
