@@ -59,11 +59,11 @@ async function loadDemoFont(): Promise<void> {
  * （链接用独立按钮窗口打开）、无 placeholder/obscure/singleLine/onSubmit
  * （占位符自绘、回车提交在输入层拦截）、无 Path2（命中即矩形）。
  */
-export default async function (canvas: HTMLCanvasElement) {
+export default function (canvas: HTMLCanvasElement) {
   // 与 canvas-render2 / canvas-v2-demo 一致：先等 CanvasKit 与字体就绪再渲染，
   // 否则首帧的段落尺寸全为 0（wasm 版没有系统默认字体）。
-  await loadCanvasKit('/canvas-kit/canvaskit.js');
-  await loadDemoFont();
+  loadCanvasKit('/canvas-kit/canvaskit.js');
+  loadDemoFont();
 
   const render = renderCanvas(canvas, {
     // 页面背景：覆盖根节点 draw（先去画背景，再交给父类画子节点）

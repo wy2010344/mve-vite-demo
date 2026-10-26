@@ -76,7 +76,7 @@ function textField(arg: FieldArg) {
         singleLine: () => !!arg.singleLine,
         obscure: () => !!arg.obscure,
         onSubmit: arg.onSubmit,
-        focusOrder: arg.focusOrder,
+        focusOrder: () => arg.focusOrder ?? null,
         fontFamily: () => 'Noto Sans SC',
         fontSize: () => 14,
         color: () => textDefaults.text,
