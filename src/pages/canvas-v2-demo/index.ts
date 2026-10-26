@@ -92,12 +92,11 @@ export default function () {
             },
           });
 
-          class DemoScrollBar extends SimpleScrollBar {
-            scroll() {
-              return scroll;
-            }
-          }
-          new DemoScrollBar(this, 'y');
+          // SimpleScrollBar 现在按参数取 scroll（不再是非抽象的 scroll() 子类重写）
+          new SimpleScrollBar(this, {
+            scroll: () => scroll,
+            direction: 'y',
+          });
         },
       });
 

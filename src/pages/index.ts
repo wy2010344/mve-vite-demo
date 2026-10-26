@@ -180,6 +180,21 @@ function renderCard() {
         description: `受react-canvas启发,基于mve`,
       });
       card({
+        href: '/canvas-render2',
+        title: 'canvasRender2 · 待办清单',
+        description: 'forEachNode 动态列表、滚动、跨组件划词',
+      });
+      card({
+        href: '/canvas-render2-basic',
+        title: 'canvasRender2 · 基础示例',
+        description: '过程式节点树、布局与画布交互',
+      });
+      card({
+        href: '/canvas-render-todo',
+        title: 'canvasRender · 待办清单',
+        description: '类式节点树，与 canvasRender2 案例同构对照',
+      });
+      card({
         href: '/magnified-dock',
         title: `magnified-dock`,
         description: `一个类似mac上的dock的实现`,
