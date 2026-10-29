@@ -1,1 +1,0 @@
-import{aP as o,ak as t,bh as r,aq as a}from"./index-DwOSKAKP.js";import{a as i}from"./onlyMobile-wR7CowIR.js";import"./index-BKf8q92t.js";function u(e){const{renderBranch:n}=o.consume();i(function({width:d,height:c},h){t.div({children(){r(e.getChildren,a,function(m){n(e.getChildren)})}})})}export{u as default};

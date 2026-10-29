@@ -4,6 +4,7 @@ import { flex, renderCanvas, setUrlOpener } from 'mve-dom-helper/canvasRender2';
 import { todoList } from './todo-list';
 import { editorPanel } from './todo-editor';
 import { actionBar, filterBar, todoHeader, toolBar } from './todo-toolbar';
+import { modifierHud, nestedScrollDemo, nowrapDemo } from './todo-demos';
 import { applyTheme, palette } from './todo-store';
 
 const FONT_URLS = ['/fonts/noto-sans-sc-chinese-simplified-400-normal.woff2'];
@@ -32,7 +33,7 @@ async function loadDemoFont(): Promise<void> {
  * 模块划分：
  * - todo-store.ts  数据层（信号 + 增删改 + 过滤 + 撤销重做快照 + 主题）
  * - todo-item.ts   单条待办组件（复选框 / 文本 / 链接 / 删除）
- * - todo-list.ts   滚动列表（scrollContent + forEachNode + scrollBar）
+ * - todo-list.ts   滚动列表（scrollContent + forEachNode + overlayScrollBar）
  * - todo-toolbar.ts 头部 / 过滤栏 / 操作栏 / 工具行（撤销·重做·主题）
  * - todo-editor.ts  编辑器面板（EditableTextNode + 焦点 + IME + 剪贴板）
  *
@@ -71,9 +72,12 @@ export default async function (
     children: [
       todoHeader(),
       filterBar(),
-      todoList.of(),
+      todoList(),
       actionBar(),
       toolBar(),
+      modifierHud(),
+      nowrapDemo(),
+      nestedScrollDemo(),
       editorPanel(),
     ],
   });
@@ -81,7 +85,7 @@ export default async function (
   // 跨组件选择：松手时把 SelectionManager 拼接出的选区文本抛给上层
   if (onSelectionChange) {
     canvas.addEventListener('mouseup', () => {
-      onSelectionChange(selectionManager.selectedText ?? '');
+      onSelectionChange(selectionManager.selectedText() ?? '');
     });
   }
 }

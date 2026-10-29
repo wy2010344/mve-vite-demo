@@ -1,0 +1,1 @@
+import{bc as o,bf as f,bg as d}from"./index-C71EYIvk.js";function a({condition:e,whenTrue:n,whenFalse:r}){f(e,n,r)}function c({render:e}){e()}function i({getArray:e,getKey:n,render:r}){o(e,n,r)}function u({key:e,render:n}){d(e,n)}export{i as ArrayRender,c as HookRender,a as If,u as OneRender};

@@ -34,7 +34,7 @@ function fieldLabel(text: string) {
     text: () => text,
     fontFamily: () => 'Noto Sans SC',
     fontSize: () => 12,
-    color: () => textDefaults.placeholder,
+    color: () => textDefaults.placeholder(),
   });
 }
 
@@ -79,7 +79,7 @@ function textField(arg: FieldArg) {
         focusOrder: () => arg.focusOrder ?? null,
         fontFamily: () => 'Noto Sans SC',
         fontSize: () => 14,
-        color: () => textDefaults.text,
+        color: () => textDefaults.text(),
         selectionColor: () => palette().selection,
       }),
     ],

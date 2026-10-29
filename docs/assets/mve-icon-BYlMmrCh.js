@@ -1,0 +1,1 @@
+import{al as o}from"./index-C71EYIvk.js";function l(n,t,e,r){return o.svg({...t,fill:"currentColor",stroke:"currentColor",strokeWidth:0,width:r,height:r,children:e})}function u(n,t,e,r){return o.svg({...t,className:r,fill:"currentColor",stroke:"currentColor",strokeWidth:0,children:e})}export{l as a,u as r};

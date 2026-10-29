@@ -1,1 +1,0 @@
-import{f as e}from"./index-BKf8q92t.js";import"./index-DwOSKAKP.js";const t=e("panel-theme-color","#ffffff"),f=e("panel-theme-scheme","light"),m=e("panel-theme-level",0);export{m as level,f as scheme,t as sourceColor};

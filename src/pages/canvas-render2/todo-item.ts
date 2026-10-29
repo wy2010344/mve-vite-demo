@@ -3,12 +3,12 @@ import { colorToCSS } from 'mve-dom-helper/canvasRender';
 import type { RichTextSpan } from 'mve-dom-helper/canvasRender';
 import {
   appendRoundedRect,
+  createPath2,
+  fc,
   flex,
   grow,
   node2,
-  Path2,
   rectNode,
-  tfc,
   wrappedTextNode,
 } from 'mve-dom-helper/canvasRender2';
 import { textDefaults } from 'mve-dom-helper/canvasRender2';
@@ -29,12 +29,12 @@ export interface TodoItemArg {
  * - 带 link 的待办渲染链接片段（RichTextSpan.url），点击经 UrlOpener 打开；
  * - 条目配色随主题（palette + TextDefaults）切换。
  */
-export const todoItem = tfc(function (ctx, node, arg: TodoItemArg) {
+export const todoItem = fc(function (ctx, arg: TodoItemArg) {
   const todo = arg.todo;
   // 复选框路径：圆角方框录制一次，绘制回放与命中判定共用
-  const box = new Path2();
+  const box = createPath2();
   appendRoundedRect(box, 0.75, 0.75, 16.5, 16.5, 4);
-  rectNode.create({
+  rectNode.of({
     height: () => 40,
     // 竖向 padding 让 stretch 后的文本行高与条目高度匹配，视觉居中
     paddingInline: () => 10,
@@ -94,7 +94,7 @@ export const todoItem = tfc(function (ctx, node, arg: TodoItemArg) {
             style: {
               fontFamily: 'Noto Sans SC',
               fontSize: 13,
-              color: t.done ? textDefaults.placeholder : textDefaults.text,
+              color: t.done ? textDefaults.placeholder() : textDefaults.text(),
               decoration: t.done ? { lineThrough: true } : {},
             },
           };
@@ -133,5 +133,5 @@ export const todoItem = tfc(function (ctx, node, arg: TodoItemArg) {
         },
       }),
     ],
-  })(node)(ctx);
+  })(ctx);
 });

@@ -190,6 +190,12 @@ function renderCard() {
         description: '过程式节点树、布局与画布交互',
       });
       card({
+        href: '/canvas-render2-features',
+        title: 'canvasRender2 · 新特性',
+        description:
+          'Toast / Popover·Placement / 右键菜单 / 异步图片 / 富文本样式段 / 布局审计',
+      });
+      card({
         href: '/canvas-render-todo',
         title: 'canvasRender · 待办清单',
         description: '类式节点树，与 canvasRender2 案例同构对照',

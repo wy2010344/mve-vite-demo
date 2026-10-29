@@ -7,7 +7,6 @@ import {
   node2,
   nodeOf,
   rectNode,
-  registerScroll,
   renderCanvas,
   richTextNode,
   scrollBar,
@@ -233,7 +232,7 @@ export default async function (
       //     children: [
       //       ctx => {
       //         const scroll = createScroll(container, 'y');
-      //         registerScroll(scroll); // 滚轮滚动（指针在容器 inner 区内时消费）
+      //         // 滚轮由 scrollContent / scrollBar 沿命中链自己接管，无需注册
       //         // nodeOf 返回的是待应用的 Fc，数组形态由 buildChildren 统一调用；
       //         // 命令式创建时需手动应用当前 ctx（与 buildChildren 的行为一致）
       //         nodeOf(() =>
@@ -282,7 +281,7 @@ export default async function (
   // 跨组件选择：松手时把 SelectionManager 拼接出的选区文本抛给上层
   if (onSelectionChange) {
     canvas.addEventListener('mouseup', () => {
-      onSelectionChange(selectionManager.selectedText ?? '');
+      onSelectionChange(selectionManager.selectedText() ?? '');
     });
   }
 }

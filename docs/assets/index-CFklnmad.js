@@ -1,0 +1,1 @@
+import{ak as n,aj as o}from"./index-C71EYIvk.js";function e(){n.div({children:[[function(i){console.log("this",this),n.div({children:"abc"})},function(i){console.log("ddd",i),n.div({children:"bbb"})},d()]]})}const d=o(function(){n.div({children:"zzz"})});export{e as default};

@@ -204,14 +204,14 @@ export function palette(): Palette {
 }
 
 /**
- * 应用主题：经 TextDefaults setter 回写核心中性默认色
+ * 应用主题：经 TextDefaults 的 setText / setPlaceholder 回写核心中性默认色
  * （对标 Kotlin：组件包切主题时同步引擎默认色，昼/夜自动换肤）。
  * 默认文本色随信号失效，读取方（wrappedTextNode 默认 color）重绘更新。
  */
 export function applyTheme(): void {
   const dark = theme.get() == 'dark';
-  textDefaults.text = dark ? rgba(226, 232, 240) : rgba(30, 41, 59);
-  textDefaults.placeholder = dark ? rgba(100, 116, 139) : rgba(148, 163, 184);
+  textDefaults.setText(dark ? rgba(226, 232, 240) : rgba(30, 41, 59));
+  textDefaults.setPlaceholder(dark ? rgba(100, 116, 139) : rgba(148, 163, 184));
 }
 
 export function toggleTheme(): void {

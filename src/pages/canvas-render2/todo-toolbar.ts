@@ -107,7 +107,7 @@ export function todoHeader() {
               fontFamily: 'Noto Sans SC',
               fontSize: 20,
               fontWeight: 700,
-              color: textDefaults.text,
+              color: textDefaults.text(),
             },
           },
         ],
@@ -122,7 +122,7 @@ export function todoHeader() {
               style: {
                 fontFamily: 'Noto Sans SC',
                 fontSize: 13,
-                color: textDefaults.placeholder,
+                color: textDefaults.placeholder(),
               },
             },
           ];
