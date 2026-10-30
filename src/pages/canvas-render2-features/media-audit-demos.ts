@@ -101,7 +101,7 @@ export function imageLoaderDemo(): Fc {
       ifNode(
         () => remoteImage.get() != null,
         function (this: StateHolder<Node2, readonly Node2[]>) {
-          imageNode.of({
+          imageNode({
             image: () => remoteImage.get(),
             radius: () => 8,
             padding: () => 0,
@@ -109,7 +109,7 @@ export function imageLoaderDemo(): Fc {
           })(this);
         },
         function (this: StateHolder<Node2, readonly Node2[]>) {
-          rectNode.of({
+          rectNode({
             width: () => 180,
             height: () => 110,
             radius: () => 8,
@@ -122,7 +122,7 @@ export function imageLoaderDemo(): Fc {
               directionJustify: 'center',
             }),
             children: [
-              wrappedTextNode.of({
+              wrappedTextNode({
                 autoWidth: () => true,
                 text: () => '加载中…（postDelayed 700ms）',
                 fontFamily: () => 'Noto Sans SC',
@@ -202,7 +202,7 @@ export function layoutAuditDemo(): Fc {
       }),
     ]),
     hint(() => auditStats.get()),
-    wrappedTextNode.of({
+    wrappedTextNode({
       width: () => CARD_W - 20,
       text: () =>
         auditLines.get().length === 0
@@ -222,7 +222,7 @@ const doubleClicks = createSignal(0);
 
 /** 一个小的"悬停光标"示意块 */
 function cursorSwatch(text: string, cursor: CursorType2): Fc {
-  return rectNode.of({
+  return rectNode({
     width: () => 96,
     height: () => 40,
     radius: () => 6,
@@ -237,7 +237,7 @@ function cursorSwatch(text: string, cursor: CursorType2): Fc {
       directionJustify: 'center',
     }),
     children: [
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         spans: () => [
           {
@@ -260,7 +260,7 @@ export function pointerDemo(): Fc {
       () =>
         '双击不吞单击（先 click 再 dblclick）；光标由节点消息派生，编辑器命中自动变 text。'
     ),
-    rectNode.of({
+    rectNode({
       width: () => CARD_W - 20,
       height: () => 56,
       radius: () => 8,
@@ -279,7 +279,7 @@ export function pointerDemo(): Fc {
         directionJustify: 'center',
       }),
       children: [
-        richTextNode.of({
+        richTextNode({
           autoWidth: () => true,
           spans: () => [
             {

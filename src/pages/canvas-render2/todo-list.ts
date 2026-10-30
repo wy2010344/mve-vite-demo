@@ -39,7 +39,7 @@ function scrollBarStyle(): ScrollBarStyle2 {
 }
 
 export const todoList = fc(function (ctx) {
-  rectNode.of({
+  rectNode({
     width: () => 380,
     height: () => 340,
     background: () => palette().card,
@@ -64,7 +64,7 @@ export const todoList = fc(function (ctx) {
           () => visibleTodos().length,
           function () {
             return listOf(
-              scrollContent.of({
+              scrollContent({
                 scroll,
                 exts: [grow({ argGrow: 1 })], // 横向撑满容器剩余空间
                 // alignFix 锁定 cross 为自身 inner；stretch 让条目横向撑满内容区
@@ -74,7 +74,7 @@ export const todoList = fc(function (ctx) {
                   forEachNode<Todo, number>(
                     cb => visibleTodos().forEach(t => cb(t.id, t)),
                     function (key, eachTime) {
-                      // fc 组件直接调用得到节点，不再需要 .of()
+                      // fc 组件直接调用得到 Fc，不再需要 .of() 柯里化
                       return todoItem({ todo: () => eachTime.getValue() })(
                         this
                       );
@@ -83,7 +83,7 @@ export const todoList = fc(function (ctx) {
                 ],
               }),
               // macOS 风格浮层滚动条：滚动/悬停时浮现，停手 850ms 后淡出
-              overlayScrollBar.of({
+              overlayScrollBar({
                 scroll,
                 style: () => scrollBarStyle(),
               })
@@ -91,7 +91,7 @@ export const todoList = fc(function (ctx) {
           },
           function () {
             // 空态提示：没有可见待办时显示，否则高度归零不占布局
-            wrappedTextNode.of({
+            wrappedTextNode({
               autoWidth: () => true,
               text: () => '暂无待办，点击下方按钮添加',
             })(this);

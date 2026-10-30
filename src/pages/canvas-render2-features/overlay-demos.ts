@@ -37,7 +37,7 @@ const toastClosed = createSignal(0);
 
 /** 一条 toast 的外观：圆角卡片 + 圆点 + 文案 */
 function toastBody(text: string, accent: number): Fc {
-  return rectNode.of({
+  return rectNode({
     paddingInline: () => 14,
     paddingBlock: () => 8,
     radius: () => 8,
@@ -47,13 +47,13 @@ function toastBody(text: string, accent: number): Fc {
     layout: flex({ direction: 'x', gap: 8, alignItem: 'center' }),
     background: () => 0xff1e293b,
     children: [
-      rectNode.of({
+      rectNode({
         width: () => 8,
         height: () => 8,
         radius: () => 4,
         background: () => accent,
       }),
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         spans: () => [
           {
@@ -104,7 +104,7 @@ export function toastDemo(): Fc {
             // 闭包读到的自然是最新值（与"先声明后赋值"的回调同一手法）。
             let close: () => void = () => {};
             close = showToast(registry, {
-              content: rectNode.of({
+              content: rectNode({
                 paddingInline: () => 14,
                 paddingBlock: () => 8,
                 radius: () => 8,
@@ -116,7 +116,7 @@ export function toastDemo(): Fc {
                 },
                 layout: flex({ direction: 'x', alignItem: 'center' }),
                 children: [
-                  richTextNode.of({
+                  richTextNode({
                     autoWidth: () => true,
                     spans: () => [
                       {
@@ -147,7 +147,7 @@ export function toastDemo(): Fc {
 
 /** 面板里的一行可点选项 */
 function menuItem(text: string, onPick: () => void): Fc {
-  return rectNode.of({
+  return rectNode({
     paddingInline: () => 10,
     paddingBlock: () => 6,
     radius: () => 4,
@@ -156,7 +156,7 @@ function menuItem(text: string, onPick: () => void): Fc {
     mouseClick: onPick,
     layout: flex({ direction: 'x' }),
     children: [
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         spans: () => [
           {
@@ -183,7 +183,7 @@ function menuItem(text: string, onPick: () => void): Fc {
  * 让各菜单项撑满面板宽（标准下拉观感）。
  */
 function panelBody(children: readonly Fc[]): Fc {
-  return rectNode.of({
+  return rectNode({
     padding: () => 6,
     radius: () => 8,
     background: () => palette().card,
@@ -295,7 +295,7 @@ export function popoverDemo(): Fc {
       row(buttons.map(b => b.fc)),
       row([stickyBtn.fc]),
       hint(() => `上一次选择：${picked.get()}`),
-      wrappedTextNode.of({
+      wrappedTextNode({
         width: () => CARD_W - 20,
         text: flipText,
         fontFamily: () => 'Noto Sans SC',
@@ -318,7 +318,7 @@ export function contextMenuDemo(): Fc {
       hint(
         () => '右键不派发 down：不会启动文本拖选，只沿命中链派发 contextmenu。'
       ),
-      rectNode.of({
+      rectNode({
         width: () => CARD_W - 20,
         height: () => 64,
         radius: () => 8,
@@ -349,11 +349,11 @@ export function contextMenuDemo(): Fc {
           });
         },
         children: [
-          rectNode.of({
+          rectNode({
             padding: () => 10,
             layout: flex({ direction: 'x' }),
             children: [
-              richTextNode.of({
+              richTextNode({
                 autoWidth: () => true,
                 spans: () => [
                   {

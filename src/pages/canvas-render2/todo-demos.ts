@@ -63,7 +63,7 @@ function label(text: string, color: ColorInt): RichTextSpan {
 
 /** 一个小药丸（label 文本 + 激活态背景），active 读信号即实时响应 */
 function pill(labelText: string, active: () => boolean): Fc {
-  return rectNode.of({
+  return rectNode({
     paddingInline: () => 8,
     paddingBlock: () => 4,
     radius: () => 6,
@@ -72,7 +72,7 @@ function pill(labelText: string, active: () => boolean): Fc {
     borderWidth: () => 1,
     layout: flex({}),
     children: [
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         spans: () => [label(labelText, active() ? 0xffffffff : 0xff334155)],
       }),
@@ -82,7 +82,7 @@ function pill(labelText: string, active: () => boolean): Fc {
 
 /** 修饰键 + 按压态 HUD（演示信号层） */
 export function modifierHud(): Fc {
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     paddingInline: () => 10,
     paddingBlock: () => 6,
@@ -97,7 +97,7 @@ export function modifierHud(): Fc {
       pill('Alt', () => altSignal.get()),
       pill('Meta', () => metaSignal.get()),
       pill('Pressed', () => pressedSignal.get() != null),
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         spans: () => [
           label(`最近按键: ${lastKeySignal.get()}`, palette().link),
@@ -109,7 +109,7 @@ export function modifierHud(): Fc {
 
 /** noWrap 单行不折行：宽文本在定宽盒内被裁剪（对齐仍生效） */
 export function nowrapDemo(): Fc {
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     paddingInline: () => 10,
     paddingBlock: () => 8,
@@ -119,7 +119,7 @@ export function nowrapDemo(): Fc {
     borderWidth: () => 1,
     layout: flex({ direction: 'x', gap: 8 }),
     children: [
-      richTextNode.of({
+      richTextNode({
         exts: [grow({ argGrow: 1 })],
         noWrap: () => true,
         spans: () => [
@@ -143,13 +143,13 @@ function listOf(...args: Fc[]): Fc {
 /** 生成若干高条目，作为内层滚动内容（制造溢出） */
 function tallItems(): Fc[] {
   return Array.from({ length: 12 }, (_, i) =>
-    rectNode.of({
+    rectNode({
       height: () => 40,
       paddingInline: () => 10,
       background: () => palette().cardDone,
       radius: () => 6,
       children: [
-        richTextNode.of({
+        richTextNode({
           autoWidth: () => true,
           spans: () => [label(`内层条目 ${i + 1}`, textDefaults.text())],
         }),
@@ -163,7 +163,7 @@ function tallItems(): Fc[] {
  * 内层滚到底后，剩余滚轮量经 parentScroll 接续外层 —— 单条滚轮手势连续驱动两层。
  */
 export function nestedScrollDemo(): Fc {
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     height: () => 180,
     padding: () => 8,
@@ -178,7 +178,7 @@ export function nestedScrollDemo(): Fc {
       alignItem: 'stretch',
     }),
     children: [
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         spans: () => [
           label(
@@ -188,7 +188,7 @@ export function nestedScrollDemo(): Fc {
         ],
       }),
       // 外层滚动容器（占满剩余高度）
-      rectNode.of({
+      rectNode({
         exts: [grow({ argGrow: 1 })],
         layout: flex({
           direction: 'x',
@@ -206,7 +206,7 @@ export function nestedScrollDemo(): Fc {
               'y'
             );
             return listOf(
-              scrollContent.of({
+              scrollContent({
                 scroll: outerScroll,
                 layout: flex({
                   direction: 'y',
@@ -217,7 +217,7 @@ export function nestedScrollDemo(): Fc {
                 exts: [grow({ argGrow: 1 })],
                 children: [
                   // 内层容器：固定 300 高（既作内层视口，又让外层可滚）
-                  rectNode.of({
+                  rectNode({
                     height: () => 300,
                     layout: flex({
                       direction: 'x',
@@ -237,7 +237,7 @@ export function nestedScrollDemo(): Fc {
                           outerScroll
                         );
                         return listOf(
-                          scrollContent.of({
+                          scrollContent({
                             scroll: innerScroll,
                             exts: [grow({ argGrow: 1 })],
                             layout: flex({
@@ -248,7 +248,7 @@ export function nestedScrollDemo(): Fc {
                             }),
                             children: tallItems(),
                           }),
-                          scrollBar.of({
+                          scrollBar({
                             scroll: innerScroll,
                             trackColor: () => palette().track,
                             thumbColor: () => palette().thumb,
@@ -257,12 +257,12 @@ export function nestedScrollDemo(): Fc {
                       },
                     ],
                   }),
-                  rectNode.of({
+                  rectNode({
                     height: () => 300,
                   }),
                 ],
               }),
-              scrollBar.of({
+              scrollBar({
                 scroll: outerScroll,
                 trackColor: () => palette().track,
                 thumbColor: () => palette().thumb,

@@ -38,7 +38,7 @@ const richText = createSignal(INITIAL);
 /** 样式段镜像（由 onSegmentsChange 回写，仅用于展示段表） */
 const segTable = createSignal<readonly RichSegment[]>([]);
 
-/** 编辑器节点句柄（`editableTextNode.create(arg)(ref)` 建好后回填） */
+/** 编辑器节点句柄（经 `arg.nodeRef` 自建 ref，建好后回填） */
 let richNode: Node2 | null = null;
 
 function editorHandle() {
@@ -152,7 +152,7 @@ export function richEditorDemo(): Fc {
         '文本是真相源，样式只是"区间 → 样式"的边界表；文本变更时段表自动对齐。'
     ),
     // 输入框外壳（焦点在里层编辑器上：命中链会找到最深 focusable）
-    rectNode.of({
+    rectNode({
       width: () => CARD_W - 20,
       height: () => 104,
       padding: () => 8,
@@ -163,7 +163,7 @@ export function richEditorDemo(): Fc {
       children: [
         function (ctx) {
           const ref = storeRef<Node2>(undefined!);
-          editableTextNode.create({
+          editableTextNode({
             width: () => CARD_W - 40,
             height: () => 88,
             text: richText.get,
@@ -175,7 +175,8 @@ export function richEditorDemo(): Fc {
             fontSize: () => 14,
             color: () => textDefaults.text(),
             selectionColor: () => palette().selection,
-          })(ref)(ctx);
+            nodeRef: ref,
+          })(ctx);
           richNode = ref.get();
         },
       ],

@@ -25,7 +25,7 @@ export const CARD_W = 416;
 
 /** 单行说明文字（自动按卡片宽换行） */
 export function hint(text: () => string): Fc {
-  return wrappedTextNode.of({
+  return wrappedTextNode({
     width: () => CARD_W - 20,
     text,
     fontFamily: () => 'Noto Sans SC',
@@ -36,7 +36,7 @@ export function hint(text: () => string): Fc {
 
 /** 卡片标题 */
 export function cardTitle(text: string): Fc {
-  return richTextNode.of({
+  return richTextNode({
     autoWidth: () => true,
     spans: () => [
       {
@@ -57,7 +57,7 @@ export function cardTitle(text: string): Fc {
  * 宽度写死，避免在 alignFix 的父布局里触发"向父级要尺寸"的依赖环。
  */
 export function card(title: string, children: readonly Fc[]): Fc {
-  return rectNode.of({
+  return rectNode({
     // 名字只用于诊断（成环 / 尺寸错误会点名节点），不影响布局
     debugName: () => `card(${title})`,
     width: () => CARD_W,
@@ -86,7 +86,7 @@ export function card(title: string, children: readonly Fc[]): Fc {
  * 这是与待办清单 `todoItem`（`flex({direction:'x'})`）一致的写法。
  */
 export function row(children: readonly Fc[], gap = 8): Fc {
-  return rectNode.of({
+  return rectNode({
     // 名字只用于诊断（成环 / 尺寸错误会点名节点），不影响布局
     debugName: () => 'row',
     layout: flex({
@@ -120,7 +120,8 @@ export function buildButton(arg: ButtonArg): {
 } {
   const ref = storeRef<Node2>(undefined!);
   const node = () => (ref.get() as Node2 | undefined) ?? null;
-  const fc = rectNode.create({
+  const fc = rectNode({
+    nodeRef: ref,
     paddingInline: () => 10,
     paddingBlock: () => 5,
     radius: () => 6,
@@ -136,7 +137,7 @@ export function buildButton(arg: ButtonArg): {
     },
     layout: flex({ direction: 'x' }),
     children: [
-      wrappedTextNode.of({
+      wrappedTextNode({
         autoWidth: () => true,
         text: arg.label,
         fontFamily: () => 'Noto Sans SC',
@@ -147,7 +148,7 @@ export function buildButton(arg: ButtonArg): {
         },
       }),
     ],
-  })(ref);
+  });
   return { fc, node };
 }
 
@@ -158,7 +159,7 @@ export function button(arg: ButtonArg): Fc {
 
 /** 一个中性的小标签（键位提示等） */
 export function chip(text: () => string): Fc {
-  return rectNode.of({
+  return rectNode({
     paddingInline: () => 6,
     paddingBlock: () => 2,
     radius: () => 4,
@@ -167,7 +168,7 @@ export function chip(text: () => string): Fc {
     borderWidth: () => 1,
     layout: flex({ direction: 'x' }),
     children: [
-      wrappedTextNode.of({
+      wrappedTextNode({
         autoWidth: () => true,
         text,
         fontFamily: () => 'Noto Sans SC',

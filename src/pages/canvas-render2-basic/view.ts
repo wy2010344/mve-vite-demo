@@ -72,7 +72,7 @@ export default async function (
     }),
     children: [
       // rectNode：背景 + 边框 + 圆角 + padding 一站式可视化盒子
-      rectNode.of({
+      rectNode({
         width: () => 200,
         height: () => 90,
         background: () => 0xfff1f5f9,
@@ -150,7 +150,7 @@ export default async function (
       //   })
       // ),
       // 原图尺寸 + 圆角 + padding，点击可切换图片（验证信号驱动的重绘）
-      imageNode.of({
+      imageNode({
         image: current.get,
         radius: () => 12,
         padding: () => 8,
@@ -168,7 +168,7 @@ export default async function (
       //   })
       // ),
       // 定宽富文本：自动换行，按住拖拽可以划词
-      richTextNode.of({
+      richTextNode({
         width: () => 320,
         padding: () => 8,
         spans: asLazy([
@@ -200,7 +200,7 @@ export default async function (
         ]),
       }),
       // autoWidth 富文本：宽度由内容决定
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         padding: () => 8,
         spans: () => [

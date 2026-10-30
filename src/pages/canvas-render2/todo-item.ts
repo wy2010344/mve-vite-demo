@@ -34,7 +34,7 @@ export const todoItem = fc(function (ctx, arg: TodoItemArg) {
   // 复选框路径：圆角方框录制一次，绘制回放与命中判定共用
   const box = createPath2();
   appendRoundedRect(box, 0.75, 0.75, 16.5, 16.5, 4);
-  rectNode.of({
+  rectNode({
     height: () => 40,
     // 竖向 padding 让 stretch 后的文本行高与条目高度匹配，视觉居中
     paddingInline: () => 10,
@@ -50,7 +50,7 @@ export const todoItem = fc(function (ctx, arg: TodoItemArg) {
     children: [
       // 复选框：Path2 圆角方框——绘制回放与命中判定共用同一份路径
       // （contains 为偶数规则纯 JS 判定，命中区域跟随圆角而非外接矩形）
-      node2.of({
+      node2({
         size: () => 18,
         acceptHit(x, y) {
           return box.contains(x, y);
@@ -85,7 +85,7 @@ export const todoItem = fc(function (ctx, arg: TodoItemArg) {
       }),
       // 文本：完成时灰色删除线；带 link 时追加链接片段
       // （点击链接由 richTextNode 命中后经 UrlOpener 打开，不触发本节点回调）
-      wrappedTextNode.of({
+      wrappedTextNode({
         exts: [grow({ argGrow: 1 })],
         spans: (): RichTextSpan[] => {
           const t = todo();
@@ -115,7 +115,7 @@ export const todoItem = fc(function (ctx, arg: TodoItemArg) {
         },
       }),
       // 删除按钮：点击移除该条
-      node2.of({
+      node2({
         size: () => 18,
         draw(ctx2: CanvasRenderingContext2D) {
           ctx2.strokeStyle = colorToCSS(palette().checkboxBorder);

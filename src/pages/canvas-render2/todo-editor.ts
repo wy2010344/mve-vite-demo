@@ -29,7 +29,7 @@ export const secretText = createSignal('');
 
 /** 字段标题 */
 function fieldLabel(text: string) {
-  return wrappedTextNode.of({
+  return wrappedTextNode({
     width: () => 356,
     text: () => text,
     fontFamily: () => 'Noto Sans SC',
@@ -58,7 +58,7 @@ interface FieldArg {
  */
 function textField(arg: FieldArg) {
   const height = arg.lines * 20 + 12;
-  return rectNode.of({
+  return rectNode({
     width: () => 356,
     height: () => height,
     padding: () => 6,
@@ -67,7 +67,7 @@ function textField(arg: FieldArg) {
     borderWidth: () => 1,
     radius: () => 6,
     children: [
-      editableTextNode.of({
+      editableTextNode({
         width: () => 342,
         height: () => height - 14,
         text: arg.text,
@@ -88,7 +88,7 @@ function textField(arg: FieldArg) {
 
 /** 编辑器演示面板（放在列表下方，作为独立一节） */
 export function editorPanel() {
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     padding: () => 10,
     background: () => palette().card,

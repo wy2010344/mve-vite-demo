@@ -34,7 +34,7 @@ async function loadDemoFont(): Promise<void> {
 
 /** 一列（卡片纵向堆叠，宽度写死避免与 alignFix 的父布局互推尺寸） */
 function column(children: readonly Fc[]): Fc {
-  return rectNode.of({
+  return rectNode({
     // 名字只用于诊断（成环 / 尺寸错误会点名节点），不影响布局
     debugName: () => 'column',
     width: () => CARD_W,

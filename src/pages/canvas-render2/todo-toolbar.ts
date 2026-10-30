@@ -42,7 +42,7 @@ function textButton({
   disabled?: () => boolean;
   onClick: () => void;
 }) {
-  return wrappedTextNode.of({
+  return wrappedTextNode({
     autoWidth: () => true,
     padding: () => 10,
     mouseClick() {
@@ -90,7 +90,7 @@ function textButton({
 
 /** 标题 + 统计（统计文本右对齐，grow 撑满） */
 export function todoHeader() {
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     paddingInline: () => 4,
     layout: flex({
@@ -98,7 +98,7 @@ export function todoHeader() {
       gap: 8,
     }),
     children: [
-      richTextNode.of({
+      richTextNode({
         autoWidth: () => true,
         spans: () => [
           {
@@ -112,7 +112,7 @@ export function todoHeader() {
           },
         ],
       }),
-      richTextNode.of({
+      richTextNode({
         exts: [grow({ argGrow: 1 })],
         spans: () => {
           const s = stats();
@@ -139,7 +139,7 @@ export function filterBar() {
     { label: '未完成', value: 'active' },
     { label: '已完成', value: 'done' },
   ];
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     paddingInline: () => 4,
     layout: flex({ direction: 'x', gap: 8, directionJustify: 'center' }),
@@ -157,7 +157,7 @@ export function filterBar() {
 
 /** 操作栏：添加一条 / 清除已完成 / 空态提示 */
 export function actionBar() {
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     paddingInline: () => 4,
     layout: flex({
@@ -180,7 +180,7 @@ export function actionBar() {
         },
       }),
       // 底部提示：当前过滤下无数据时高亮
-      wrappedTextNode.of({
+      wrappedTextNode({
         exts: [grow({ argGrow: 1 })],
         text: () => (visibleTodos().length == 0 ? '当前过滤下没有待办' : ''),
       }),
@@ -194,7 +194,7 @@ export function actionBar() {
  * disabled 现读 canUndo/canRedo 信号，无路可走时置灰。
  */
 export function toolBar() {
-  return rectNode.of({
+  return rectNode({
     width: () => 380,
     paddingInline: () => 4,
     layout: flex({
